@@ -246,6 +246,7 @@ void MainWindow::markAutoRemove()
 void MainWindow::checkForUpdates()
 {
     setActionsEnabled(false);
+    m_managerWidget->setEnabled(false);
     initDownloadWidget();
     m_backend->updateCache();
 }
@@ -258,6 +259,7 @@ void MainWindow::errorOccurred(QApt::ErrorCode error, const QVariantMap &details
 
     switch(error) {
     case QApt::UserCancelError:
+        m_managerWidget->setEnabled(true);
         QApplication::restoreOverrideCursor();
         returnFromPreview();
         break;
@@ -359,6 +361,7 @@ void MainWindow::returnFromPreview()
 void MainWindow::startCommit()
 {
     setActionsEnabled(false);
+    m_managerWidget->setEnabled(false);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     initDownloadWidget();
     initCommitWidget();
@@ -399,6 +402,7 @@ void MainWindow::reload()
 
     m_statusWidget->updateStatus();
     setActionsEnabled();
+    m_managerWidget->setEnabled(true);
 
     // No need to keep these around in memory.
     if (m_downloadWidget) {

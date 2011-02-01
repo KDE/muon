@@ -112,6 +112,7 @@ void UpdaterWindow::setupActions()
 void UpdaterWindow::checkForUpdates()
 {
     setActionsEnabled(false);
+    m_updaterWidget->setEnabled(false);
     initDownloadWidget();
     m_backend->updateCache();
 }
@@ -171,6 +172,7 @@ void UpdaterWindow::errorOccurred(QApt::ErrorCode error, const QVariantMap &args
 
     switch(error) {
     case QApt::UserCancelError:
+        m_updaterWidget->setEnabled(true);
         QApplication::restoreOverrideCursor();
         returnFromPreview();
         break;
@@ -216,6 +218,7 @@ void UpdaterWindow::reload()
     m_updaterWidget->reload();
     m_statusWidget->updateStatus();
     setActionsEnabled();
+    m_updaterWidget->setEnabled(true);
 
     // No need to keep these around in memory.
     if (m_downloadWidget) {
