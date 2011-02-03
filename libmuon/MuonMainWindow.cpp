@@ -77,9 +77,7 @@ void MuonMainWindow::initObject()
 
 void MuonMainWindow::slotQuit()
 {
-    if (queryExit()) {
-        KApplication::instance()->quit();
-    }
+    KApplication::instance()->quit();
 }
 
 bool MuonMainWindow::queryExit()
