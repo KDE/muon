@@ -206,11 +206,13 @@ void MainTab::refresh()
                  QApt::Package::ToUpgrade | QApt::Package::ToDowngrade |
                  QApt::Package::ToRemove  | QApt::Package::ToPurge)) {
         m_installButton->hide();
+        m_reinstallButton->hide();
         m_removeButton->hide();
         m_upgradeButton->hide();
-        m_reinstallButton->hide();
-        m_purgeButton->hide();
         m_cancelButton->show();
+        if (state & QApt::Package::ToRemove) {
+            m_purgeButton->show();
+        }
     }
 
     m_packageShortDescLabel->setText(m_package->shortDescription());
