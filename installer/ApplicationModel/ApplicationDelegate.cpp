@@ -254,7 +254,7 @@ QSize ApplicationDelegate::sizeHint(const QStyleOptionViewItem &option,
 
 void ApplicationDelegate::itemActivated(QModelIndex index)
 {
-    if (index == m_oldIndex) {
+    if (index == m_oldIndex && isExtended(index)) {
         return;
     }
 
