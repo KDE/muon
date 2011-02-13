@@ -100,8 +100,6 @@ void ApplicationBackend::init()
     qSort(popconScores);
 
     m_maxPopconScore = popconScores.last();
-    qDeleteAll(m_queue);
-    m_queue.clear();
 }
 
 void ApplicationBackend::reload()
@@ -109,6 +107,7 @@ void ApplicationBackend::reload()
     emit reloadStarted();
     qDeleteAll(m_appList);
     m_appList.clear();
+    qDeleteAll(m_queue);
     m_queue.clear();
     m_backend->reloadCache();
 
