@@ -319,7 +319,9 @@ QHash<QByteArray, QByteArray> Application::desktopContents()
             aKey = line.left(eqpos);
             aValue = line.right(line.size() - eqpos -1);
 
-            contents[aKey] = aValue;
+            if (!contents.contains(aKey)) {
+                contents[aKey] = aValue;
+            }
         }
 
         lineIndex++;
