@@ -419,6 +419,8 @@ void PackageWidget::actOnPackages(QApt::Package::State action)
 
     foreach (QApt::Package *package, packages) {
         if (m_stop) {
+            m_compressEvents = false;
+            QApplication::restoreOverrideCursor();
             break;
         }
 
