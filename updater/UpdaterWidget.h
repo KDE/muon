@@ -32,6 +32,7 @@ public:
 
 public Q_SLOTS:
     void setBackend(QApt::Backend *backend);
+    void reload();
 };
 
 #endif

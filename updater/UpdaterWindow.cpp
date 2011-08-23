@@ -279,7 +279,6 @@ void UpdaterWindow::reload()
 void UpdaterWindow::returnFromPreview()
 {
     m_stack->setCurrentWidget(m_updaterWidget);
-    m_backend->markPackagesForDistUpgrade();
 }
 
 void UpdaterWindow::setActionsEnabled(bool enabled)

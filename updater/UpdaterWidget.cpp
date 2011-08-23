@@ -43,4 +43,10 @@ void UpdaterWidget::setBackend(QApt::Backend *backend)
     PackageWidget::setBackend(backend);
 }
 
+void UpdaterWidget::reload()
+{
+    PackageWidget::reload();
+    m_backend->markPackagesForDistUpgrade();
+}
+
 #include "UpdaterWidget.moc"
