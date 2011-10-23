@@ -30,7 +30,7 @@
 static const char description[] =
     I18N_NOOP("An application manager");
 
-static const char version[] = "1.2.1 \"Caustic Carrionite\"";
+static const char version[] = "1.2.2 \"Caustic Carrionite\"";
 
 int main(int argc, char **argv)
 {
