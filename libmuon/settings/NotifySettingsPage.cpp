@@ -20,6 +20,8 @@
 
 #include "NotifySettingsPage.h"
 
+#include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusMessage>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QCheckBox>
 #include <QtGui/QLabel>
@@ -119,6 +121,12 @@ void NotifySettingsPage::applySettings()
                                m_KNotifyOnlyRadio->isChecked() ? "KNotifyOnly" :
                                "Combo");
     notifyTypeGroup.sync();
+
+    QDBusMessage message = QDBusMessage::createMethodCall("org.kubuntu.MuonNotifier",
+                               "/MuonNotifier",
+                               "org.kubuntu.MuonNotifier",
+                               "reloadConfig");
+    QDBusConnection::sessionBus().send(message);
 }
 
 void NotifySettingsPage::restoreDefaults()
