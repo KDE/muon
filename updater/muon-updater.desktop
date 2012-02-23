@@ -1,7 +1,12 @@
 [Desktop Entry]
 Name=Muon Update Manager
+Name[da]=Muon håndtering af opdateringer
+Name[hu]=Muon frissítéskezelő
 Name[nl]=Muon beheerder voor bijwerken
 Name[pa]=ਮੂਉਨ ਅੱਪਡੇਟ ਮੈਨੇਜਰ
+Name[pt]=Gestor de Actualizações do Muon
+Name[pt_BR]=Gerenciador de atualizações do Muon
+Name[sv]=Muon uppdateringshanterare
 Name[uk]=Керування оновленнями
 Name[x-test]=xxMuon Update Managerxx
 Name[zh_CN]=Muon 更新管理器
@@ -10,8 +15,13 @@ Icon=system-software-update
 Type=Application
 X-DocPath=muon/index.html
 GenericName=Update Manager
+GenericName[da]=Håndtering af opdateringer
+GenericName[hu]=Frissítéskezelő
 GenericName[nl]=Beheerder voor bijwerken
 GenericName[pa]=ਅੱਪਡੇਟ ਮੈਨੇਜਰ
+GenericName[pt]=Gestor de Actualizações
+GenericName[pt_BR]=Gerenciador de atualizações
+GenericName[sv]=Uppdateringshanterare
 GenericName[uk]=Керування оновленнями
 GenericName[x-test]=xxUpdate Managerxx
 GenericName[zh_CN]=更新管理器
