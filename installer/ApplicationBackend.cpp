@@ -43,6 +43,7 @@ ApplicationBackend::ApplicationBackend(QObject *parent)
     : QObject(parent)
     , m_backend(0)
     , m_reviewsBackend(new ReviewsBackend(this))
+    , m_isReloading(false)
     , m_currentTransaction(0)
 {
     m_pkgBlacklist << "kdebase-runtime" << "kdepim-runtime" << "kdelibs5-plugins" << "kdelibs5-data";
@@ -116,6 +117,7 @@ void ApplicationBackend::init()
 void ApplicationBackend::reload()
 {
     emit reloadStarted();
+    m_isReloading = true;
     qDeleteAll(m_appList);
     m_appList.clear();
     qDeleteAll(m_queue);
@@ -126,7 +128,13 @@ void ApplicationBackend::reload()
 
     init();
 
+    m_isReloading = false;
     emit reloadFinished();
+}
+
+bool ApplicationBackend::isReloading() const
+{
+    return m_isReloading;
 }
 
 void ApplicationBackend::workerEvent(QApt::WorkerEvent event)
