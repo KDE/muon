@@ -192,6 +192,7 @@ void ReviewsBackend::fetchReviews(Application *app)
 void ReviewsBackend::reviewsFetched(KJob *job)
 {
     if (job->error()) {
+        m_jobHash.remove(job);
         return;
     }
 
@@ -205,6 +206,7 @@ void ReviewsBackend::reviewsFetched(KJob *job)
     QVariant reviews = parser.parse(json, &ok);
 
     if (!ok) {
+        m_jobHash.remove(job);
         return;
     }
 
