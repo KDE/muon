@@ -224,6 +224,9 @@ void ReviewsBackend::reviewsFetched(KJob *job)
     Application *app = m_jobHash.value(job);
     m_jobHash.remove(job);
 
+    if (!app)
+        return;
+
     m_reviewsCache[app->package()->latin1Name() + app->name()] = reviewsList;
 
     emit reviewsReady(app, reviewsList);
