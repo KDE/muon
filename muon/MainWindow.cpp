@@ -295,6 +295,7 @@ void MainWindow::errorOccurred(QApt::ErrorCode error, const QVariantMap &details
             m_downloadWidget->clear();
         }
     case QApt::AuthError:
+    case QApt::LockError:
         m_managerWidget->setEnabled(true);
         QApplication::restoreOverrideCursor();
         returnFromPreview();
