@@ -46,7 +46,7 @@ ApplicationBackend::ApplicationBackend(QObject *parent)
     , m_isReloading(false)
     , m_currentTransaction(0)
 {
-    m_pkgBlacklist << "kdebase-runtime" << "kdepim-runtime" << "kdelibs5-plugins" << "kdelibs5-data";
+    m_pkgBlacklist << "kde-runtime" << "kdepim-runtime" << "kdelibs5-plugins" << "kdelibs5-data";
 }
 
 ApplicationBackend::~ApplicationBackend()
