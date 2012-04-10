@@ -2,6 +2,7 @@ import QtQuick 1.1
 import org.kde.plasma.components 0.1
 import org.kde.qtextracomponents 0.1
 import org.kde.muon 1.0
+import QtDesktop 0.1
 
 Page
 {
@@ -55,54 +56,40 @@ Page
         }
     }
     
-    TabBar {
+    TabFrame {
         id: tabs
         anchors {
             top: intro.bottom
             left: parent.left
             right: parent.right
-            margins: 10
-        }
-        TabButton {
-            tab: applicationOverview
-            text: i18n("Overview")
-        }
-        TabButton {
-            tab: addonsView
-            text: i18n("Add-ons")
-            visible: !addonsView.isEmpty //TODO: probably should be enabled: instead
-        }
-        TabButton {
-            tab: reviewsView
-            text: i18n("Reviews")
-        }
-    }
-    
-    TabGroup {
-        id: currentView
-        currentTab: tabs.currentTab
-        anchors {
-            top: tabs.bottom
-            left: parent.left
-            right: parent.right
             bottom: parent.bottom
             margins: 10
         }
-        
-        ApplicationOverview {
-            id: applicationOverview
-            application: page.application
+        Tab {
+            title: i18n("Overview")
+            ApplicationOverview {
+                id: applicationOverview
+                application: page.application
+                anchors.fill: parent
+            }
         }
-        
-        AddonsView {
-            id:addonsView
-            application: page.application
-            isInstalling: installButton.isInstalling
+        Tab {
+            title: i18n("Add-ons")
+            visible: !addonsView.isEmpty //TODO: probably should be enabled: instead
+            AddonsView {
+                id:addonsView
+                application: page.application
+                isInstalling: installButton.isInstalling
+                anchors.fill: parent
+            }
         }
-        
-        ReviewsView {
-            id: reviewsView
-            application: page.application
+        Tab {
+            title: i18n("Reviews")
+            ReviewsView {
+                id: reviewsView
+                application: page.application
+                anchors.fill: parent
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 import org.kde.qtextracomponents 0.1
 import org.kde.muon 1.0
 
@@ -10,7 +10,7 @@ Item {
     ScrollBar {
         id: scroll
         orientation: Qt.Vertical
-        flickableItem: overviewContentsFlickable
+//         flickableItem: overviewContentsFlickable
         anchors {
             top: overviewContentsFlickable.top
             bottom: overviewContentsFlickable.bottom
@@ -47,7 +47,7 @@ Item {
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: i18n("Homepage")
-                iconSource: "go-home"
+                iconSource: "image://desktoptheme/go-home"
                 enabled: application.homepage
                 onClicked: app.openUrl(application.homepage)
             }
@@ -64,7 +64,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: application.isInstalled && app.appBackend.reviewsBackend().hasCredentials
                 text: i18n("Review")
-                onClicked: reviewDialog.open()
+                onClicked: reviewDialog.visible=true
             }
             
             Label {

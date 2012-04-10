@@ -262,7 +262,7 @@ Page {
         }
     }
     
-    state: "grid1"
+    state: "list"
     states: [
         State {
             name: "list"

@@ -1,40 +1,20 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 
-CommonDialog {
+Dialog {
     property QtObject application
     property alias rating: ratingInput.rating
     property alias summary: summaryInput.text
     property alias review: reviewInput.text
     id: reviewDialog
-    onClickedOutside: reviewDialog.close()
-    titleText: i18n("Reviewing %1", application.name)
-    buttons: Item {
-        height: 30
-        width: 200
-        Button {
-            id: submitButton
-            height: parent.height
-            anchors.left: parent.left
-            anchors.margins: 10
-            width: 100
-            text: i18n("Submit"); onClicked: reviewDialog.accept()
-            iconSource: "dialog-accept"
-        }
-        Button {
-            height: parent.height
-            width: 100
-            anchors.margins: 10
-            anchors.right: parent.right; anchors.left: submitButton.right
-            iconSource: "dialog-close"
-            text: i18n("Close"); onClicked: reviewDialog.reject()
-        }
-    }
+    height: 400
+    width: 400
+    modal: true
     
-    content: Item {
-        height: 200
-        width: 200
-        
+    title: i18n("Reviewing %1", application.name)
+    
+    Item {
+        anchors.fill: parent
         Column {
             id: info
             spacing: 5
@@ -52,6 +32,7 @@ CommonDialog {
                 anchors.left: parent.left
                 anchors.right: parent.right
             }
+            Label { text: i18n("Description:") }
         }
         
         TextArea {

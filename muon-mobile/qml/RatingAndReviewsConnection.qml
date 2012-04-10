@@ -1,5 +1,5 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 import org.kde.muon 1.0
 
 Item {
@@ -32,14 +32,14 @@ Item {
             anchors.horizontalCenter: contents.horizontalCenter
             visible: page.state=="notlogged"
             text: i18n("Login")
-            iconSource: "network-connect"
+            iconSource: "image://desktoptheme/network-connect"
             onClicked: reviews.login()
         }
         Button {
             anchors.horizontalCenter: contents.horizontalCenter
             visible: page.state=="notlogged"
             text: i18n("Register")
-            iconSource: "system-users"
+            iconSource: "image://desktoptheme/system-users"
             onClicked: reviews.registerAndLogin();
         }
         Button {
@@ -47,7 +47,7 @@ Item {
             visible: page.state=="logged"
             
             text: i18n("Logout")
-            iconSource: "dialog-close"
+            iconSource: "image://desktoptheme/dialog-close"
             onClicked: reviews.logout();
         }
     }

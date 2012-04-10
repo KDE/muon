@@ -1,5 +1,5 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 import org.kde.qtextracomponents 0.1
 import "navigation.js" as Navigation
 
@@ -17,10 +17,9 @@ Item {
     {
         id: view
         anchors {
-            top: parent.top
-            left: parent.left
-            bottom: parent.bottom
-            right: scroll.left
+            fill: parent
+            rightMargin: 10+scroll.width
+            leftMargin: 10+scroll.width
         }
         spacing: 3
         
@@ -105,9 +104,7 @@ Item {
     ScrollBar {
         id: scroll
         orientation: Qt.Vertical
-        flickableItem: view
-        stepSize: 40
-        scrollButtonInterval: 50
+//         flickableItem: view
         anchors {
                 top: parent.top
                 right: parent.right

@@ -1,17 +1,18 @@
 import QtQuick 1.0
-import org.kde.plasma.components 0.1
+import org.kde.plasma.components 0.1 as Plasma
 import org.kde.muon 1.0
+import QtDesktop 0.1
 
-Page {
+Plasma.Page {
     id: page
     
     tools: Row {
         anchors.fill: parent
         visible: page.visible
         ToolButton {
-            iconSource: "list-add"
+            iconSource: "image://desktoptheme/list-add"
             text: i18n("Add Source")
-            onClicked: newSourceDialog.open()
+            onClicked: newSourceDialog.visible=true
             anchors.verticalCenter: parent.verticalCenter
         }
         
@@ -29,29 +30,14 @@ Page {
         }
     }
     
-    CommonDialog {
+    Dialog {
         id: newSourceDialog
-        onClickedOutside: reviewDialog.close()
-        titleText: i18n("Specify the new source")
-        buttons: Row {
-            spacing: 5
-            Button {
-                text: i18n("Ok")
-                iconSource: "dialog-ok"
-                enabled: repository.text!=""
-                onClicked: newSourceDialog.accept()
-            }
-            Button {
-                text: i18n("Cancel")
-                iconSource: "dialog-cancel"
-                onClicked: newSourceDialog.reject()
-            }
-        }
+        title: i18n("Specify the new source")
+        height: 300
+        width: 500
         
-        content: Item {
-            height: 200
-            width: 500
-            
+        Item {
+            anchors.fill: parent
             Column {
                 id: info
                 spacing: 5
@@ -91,9 +77,7 @@ Page {
     ScrollBar {
         id: scroll
         orientation: Qt.Vertical
-        flickableItem: view
-        stepSize: 40
-        scrollButtonInterval: 50
+//         flickableItem: view
         anchors {
                 top: view.top
                 right: parent.right
@@ -119,9 +103,12 @@ Page {
         model: origins.sources
         
         delegate: ListItem {
+            height: removeButton.height
             Label {
                 anchors {
-                    fill: parent
+                    left: removeButton.right
+                    verticalCenter: removeButton.verticalCenter
+                    
                     leftMargin: removeButton.width+5
                 }
                 text: modelData.isSource ? i18n("%1 (Source)", modelData.suite) : modelData.suite
@@ -129,7 +116,7 @@ Page {
             ToolButton {
                 id: removeButton
                 anchors.left: parent.left
-                iconSource: "list-remove"
+                iconSource: "image://desktoptheme/list-remove"
                 onClicked: origins.removeRepository(modelData.uri)
             }
         }

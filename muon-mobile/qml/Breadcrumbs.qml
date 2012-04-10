@@ -1,5 +1,5 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 
 Item {
     id: bread
@@ -40,7 +40,7 @@ Item {
         orientation: ListView.Horizontal
         delegate: ToolButton {
             height: bread.height
-            iconSource: decoration
+            iconSource: "image://desktoptheme/"+decoration
             onClicked: doClick(index)
             text: display ? display : ""
             visible: items.count-index>1

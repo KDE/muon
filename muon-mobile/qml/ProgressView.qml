@@ -1,9 +1,10 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 import org.kde.qtextracomponents 0.1
 import org.kde.muon 1.0
 
-ToolBar {
+Item {
+    visible: height>0
     id: page
     property QtObject backend: app.appBackend
     property bool active: transactionsModel.count>0
@@ -77,7 +78,7 @@ ToolBar {
             right: parent.right
             rightMargin: 5
         }
-        iconSource: "dialog-close"
+        iconSource: "image://desktoptheme/dialog-close"
         onClicked: transactionsModel.clear()
     }
 }

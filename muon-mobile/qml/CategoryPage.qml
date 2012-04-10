@@ -1,10 +1,11 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import org.kde.plasma.components 0.1 as Plasma
 import org.kde.qtextracomponents 0.1
 import org.kde.muon 1.0
+import QtDesktop 0.1
 import "navigation.js" as Navigation
 
-Page {
+Plasma.Page {
     id: page
     property QtObject category
     
@@ -23,6 +24,7 @@ Page {
             height: view.cellHeight -10
             Column {
                 anchors.fill: parent
+                anchors.margins: 5
                 spacing: 10
                 QIconItem {
                     icon: decoration
@@ -42,7 +44,7 @@ Page {
             }
             Rectangle {
                 anchors.fill: parent
-                color: "white"
+                color: syspal.mid
                 opacity: itemArea.containsMouse ? 0.3 : 0 
             }
             MouseArea {
@@ -93,9 +95,7 @@ Page {
     ScrollBar {
         id: scroll
         orientation: Qt.Vertical
-        flickableItem: view
-        stepSize: 40
-        scrollButtonInterval: 50
+//         flickableItem: view
         anchors {
                 top: view.top
                 right: parent.right
@@ -115,6 +115,7 @@ Page {
             ListView {
                 id: top1
                 interactive: false
+                spacing: 3
                 anchors {
                     top: parent.top
                     left: parent.left
@@ -155,6 +156,7 @@ Page {
             ListView {
                 id: top2
                 interactive: false
+                spacing: 3
                 height: parent.height
                 anchors {
                     right: parent.right

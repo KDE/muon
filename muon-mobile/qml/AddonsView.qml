@@ -1,5 +1,5 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 import org.kde.muon 1.0
 
 ListView
@@ -41,9 +41,7 @@ ListView
     ScrollBar {
         id: scroll
         orientation: Qt.Vertical
-        flickableItem: parent
-        stepSize: 40
-        scrollButtonInterval: 50
+//         flickableItem: parent
         anchors {
             top: parent.top
             right: parent.right
@@ -64,12 +62,12 @@ ListView
             spacing: 5
             
             Button {
-                iconSource: "dialog-ok"
+                iconSource: "image://desktoptheme/dialog-ok"
                 text: i18n("Apply")
                 onClicked: addonsModel.applyChanges()
             }
             Button {
-                iconSource: "document-revert"
+                iconSource: "image://desktoptheme/document-revert"
                 text: i18n("Discard")
                 onClicked: addonsModel.discardChanges()
             }

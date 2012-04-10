@@ -1,17 +1,17 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import QtDesktop 0.1
 import org.kde.muon 1.0
 
 Item
 {
     property alias application: reviewsModel.application
-    
     ListView {
         id: reviewsView
         clip: true
         anchors {
             fill: parent
-            rightMargin: scroll.width
+            rightMargin: scroll.width+anchors.margins
+            margins: 5
         }
         visible: reviewsView.count>0
         spacing: 5
@@ -19,6 +19,10 @@ Item
         header: Label { text: i18n("<b>Reviews:</b>") }
         
         delegate: ListItem {
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
             visible: model["shouldShow"]
             height: content.height+10
             
@@ -76,9 +80,7 @@ Item
     ScrollBar {
         id: scroll
         orientation: Qt.Vertical
-        flickableItem: reviewsView
-        stepSize: 40
-        scrollButtonInterval: 50
+//         flickableItem: reviewsView
         anchors {
             top: reviewsView.top
             right: parent.right

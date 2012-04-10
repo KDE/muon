@@ -1,6 +1,7 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
+import org.kde.plasma.components 0.1 as Plasma
 import "navigation.js" as Navigation
+import QtDesktop 0.1
 
 Item {
     id: window
@@ -61,11 +62,12 @@ Item {
             Repeater {
                 model: toplevelsRow.sectionsModel
                 
-                delegate: MuonToolButton {
+                delegate: ToolButton {
                     height: toplevelsRow.height
                     text: modelData.text
-                    icon: modelData.icon
-                    overlayText: modelData.overlay
+                    iconSource: "image://desktoptheme/"+modelData.icon
+//                     iconSize: width
+//                     overlayText: modelData.overlay
                     checked: currentTopLevel==modelData.component
                     onClicked: {
                         Navigation.clearPages()
@@ -84,9 +86,9 @@ Item {
                 right: parent.right
             }
             
-            MuonToolButton {
+            ToolButton {
                 id: usersButton
-                icon: "system-users"
+                iconSource: "image://desktoptheme/system-users"
                 visible: window.state=="loaded"
                 height: parent.height
                 checkable: true
@@ -112,7 +114,7 @@ Item {
         onOpenApplicationInternal: Navigation.openApplication(app.appBackend.applicationByPackageName(appname))
     }
     
-    ToolBar {
+    Item {
         id: breadcrumbsItemBar
         anchors {
             top: toolbar.bottom
@@ -123,7 +125,7 @@ Item {
         z: 0
         height: 30
         
-        tools: Item {
+        Item {
             anchors.fill: parent
             Breadcrumbs {
                 anchors {
@@ -152,20 +154,21 @@ Item {
         }
     }
     
-    ToolBar {
+    
+    Plasma.ToolBar {
         id: pageToolBar
+        visible: tools!=null
+        width: visible ? tools.childrenRect.width : 0
         anchors {
             top: toolbar.bottom
             bottom: breadcrumbsItemBar.bottom
             right: parent.right
         }
-        width: visible ? tools.childrenRect.width : 0
-        visible: tools!=null
-        
         Behavior on width { NumberAnimation { duration: 250 } }
     }
+    SystemPalette { id: syspal }
     
-    PageStack {
+    Plasma.PageStack {
         id: pageStack
         clip: true
         toolBar: pageToolBar
@@ -175,6 +178,11 @@ Item {
             left: parent.left
             right: parent.right
             topMargin: 3
+        }
+        
+        Rectangle {
+            anchors.fill: parent
+            color: syspal.base
         }
     }
     

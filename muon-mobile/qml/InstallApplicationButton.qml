@@ -1,7 +1,7 @@
 import QtQuick 1.1
-import org.kde.plasma.components 0.1
 import org.kde.qtextracomponents 0.1
 import org.kde.muon 1.0
+import QtDesktop 0.1
 
 Item {
     property alias application: transactions.application
@@ -67,7 +67,7 @@ Item {
             id: workingCancelButton
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            iconSource: "dialog-cancel"
+            iconSource: "image://desktoptheme/dialog-cancel"
             enabled: transactions.isDownloading
             onClicked: app.appBackend.cancelTransaction(application)
         }
