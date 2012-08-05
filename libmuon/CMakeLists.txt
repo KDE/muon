@@ -43,6 +43,7 @@ set(muon_LIB_SRCS
     resources/PackageState.cpp
     resources/AbstractBackendUpdater.cpp
     resources/ResourcesUpdatesModel.cpp
+    USCBackend/USCResource.cpp
 )
 
 if(QAPT_FOUND)
