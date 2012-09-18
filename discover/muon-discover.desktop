@@ -23,6 +23,7 @@ Name[sr@latin]=Muonov otkrivač
 Name[sv]=Muon upptäckt
 Name[uk]=Шукач Muon
 Name[x-test]=xxMuon Discoverxx
+Name[zh_TW]=Muon 探測器
 Exec=muon-discover
 Icon=muondiscover
 Type=Application
