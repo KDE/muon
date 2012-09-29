@@ -1,3 +1,14 @@
+1.4.1:
+======
+- Bugfixes:
+  * Fixed overlapping text in Muon Discover's "Sources" tab. (BKO: #305349)
+  * Fixed improper parsing of cdrom sources in Muon Discover's "Sources" tab.
+  * Do not open sources that have not been detected properly. (Discover)
+  * Properly reload the backend after updating sources. (Discover)
+  * Fix an issue where the release upgrade checker would fail if the user has a proxy.
+  * Fix an issue where the Muon Notifier would hang KDED for 25 seconds if UpdateManager's
+    MetaReleaseChecker threw an exception. (BKO: #307049)
+
 1.4.0
 ======
 - Features:
