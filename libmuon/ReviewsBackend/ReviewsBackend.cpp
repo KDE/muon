@@ -73,7 +73,8 @@ ReviewsBackend::ReviewsBackend(QObject *parent)
     connect(m_loginBackend, SIGNAL(connectionStateChanged()), SLOT(refreshConsumerKeys()));
     m_oauthInterface = new QOAuth::Interface(this);
     refreshConsumerKeys();
-    fetchRatings();
+    
+    QMetaObject::invokeMethod(this, "fetchRatings", Qt::QueuedConnection);
 }
 
 ReviewsBackend::~ReviewsBackend()
