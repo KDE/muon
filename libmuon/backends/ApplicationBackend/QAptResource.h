@@ -42,17 +42,15 @@ public:
     virtual QApt::Package *package() = 0;
     bool isValid() const;
     void clearPackage();
-    QApt::PackageList addons();
+    QList<PackageState> addonsInformation();
 
 protected:
     QApt::Backend *m_backend;
     QApt::Package *m_package;
     bool m_isValid;
 
-signals:
-    
-public slots:
-    
+private:
+    QApt::PackageList addons();
 };
 
 #endif // QAPTRESOURCE_H

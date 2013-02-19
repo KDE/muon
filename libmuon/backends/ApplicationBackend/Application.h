@@ -57,7 +57,6 @@ public:
     QString license();
     QUrl screenshotUrl();
     QUrl thumbnailUrl();
-    virtual QList< PackageState > addonsInformation();
     bool isValid() const;
     bool isTechnical() const;
     QString packageName() const;

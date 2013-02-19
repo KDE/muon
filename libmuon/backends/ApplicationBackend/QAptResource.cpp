@@ -49,6 +49,18 @@ void QAptResource::clearPackage()
     m_package = 0;
 }
 
+QList<PackageState> QAptResource::addonsInformation()
+{
+    QList<PackageState> ret;
+
+    QApt::PackageList pkgs = addons();
+    for (QApt::Package* p : pkgs) {
+        ret += PackageState(p->name(), p->shortDescription(), p->isInstalled());
+    }
+
+    return ret;
+}
+
 QApt::PackageList QAptResource::addons()
 {
     QApt::PackageList addons;

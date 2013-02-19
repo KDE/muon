@@ -43,7 +43,6 @@ public:
     QString license();
     QUrl screenshotUrl();
     QUrl thumbnailUrl();
-    QList<PackageState> addonsInformation();
     bool isTechnical() const;
     QString packageName() const;
     QUrl homepage() const;

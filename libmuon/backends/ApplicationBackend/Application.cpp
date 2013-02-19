@@ -250,18 +250,6 @@ QString Application::license()
     }
 }
 
-QList<PackageState> Application::addonsInformation()
-{
-    QList<PackageState> ret;
-
-    QApt::PackageList pkgs = addons();
-    for (QApt::Package* p : pkgs) {
-        ret += PackageState(p->name(), p->shortDescription(), p->isInstalled());
-    }
-
-    return ret;
-}
-
 bool Application::isValid() const
 {
     return m_isValid;

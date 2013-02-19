@@ -105,18 +105,6 @@ QUrl PackageResource::thumbnailUrl()
     return m_package->screenshotUrl(QApt::Thumbnail);
 }
 
-QList<PackageState> PackageResource::addonsInformation()
-{
-    QList<PackageState> ret;
-
-    QApt::PackageList pkgs = addons();
-    for (QApt::Package* p : pkgs) {
-        ret += PackageState(p->name(), p->shortDescription(), p->isInstalled());
-    }
-
-    return ret;
-}
-
 bool PackageResource::isTechnical() const
 {
     return true;
