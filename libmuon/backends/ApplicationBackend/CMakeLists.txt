@@ -30,8 +30,11 @@ set(appsbackend_SRCS
     ApplicationBackend.cpp
     Application.cpp
     ApplicationUpdates.cpp
+    PackageResource.cpp
+    QAptResource.cpp
     ReviewsBackend.cpp #TODO: rename to AptReviewsBackend
     UbuntuLoginBackend.cpp
+    USCResource.cpp
 )
 
 qt4_add_dbus_interface(appsbackend_SRCS ubuntu_sso_dbus_interface.xml ubuntu_sso -i "LoginMetaTypes.h")

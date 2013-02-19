@@ -47,6 +47,7 @@ class ApplicationUpdates;
 class ReviewsBackend;
 class Transaction;
 class QAptActions;
+class QAptResource;
 class KJob;
 
 class MUONPRIVATE_EXPORT ApplicationBackend : public AbstractResourcesBackend
@@ -89,8 +90,8 @@ private:
     ReviewsBackend *m_reviewsBackend;
     bool m_isReloading;
 
-    QFutureWatcher<QVector<Application*> >* m_watcher;
-    QVector<Application *> m_appList;
+    QFutureWatcher<QVector<QAptResource *>> *m_watcher;
+    QVector<QAptResource *> m_appList;
 
     // Transactions
     QHash<Transaction *, QApt::Transaction *> m_transQueue;

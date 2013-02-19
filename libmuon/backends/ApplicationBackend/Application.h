@@ -31,21 +31,20 @@
 #include <LibQApt/Package>
 
 #include "libmuonprivate_export.h"
-#include "resources/AbstractResource.h"
+#include "QAptResource.h"
 
 class KJob;
 namespace QApt {
     class Backend;
 }
 
-class MUONPRIVATE_EXPORT Application : public AbstractResource
+class MUONPRIVATE_EXPORT Application : public QAptResource
 {
 Q_OBJECT
 // Q_PROPERTY(QString mimetypes READ mimetypes CONSTANT)
 Q_PROPERTY(QString menuPath READ menuPath CONSTANT)
 public:
     explicit Application(const QString &fileName, QApt::Backend *backend);
-    explicit Application(QApt::Package *package, QApt::Backend *backend);
 
     QString name();
     QString untranslatedName();
@@ -74,7 +73,7 @@ public:
 
     bool hasScreenshot() const { return m_sourceHasScreenshot; }
     void setHasScreenshot(bool has);
-    
+
     void clearPackage();
     QVector<KService::Ptr> findExecutables() const;
     virtual QStringList executables() const;
@@ -100,18 +99,14 @@ private:
     QString buildDescription(const QByteArray& data, const QString& source);
     
     KSharedConfigPtr m_data;
-    QApt::Backend *m_backend;
-    QApt::Package *m_package;
     QByteArray m_packageName;
 
     bool m_isValid;
     bool m_isTechnical;
-    bool m_isExtrasApp;
     bool m_sourceHasScreenshot;
 
     QByteArray getField(const char* field, const QByteArray& defaultvalue = QByteArray()) const;
     KSharedConfigPtr desktopContents(const QString& filename);
-    QApt::PackageList addons();
     QVector<QPair<QString, QString> > locateApplication(const QString &_relPath, const QString &menuId) const;
     bool hasField(const char* field) const;
 };

@@ -53,6 +53,7 @@
 
 // Own includes
 #include "Application.h"
+#include "PackageResource.h"
 #include "ReviewsBackend.h"
 #include "Transaction/Transaction.h"
 #include "Transaction/TransactionModel.h"
@@ -77,7 +78,7 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
 {
     KGlobal::dirs()->addResourceDir("appicon", "/usr/share/app-install/icons/");
     
-    m_watcher = new QFutureWatcher<QVector<Application*> >(this);
+    m_watcher = new QFutureWatcher<QVector<QAptResource *>>(this);
     connect(m_watcher, SIGNAL(finished()), this, SLOT(setApplications()));
     connect(this, SIGNAL(reloadFinished()), SIGNAL(updatesCountChanged()));
     connect(this, SIGNAL(backendReady()), SIGNAL(updatesCountChanged()));
@@ -91,15 +92,16 @@ ApplicationBackend::~ApplicationBackend()
     qDeleteAll(m_appList);
 }
 
-QVector<Application *> init(QApt::Backend *backend, QThread* thread)
+QVector<QAptResource *> init(QApt::Backend *backend, QThread* thread)
 {
-    QVector<Application *> appList;
+    QVector<QAptResource *> appList;
     QDir appDir("/usr/share/app-install/desktop/");
     QStringList fileList = appDir.entryList(QStringList("*.desktop"), QDir::Files);
 
-    QList<Application *> tempList;
+    QList<QAptResource *> tempList;
     QSet<QString> packages;
     foreach(const QString &fileName, fileList) {
+        //qDebug() << fileName;
         Application *app = new Application(appDir.filePath(fileName), backend);
         packages.insert(app->packageName());
         tempList << app;
@@ -113,15 +115,15 @@ QVector<Application *> init(QApt::Backend *backend, QThread* thread)
         if (package->isMultiArchDuplicate())
             continue;
 
-        Application *app = new Application(package, backend);
-        tempList << app;
+        PackageResource *res = new PackageResource(0, backend, package);
+        tempList << res;
     }
 
     // To be added an Application must have a package that:
     // a) exists
     // b) is not on the blacklist
     // c) if not downloadable, then it must already be installed
-    for (Application *app : tempList) {
+    for (QAptResource *app : tempList) {
         bool added = false;
         QApt::Package *pkg = app->package();
         if (app->isValid() && pkg) {
@@ -140,7 +142,7 @@ QVector<Application *> init(QApt::Backend *backend, QThread* thread)
 void ApplicationBackend::setApplications()
 {
     m_appList = m_watcher->future().result();
-    for (Application* app : m_appList)
+    for (QAptResource* app : m_appList)
         app->setParent(this);
 
     emit backendReady();
@@ -156,23 +158,33 @@ void ApplicationBackend::reload()
 {
     if (m_aptify)
         m_aptify->setCanExit(false);
+
+    // Start reload
     emit reloadStarted();
     m_isReloading = true;
-    foreach(Application* app, m_appList)
+
+    // Clear resources
+    for (QAptResource* app : m_appList)
         app->clearPackage();
+
+    // Clean transaction queue
     qDeleteAll(m_transQueue);
     m_transQueue.clear();
     m_reviewsBackend->stopPendingJobs();
 
+    // Reload QApt cache
     if (!m_backend->reloadCache())
         QAptActions::self()->initError();
 
-    foreach(Application* app, m_appList)
+    // Re-validate resource QApt::Package pointers
+    for (QAptResource* app : m_appList)
         app->package();
 
+    // End reload
     m_isReloading = false;
     if (m_aptify)
         m_aptify->setCanExit(true);
+
     emit reloadFinished();
     emit searchInvalidated();
 }
@@ -300,7 +312,7 @@ bool ApplicationBackend::confirmRemoval(QApt::StateChanges changes)
 
 void ApplicationBackend::markTransaction(Transaction *transaction)
 {
-    Application *app = qobject_cast<Application*>(transaction->resource());
+    QAptResource *app = qobject_cast<QAptResource*>(transaction->resource());
 
     switch (transaction->role()) {
     case Transaction::InstallRole:
@@ -395,7 +407,7 @@ void ApplicationBackend::addTransaction(Transaction *transaction)
         return;
     }
 
-    Application *app = qobject_cast<Application*>(transaction->resource());
+    QAptResource *app = qobject_cast<QAptResource*>(transaction->resource());
 
     if (app->package()->wouldBreak()) {
         m_backend->restoreCacheState(oldCacheState);
@@ -445,7 +457,7 @@ QVector<AbstractResource*> ApplicationBackend::allResources() const
 {
     QVector<AbstractResource*> ret;
 
-    for (Application* app : m_appList) {
+    for (QAptResource* app : m_appList) {
         ret += app;
     }
     return ret;
@@ -475,28 +487,30 @@ int ApplicationBackend::updatesCount() const
         return 0;
 
     int count = 0;
-    foreach(Application* app, m_appList) {
+    for (QAptResource* app : m_appList)
         count += app->canUpgrade();
-    }
+
     return count;
 }
 
 AbstractResource* ApplicationBackend::resourceByPackageName(const QString& name) const
 {
-    foreach(Application* app, m_appList) {
-        if(app->packageName()==name)
+    for (QAptResource* app : m_appList) {
+        if(app->packageName() == name)
             return app;
     }
-    return 0;
+
+    return nullptr;
 }
 
 QStringList ApplicationBackend::searchPackageName(const QString& searchText)
 {
     QApt::PackageList packages = m_backend->search(searchText);
     QStringList names;
-    foreach(QApt::Package* package, packages) {
+
+    for (QApt::Package* package : packages)
         names += package->name();
-    }
+
     return names;
 }
 
@@ -548,7 +562,7 @@ void ApplicationBackend::initBackend()
     m_reviewsBackend->setAptBackend(m_backend);
     m_backendUpdater->setBackend(m_backend);
 
-    QFuture<QVector<Application*> > future = QtConcurrent::run(init, m_backend, QThread::currentThread());
+    QFuture<QVector<QAptResource*> > future = QtConcurrent::run(init, m_backend, QThread::currentThread());
     m_watcher->setFuture(future);
     connect(m_backend, SIGNAL(transactionQueueChanged(QString,QStringList)),
             this, SLOT(aptTransactionsChanged(QString)));
@@ -593,23 +607,25 @@ void ApplicationBackend::initAvailablePackages(KJob* j)
     else {
         Q_ASSERT(!m_appList.isEmpty());
         QSet<QString> packages;
-        foreach(const QVariant& v, data) {
+        for (const QVariant& v : data)
             packages += v.toMap().value("name").toString();
-        }
+
         Q_ASSERT(packages.count()==data.count());
-        for(Application* a : m_appList) {
-            a->setHasScreenshot(packages.contains(a->packageName()));
-        }
+        // FIXME
+//        for (QAptResource *a : m_appList)
+//            a->setHasScreenshot(packages.contains(a->packageName()));
     }
 }
 
 QList< AbstractResource* > ApplicationBackend::upgradeablePackages() const
 {
     QList<AbstractResource*> ret;
-    foreach(AbstractResource* r, m_appList) {
+
+    for (AbstractResource* r : m_appList) {
         if(r->state()==AbstractResource::Upgradeable)
             ret+=r;
     }
+
     return ret;
 }
 

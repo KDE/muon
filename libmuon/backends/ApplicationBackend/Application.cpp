@@ -50,38 +50,12 @@
 #include <qjson/parser.h>
 
 Application::Application(const QString& fileName, QApt::Backend* backend)
-        : AbstractResource(0)
-        , m_backend(backend)
-        , m_package(0)
-        , m_isValid(true)
+        : QAptResource(nullptr, backend)
         , m_isTechnical(false)
-        , m_isExtrasApp(false)
-        , m_sourceHasScreenshot(true)
 {
     m_data = desktopContents(fileName);
     m_isTechnical = getField("NoDisplay").toLower() == "true" || !hasField("Exec");
     m_packageName = getField("X-AppInstall-Package");
-}
-
-Application::Application(QApt::Package* package, QApt::Backend* backend)
-        : AbstractResource(0)
-        , m_backend(backend)
-        , m_package(package)
-        , m_isValid(true)
-        , m_isTechnical(true)
-        , m_isExtrasApp(false)
-{
-    m_packageName = m_package->name().latin1();
-    
-    if (m_package->architecture() != m_backend->nativeArchitecture())
-        m_packageName.append(QByteArray(":") + m_package->architecture().toLatin1());
-
-    if (m_package->origin() == QLatin1String("LP-PPA-app-review-board")) {
-        if (!m_package->controlField(QLatin1String("Appname")).isEmpty()) {
-            m_isExtrasApp = true;
-            m_isTechnical = false;
-        }
-    }
 }
 
 QString Application::name()
@@ -100,13 +74,8 @@ QString Application::name()
 QString Application::untranslatedName()
 {
     QString name = QString::fromUtf8(getField("Name")).trimmed();
-    if (name.isEmpty() && package()) {
-        // extras.ubuntu.com packages can have this
-        if (m_isExtrasApp)
-            name = m_package->controlField(QLatin1String("Appname"));
-        else
-            name = m_package->name();
-    }
+    if (name.isEmpty() && package())
+        name = m_package->name();
 
     return name;
 }
@@ -248,14 +217,7 @@ QVector<QPair<QString, QString> > Application::locateApplication(const QString &
 
 QString Application::categories()
 {
-    QString categories = getField("Categories");
-
-    if (categories.isEmpty()) {
-        // extras.ubuntu.com packages can have this field
-        if (m_isExtrasApp)
-            categories = package()->controlField(QLatin1String("Category"));
-    }
-    return categories;
+    return getField("Categories");
 }
 
 QUrl Application::thumbnailUrl()
@@ -288,72 +250,15 @@ QString Application::license()
     }
 }
 
-QApt::PackageList Application::addons()
-{
-    QApt::PackageList addons;
-
-    QApt::Package *pkg = package();
-    if (!pkg) {
-        return addons;
-    }
-
-    QStringList tempList;
-    // Only add recommends or suggests to the list if they aren't already going to be
-    // installed
-    if (!m_backend->config()->readEntry("APT::Install-Recommends", true)) {
-        tempList << m_package->recommendsList();
-    }
-    if (!m_backend->config()->readEntry("APT::Install-Suggests", false)) {
-        tempList << m_package->suggestsList();
-    }
-    tempList << m_package->enhancedByList();
-
-    QStringList languagePackages;
-    QFile l10nFilterFile("/usr/share/language-selector/data/pkg_depends");
-
-    if (l10nFilterFile.open(QFile::ReadOnly)) {
-        QString contents = l10nFilterFile.readAll();
-
-        foreach (const QString &line, contents.split('\n')) {
-            if (line.startsWith(QLatin1Char('#'))) {
-                continue;
-            }
-            languagePackages << line.split(':').last();
-        }
-
-        languagePackages.removeAll("");
-    }
-
-    foreach (const QString &addon, tempList) {
-        bool shouldShow = true;
-        QApt::Package *package = m_backend->package(addon);
-
-        if (!package || QString(package->section()).contains("lib") || addons.contains(package)) {
-            continue;
-        }
-
-        foreach (const QString &langpack, languagePackages) {
-            if (addon.contains(langpack)) {
-                shouldShow = false;
-                break;
-            }
-        }
-
-        if (shouldShow) {
-            addons << package;
-        }
-    }
-
-    return addons;
-}
-
 QList<PackageState> Application::addonsInformation()
 {
     QList<PackageState> ret;
+
     QApt::PackageList pkgs = addons();
-    foreach(QApt::Package* p, pkgs) {
+    for (QApt::Package* p : pkgs) {
         ret += PackageState(p->name(), p->shortDescription(), p->isInstalled());
     }
+
     return ret;
 }
 
@@ -434,11 +339,6 @@ KSharedConfigPtr Application::desktopContents(const QString& filename)
     return KSharedConfig::openConfig(filename, KConfig::SimpleConfig);
 }
 
-void Application::clearPackage()
-{
-    m_package = 0;
-}
-
 QVector<KService::Ptr> Application::findExecutables() const
 {
     QVector<KService::Ptr> ret;
@@ -500,6 +400,7 @@ void Application::fetchScreenshots()
         QFile f(dest);
         bool b = f.open(QIODevice::ReadOnly);
         Q_ASSERT(b);
+        Q_UNUSED(b)
         
         QJson::Parser p;
         bool ok;
@@ -525,11 +426,6 @@ void Application::fetchScreenshots()
         }
         emit screenshotsFetched(thumbnails, screenshots);
     }
-}
-
-void Application::setHasScreenshot(bool has)
-{
-    m_sourceHasScreenshot = has;
 }
 
 QStringList Application::executables() const
