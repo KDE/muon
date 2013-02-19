@@ -53,7 +53,7 @@ Application::Application(const QString& fileName, QApt::Backend* backend)
         , m_isTechnical(false)
 {
     m_data = desktopContents(fileName);
-    m_isTechnical = getField("NoDisplay").toLower() == "true" || !hasField("Exec");
+    m_isTechnical = getField("NoDisplay").toLower() == QLatin1String("true") || !hasField("Exec");
     m_packageName = getField("X-AppInstall-Package");
 }
 
