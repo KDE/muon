@@ -55,6 +55,17 @@ void QAptResource::clearPackage()
     m_package = nullptr;
 }
 
+AbstractResource::State QAptResource::state()
+{
+    State ret = None;
+    int s = package()->state();
+    if(s & QApt::Package::Upgradeable) ret = Upgradeable;
+    else if(s & QApt::Package::Installed) ret = Installed;
+
+    return ret;
+}
+
+
 QList<PackageState> QAptResource::addonsInformation()
 {
     QList<PackageState> ret;

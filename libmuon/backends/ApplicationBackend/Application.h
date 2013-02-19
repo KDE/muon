@@ -85,8 +85,6 @@ public:
     
     bool canExecute() const;
     QString section();
-    
-    State state();
     void fetchScreenshots();
     
     bool isSecure() const;

@@ -58,7 +58,6 @@ public:
     void invokeApplication() const;
     bool canExecute() const;
 
-    State state();
     void fetchScreenshots();
 
 private:
