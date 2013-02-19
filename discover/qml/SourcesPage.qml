@@ -1,6 +1,7 @@
 import QtQuick 1.0
 import org.kde.plasma.components 0.1
 import org.kde.muon 1.0
+import org.kde.muonapt 1.0
 import "navigation.js" as Navigation
 
 Page {
@@ -32,6 +33,7 @@ Page {
         }
     }
     
+    
     CommonDialog {
         id: newSourceDialog
         onClickedOutside: reviewDialog.close()
@@ -39,7 +41,7 @@ Page {
         buttons: Row {
             spacing: 5
             Button {
-                text: i18n("Ok")
+                text: i18n("OK")
                 iconSource: "dialog-ok"
                 enabled: repository.text!=""
                 onClicked: newSourceDialog.accept()
@@ -92,7 +94,7 @@ Page {
     }
     OriginsBackend { id: origins }
     
-    ScrollBar {
+    NativeScrollBar {
         id: scroll
         orientation: Qt.Vertical
         flickableItem: view
@@ -136,15 +138,31 @@ Page {
                 
                 return ret.join(", ")
             }
+            enabled: browseOrigin.enabled
+            onClicked: Navigation.openApplicationListSource(modelData.name)
             
-            Label {
+            CheckBox {
+                id: enabledBox
+                enabled: false //TODO: implement the application of this change
                 anchors {
-                    fill: parent
-                    leftMargin: removeButton.width+5
+                    left: parent.left
+                    top: parent.top
                 }
-                text: modelData.name=="" ? modelData.uri : i18n("%1. <em>%2</em>", modelData.name, modelData.uri)
+                checked: modelData.enabled
             }
             Label {
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: enabledBox.right
+                    right: suitesLabel.left
+                    leftMargin: 5
+                }
+                elide: Text.ElideRight
+                text: modelData.name=="" ? modelData.uri : i18n("%1. %2", modelData.name, modelData.uri)
+            }
+            Label {
+                id: suitesLabel
                 anchors {
                     bottom: parent.bottom
                     right: browseOrigin.left
@@ -158,14 +176,14 @@ Page {
                 onClicked: Navigation.openApplicationListSource(modelData.name)
                 anchors {
                     bottom: parent.bottom
-                    right: parent.right
+                    right: removeButton.left
                 }
                 
             }
             ToolButton {
                 id: removeButton
-                anchors.left: parent.left
-                iconSource: "list-remove"
+                anchors.right: parent.right
+                iconSource: "edit-delete"
                 onClicked: origins.removeRepository(modelData.uri)
             }
         }

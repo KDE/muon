@@ -35,32 +35,31 @@
 #include <KFileDialog>
 #include <KLocale>
 #include <KMessageBox>
+#include <KProtocolManager>
 #include <KStandardAction>
 #include <KStatusBar>
 
 // LibQApt includes
 #include <LibQApt/Backend>
 #include <LibQApt/Config>
+#include <LibQApt/Transaction>
 
 // Own includes
-#include "../libmuon/HistoryView/HistoryView.h"
-#include "CommitWidget.h"
-#include "DownloadWidget.h"
+#include "../libmuonapt/MuonStrings.h"
+#include "TransactionWidget.h"
 #include "FilterWidget/FilterWidget.h"
 #include "ManagerWidget.h"
 #include "ReviewWidget.h"
 #include "MuonSettings.h"
 #include "StatusWidget.h"
 #include "config/ManagerSettingsDialog.h"
+#include "../libmuonapt/QAptActions.h"
 
 MainWindow::MainWindow()
     : MuonMainWindow()
-    , m_stack(0)
-    , m_settingsDialog(0)
-    , m_historyDialog(0)
-    , m_reviewWidget(0)
-    , m_downloadWidget(0)
-    , m_commitWidget(0)
+    , m_settingsDialog(nullptr)
+    , m_reviewWidget(nullptr)
+    , m_transWidget(nullptr)
 
 {
     initGUI();
@@ -93,6 +92,10 @@ void MainWindow::initGUI()
     m_mainWidget = new QSplitter(this);
     m_mainWidget->setOrientation(Qt::Horizontal);
     connect(m_mainWidget, SIGNAL(splitterMoved(int,int)), this, SLOT(saveSplitterSizes()));
+    connect(m_managerWidget, SIGNAL(doneSortingPackages(bool)),
+            this, SLOT(setCanExit(bool)));
+
+    m_transWidget = new TransactionWidget(this);
 
     m_filterBox = new FilterWidget(m_stack);
     connect(this, SIGNAL(backendReady(QApt::Backend*)),
@@ -110,9 +113,16 @@ void MainWindow::initGUI()
     m_mainWidget->addWidget(m_managerWidget);
     loadSplitterSizes();
 
+    m_stack->addWidget(m_transWidget);
     m_stack->addWidget(m_mainWidget);
     m_stack->setCurrentWidget(m_mainWidget);
 
+    m_backend = new QApt::Backend(this);
+    QAptActions* actions = QAptActions::self();
+
+    actions->setMainWindow(this);
+    connect(actions, SIGNAL(changesReverted()), this, SLOT(revertChanges()));
+    connect(actions, SIGNAL(checkForUpdates()), this, SLOT(checkForUpdates()));
     setupActions();
 
     m_statusWidget = new StatusWidget(centralWidget);
@@ -123,12 +133,15 @@ void MainWindow::initGUI()
 
 void MainWindow::initObject()
 {
-    MuonMainWindow::initObject();
+    if (!m_backend->init())
+        QAptActions::self()->initError();
 
+    emit backendReady(m_backend);
+    QAptActions::self()->setBackend(m_backend);
+
+    // Set up GUI
     loadSettings();
-
-    setActionsEnabled(); //Get initial enabled/disabled state
-
+    setActionsEnabled();
     m_managerWidget->setFocus();
 }
 
@@ -158,40 +171,6 @@ void MainWindow::setupActions()
 {
     MuonMainWindow::setupActions();
 
-    m_loadSelectionsAction = actionCollection()->addAction("open_markings");
-    m_loadSelectionsAction->setIcon(KIcon("document-open"));
-    m_loadSelectionsAction->setText(i18nc("@action", "Read Markings..."));
-    connect(m_loadSelectionsAction, SIGNAL(triggered()), this, SLOT(loadSelections()));
-
-    m_saveSelectionsAction = actionCollection()->addAction("save_markings");
-    m_saveSelectionsAction->setIcon(KIcon("document-save-as"));
-    m_saveSelectionsAction->setText(i18nc("@action", "Save Markings As..."));
-    connect(m_saveSelectionsAction, SIGNAL(triggered()), this, SLOT(saveSelections()));
-
-    m_createDownloadListAction = actionCollection()->addAction("save_download_list");
-    m_createDownloadListAction->setIcon(KIcon("document-save-as"));
-    m_createDownloadListAction->setText(i18nc("@action", "Save Package Download List..."));
-    connect(m_createDownloadListAction, SIGNAL(triggered()), this, SLOT(createDownloadList()));
-
-    m_downloadListAction = actionCollection()->addAction("download_from_list");
-    m_downloadListAction->setIcon(KIcon("download"));
-    m_downloadListAction->setText(i18nc("@action", "Download Packages From List..."));
-    connect(m_downloadListAction, SIGNAL(triggered()), this, SLOT(downloadPackagesFromList()));
-    if (!isConnected()) {
-        m_downloadListAction->setDisabled(false);
-    }
-    connect(this, SIGNAL(shouldConnect(bool)), m_downloadListAction, SLOT(setEnabled(bool)));
-
-    m_loadArchivesAction = actionCollection()->addAction("load_archives");
-    m_loadArchivesAction->setIcon(KIcon("document-open"));
-    m_loadArchivesAction->setText(i18nc("@action", "Add Downloaded Packages"));
-    connect(m_loadArchivesAction, SIGNAL(triggered()), this, SLOT(loadArchives()));
-
-    m_saveInstalledAction = actionCollection()->addAction("save_package_list");
-    m_saveInstalledAction->setIcon(KIcon("document-save-as"));
-    m_saveInstalledAction->setText(i18nc("@action", "Save Installed Packages List..."));
-    connect(m_saveInstalledAction, SIGNAL(triggered()), this, SLOT(saveInstalledPackagesList()));
-
     m_safeUpgradeAction = actionCollection()->addAction("safeupgrade");
     m_safeUpgradeAction->setIcon(KIcon("go-up"));
     m_safeUpgradeAction->setText(i18nc("@action Marks upgradeable packages for upgrade", "Cautious Upgrade"));
@@ -219,13 +198,17 @@ void MainWindow::setupActions()
     m_applyAction->setText(i18nc("@action Applys the changes a user has made", "Apply Changes"));
     connect(m_applyAction, SIGNAL(triggered()), this, SLOT(startCommit()));
 
-    KStandardAction::preferences(this, SLOT(editSettings()), actionCollection());
+    KAction* updateAction = actionCollection()->addAction("update");
+    updateAction->setIcon(KIcon("system-software-update"));
+    updateAction->setText(i18nc("@action Checks the Internet for updates", "Check for Updates"));
+    updateAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+    connect(updateAction, SIGNAL(triggered()), SIGNAL(checkForUpdates()));
+    if (!isConnected()) {
+        updateAction->setDisabled(true);
+    }
+    connect(this, SIGNAL(shouldConnect(bool)), updateAction, SLOT(setEnabled(bool)));
 
-    m_historyAction = actionCollection()->addAction("history");
-    m_historyAction->setIcon(KIcon("view-history"));
-    m_historyAction->setText(i18nc("@action::inmenu", "History..."));
-    m_historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
-    connect(m_historyAction, SIGNAL(triggered()), this, SLOT(showHistoryDialog()));
+    KStandardAction::preferences(this, SLOT(editSettings()), actionCollection());
 
     setActionsEnabled(false);
 
@@ -276,97 +259,45 @@ void MainWindow::checkForUpdates()
 {
     setActionsEnabled(false);
     m_managerWidget->setEnabled(false);
-    initDownloadWidget();
-    m_backend->updateCache();
+
+    m_stack->setCurrentWidget(m_transWidget);
+    m_trans = m_backend->updateCache();
+    setupTransaction(m_trans);
+
+    m_trans->run();
 }
 
-void MainWindow::downloadPackagesFromList()
+void MainWindow::errorOccurred(QApt::ErrorCode error)
 {
-    initDownloadWidget();
-    MuonMainWindow::downloadPackagesFromList();
-}
-
-void MainWindow::errorOccurred(QApt::ErrorCode error, const QVariantMap &details)
-{
-    Q_UNUSED(details);
-
-    MuonMainWindow::errorOccurred(error, details);
-
     switch(error) {
-    case QApt::UserCancelError:
-        if (m_downloadWidget) {
-            m_downloadWidget->clear();
-        }
     case QApt::AuthError:
     case QApt::LockError:
         m_managerWidget->setEnabled(true);
         QApplication::restoreOverrideCursor();
         returnFromPreview();
+        setActionsEnabled();
         break;
     default:
         break;
     }
 }
 
-void MainWindow::workerEvent(QApt::WorkerEvent event)
+void MainWindow::transactionStatusChanged(QApt::TransactionStatus status)
 {
-    MuonMainWindow::workerEvent(event);
-
-    switch (event) {
-    case QApt::CacheUpdateStarted:
-        if (m_downloadWidget) {
-            m_downloadWidget->setHeaderText(i18nc("@info", "<title>Updating software sources</title>"));
-            m_stack->setCurrentWidget(m_downloadWidget);
-            connect(m_downloadWidget, SIGNAL(cancelDownload()), m_backend, SLOT(cancelDownload()));
-        }
-        break;
-    case QApt::CacheUpdateFinished:
-    case QApt::CommitChangesFinished:
-        if (m_backend) {
-            reload();
-            setActionsEnabled();
-        }
-    case QApt::PackageDownloadFinished:
-        returnFromPreview();
-        if (m_warningStack.size() > 0) {
-            showQueuedWarnings();
-            m_warningStack.clear();
-        }
-        if (m_errorStack.size() > 0) {
-            showQueuedErrors();
-            m_errorStack.clear();
-        }
-
-        m_downloadWidget->deleteLater();
-        m_downloadWidget = 0;
-        break;
-    case QApt::PackageDownloadStarted:
-        if (m_downloadWidget) {
-            m_downloadWidget->setHeaderText(i18nc("@info", "<title>Downloading Packages</title>"));
-            m_stack->setCurrentWidget(m_downloadWidget);
-            connect(m_downloadWidget, SIGNAL(cancelDownload()), m_backend, SLOT(cancelDownload()));
-        }
+    // FIXME: better support for transactions that do/don't need reloads
+    switch (status) {
+    case QApt::RunningStatus:
+    case QApt::WaitingStatus:
         QApplication::restoreOverrideCursor();
+        m_stack->setCurrentWidget(m_transWidget);
         break;
-    case QApt::CommitChangesStarted:
-        if (m_commitWidget) {
-            m_commitWidget->setHeaderText(i18nc("@info", "<title>Committing Changes</title>"));
-            m_stack->setCurrentWidget(m_commitWidget);
-        }
-        QApplication::restoreOverrideCursor();
+    case QApt::FinishedStatus:
+        reload();
+        setActionsEnabled();
+
+        m_trans->deleteLater();
+        m_trans = nullptr;
         break;
-    case QApt::XapianUpdateStarted:
-        m_statusWidget->showXapianProgress();
-        connect(m_backend, SIGNAL(xapianUpdateProgress(int)),
-                m_statusWidget, SLOT(updateXapianProgress(int)));
-        break;
-    case QApt::XapianUpdateFinished:
-        m_managerWidget->startSearch();
-        disconnect(m_backend, SIGNAL(xapianUpdateProgress(int)),
-                   m_statusWidget, SLOT(updateXapianProgress(int)));
-        m_statusWidget->hideXapianProgress();
-        break;
-    case QApt::InvalidEvent:
     default:
         break;
     }
@@ -393,7 +324,7 @@ void MainWindow::returnFromPreview()
     m_stack->setCurrentWidget(m_mainWidget);
     if (m_reviewWidget) {
         m_reviewWidget->deleteLater();
-        m_reviewWidget = 0;
+        m_reviewWidget = nullptr;
     }
 
     m_previewAction->setIcon(KIcon("document-preview-archive"));
@@ -407,69 +338,36 @@ void MainWindow::startCommit()
     setActionsEnabled(false);
     m_managerWidget->setEnabled(false);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    initDownloadWidget();
-    initCommitWidget();
-    m_backend->commitChanges();
-}
 
-void MainWindow::initDownloadWidget()
-{
-    if (!m_downloadWidget) {
-        m_downloadWidget = new DownloadWidget(this);
-        m_stack->addWidget(m_downloadWidget);
-        connect(m_backend, SIGNAL(downloadProgress(int,int,int)),
-                m_downloadWidget, SLOT(updateDownloadProgress(int,int,int)));
-        connect(m_backend, SIGNAL(packageDownloadProgress(QString,int,QString,double,int)),
-                m_downloadWidget, SLOT(updatePackageDownloadProgress(QString,int,QString,double,int)));
-    }
-}
+    m_stack->setCurrentWidget(m_transWidget);
+    m_trans = m_backend->commitChanges();
+    setupTransaction(m_trans);
 
-void MainWindow::initCommitWidget()
-{
-    if (!m_commitWidget) {
-        m_commitWidget = new CommitWidget(this);
-        m_stack->addWidget(m_commitWidget);
-        connect(m_backend, SIGNAL(commitProgress(QString,int)),
-                m_commitWidget, SLOT(updateCommitProgress(QString,int)));
-    }
+    m_trans->run();
 }
 
 void MainWindow::reload()
 {
-    m_canExit = false;
+    setCanExit(false);
     returnFromPreview();
     m_stack->setCurrentWidget(m_mainWidget);
 
-    m_isReloading = true;
+    // Reload the QApt Backend
     m_managerWidget->reload();
-    m_isReloading = false;
 
+    // Reload other widgets
     if (m_reviewWidget) {
         m_reviewWidget->reload();
     }
-    m_originalState = m_backend->currentCacheState();
 
     m_filterBox->reload();
 
+    QAptActions::self()->setOriginalState(m_backend->currentCacheState());
     m_statusWidget->updateStatus();
     setActionsEnabled();
     m_managerWidget->setEnabled(true);
 
-    // No need to keep these around in memory.
-    if (m_downloadWidget) {
-        m_downloadWidget->deleteLater();
-        m_downloadWidget = 0;
-    }
-    if (m_commitWidget) {
-        m_commitWidget->deleteLater();
-        m_commitWidget = 0;
-    }
-
-    if (m_backend->xapianIndexNeedsUpdate()) {
-        m_backend->updateXapianIndex();
-    }
-
-    m_canExit = true;
+    setCanExit(true);
 }
 
 void MainWindow::setActionsEnabled(bool enabled)
@@ -483,6 +381,7 @@ void MainWindow::setActionsEnabled(bool enabled)
     bool changesPending = m_backend->areChangesMarked();
     int autoRemoveable = m_backend->packageCount(QApt::Package::IsGarbage);
 
+    m_applyAction->setEnabled(changesPending);
     m_safeUpgradeAction->setEnabled(upgradeable > 0);
     m_distUpgradeAction->setEnabled(upgradeable > 0);
     m_autoRemoveAction->setEnabled(autoRemoveable > 0);
@@ -492,14 +391,20 @@ void MainWindow::setActionsEnabled(bool enabled)
     } else {
         m_previewAction->setEnabled(changesPending);
     }
+}
 
-    m_downloadListAction->setEnabled(isConnected());
+void MainWindow::downloadArchives(QApt::Transaction *trans)
+{
+    if (!trans) {
+        // Shouldn't happen...
+        delete trans;
+        return;
+    }
 
-    m_applyAction->setEnabled(changesPending);
-
-    m_loadSelectionsAction->setEnabled(true);
-    m_saveSelectionsAction->setEnabled(changesPending);
-    m_saveInstalledAction->setEnabled(true);
+    m_stack->setCurrentWidget(m_transWidget);
+    m_trans = trans;
+    setupTransaction(trans);
+    trans->run();
 }
 
 void MainWindow::editSettings()
@@ -517,46 +422,30 @@ void MainWindow::editSettings()
 void MainWindow::closeSettingsDialog()
 {
     m_settingsDialog->deleteLater();
-    m_settingsDialog = 0;
-}
-
-void MainWindow::showHistoryDialog()
-{
-    if (!m_historyDialog) {
-        m_historyDialog = new KDialog(this);
-
-        KConfigGroup dialogConfig(KSharedConfig::openConfig("muonrc"),
-                                  "HistoryDialog");
-        m_historyDialog->restoreDialogSize(dialogConfig);
-
-        connect(m_historyDialog, SIGNAL(finished()), SLOT(closeHistoryDialog()));
-        HistoryView *historyView = new HistoryView(m_historyDialog);
-        m_historyDialog->setMainWidget(historyView);
-        m_historyDialog->setWindowTitle(i18nc("@title:window", "Package History"));
-        m_historyDialog->setWindowIcon(KIcon("view-history"));
-        m_historyDialog->setButtons(KDialog::Close);
-        m_historyDialog->show();
-    } else {
-        m_historyDialog->raise();
-    }
-}
-
-void MainWindow::closeHistoryDialog()
-{
-    KConfigGroup dialogConfig(KSharedConfig::openConfig("muonrc"),
-                              "HistoryDialog");
-    m_historyDialog->saveDialogSize(dialogConfig, KConfigBase::Persistent);
-    m_historyDialog->deleteLater();
-    m_historyDialog = 0;
+    m_settingsDialog = nullptr;
 }
 
 void MainWindow::revertChanges()
 {
-    MuonMainWindow::revertChanges();
-
     if (m_reviewWidget) {
         returnFromPreview();
     }
 }
 
-#include "MainWindow.moc"
+void MainWindow::setupTransaction(QApt::Transaction *trans)
+{
+    // Provide proxy/locale to the transaction
+    if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
+        trans->setProxy(KProtocolManager::proxyFor("http"));
+    }
+
+    trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
+
+    trans->setDebconfPipe(m_transWidget->pipe());
+    m_transWidget->setTransaction(m_trans);
+
+    connect(m_trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
+            this, SLOT(transactionStatusChanged(QApt::TransactionStatus)));
+    connect(m_trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
+            this, SLOT(errorOccurred(QApt::ErrorCode)));
+}

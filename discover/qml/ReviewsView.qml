@@ -1,10 +1,12 @@
 import QtQuick 1.1
 import org.kde.plasma.components 0.1
+import org.kde.plasma.extras 0.1
 import org.kde.muon 1.0
 
 Item
 {
     property alias application: reviewsModel.resource
+    property bool hasReviews: reviewsView.count>0
     
     ListView {
         id: reviewsView
@@ -16,7 +18,7 @@ Item
         visible: reviewsView.count>0
         spacing: 5
         
-        header: Label { text: i18n("<b>Reviews:</b>") }
+        header: Heading { text: i18n("<b>Reviews:</b>") }
         
         delegate: ListItem {
             visible: model["shouldShow"]
@@ -37,11 +39,11 @@ Item
                 Label {
                     anchors {
                         left: parent.left
-                        right: parent.right
+                        right: rating.left
                     }
                     
                     id: content
-                    text: i18n("<b>%1</b> by %2<p/>%3<br/>%4", summary, reviewer,
+                    text: i18n("<p style='margin: 0 0 0 0'><b>%1</b> by %2</p><p style='margin: 0 0 0 0'>%3</p><p style='margin: 0 0 0 0'>%4</p>", summary, reviewer,
                             display, usefulnessToString(usefulnessFavorable, usefulnessTotal))
                     wrapMode: Text.WordWrap
                 }
@@ -59,6 +61,7 @@ Item
                 }
                 
                 Rating {
+                    id: rating
                     anchors.top: parent.top
                     anchors.right: parent.right
                     rating: model["rating"]
@@ -72,7 +75,7 @@ Item
         }
     }
     
-    ScrollBar {
+    NativeScrollBar {
         id: scroll
         orientation: Qt.Vertical
         flickableItem: reviewsView

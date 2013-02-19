@@ -1,41 +1,21 @@
-# make the macro a bit more smart, making it possible to pass arguments to qdbusxml2cpp
-MACRO(QT4_ADD_DBUS_INTERFACE _sources _interface _basename)
-  GET_FILENAME_COMPONENT(_infile ${_interface} ABSOLUTE)
-  SET(_header ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.h)
-  SET(_impl   ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.cpp)
-  SET(_moc    ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.moc)
-
-  # handling more arguments (as in FindQt4.cmake from KDE4) will come soon, then
-  # _params will be used for more than just -m
-  SET(_params -m)
-
-  ADD_CUSTOM_COMMAND(OUTPUT ${_impl} ${_header}
-      COMMAND ${QT_DBUSXML2CPP_EXECUTABLE} ${_params} -p ${_basename} ${_infile} ${ARGN}
-      DEPENDS ${_infile})
-
-  SET_SOURCE_FILES_PROPERTIES(${_impl} PROPERTIES SKIP_AUTOMOC TRUE)
-
-  QT4_GENERATE_MOC(${_header} ${_moc})
-
-  SET(${_sources} ${${_sources}} ${_impl} ${_header} ${_moc})
-  MACRO_ADD_FILE_DEPENDENCIES(${_impl} ${_moc})
-
-ENDMACRO(QT4_ADD_DBUS_INTERFACE)
-
-add_subdirectory(tests)
+add_subdirectory(backends)
+add_subdirectory(declarative)
 
 set(muon_LIB_SRCS
     Category/Category.cpp
     Category/CategoryModel.cpp
-    mobile/src/mousecursor.cpp
+    MuonMainWindow.cpp
     ReviewsBackend/AbstractReviewsBackend.cpp
     ReviewsBackend/Rating.cpp
     ReviewsBackend/Review.cpp
     ReviewsBackend/AbstractLoginBackend.cpp
+    ReviewsBackend/ReviewsModel.cpp
     settings/SettingsPageBase.cpp
     settings/NotifySettingsPage.cpp
+    Transaction/AddonList.cpp
     Transaction/Transaction.cpp
     Transaction/TransactionListener.cpp
+    Transaction/TransactionModel.cpp
     resources/ResourcesModel.cpp
     resources/ResourcesProxyModel.cpp
     resources/AbstractResourcesBackend.cpp
@@ -43,35 +23,12 @@ set(muon_LIB_SRCS
     resources/PackageState.cpp
     resources/AbstractBackendUpdater.cpp
     resources/ResourcesUpdatesModel.cpp
+    resources/StandardBackendUpdater.cpp
+    MuonBackendsFactory.cpp
+    ScreenshotsModel.cpp
+    ApplicationAddonsModel.cpp
     USCBackend/USCResource.cpp
 )
-
-if(QAPT_FOUND)
-    set(muon_LIB_SRCS ${muon_LIB_SRCS}
-        ApplicationBackend/Application.cpp
-        ApplicationBackend/ApplicationBackend.cpp
-        ChangesDialog.cpp
-        MuonStrings.cpp
-        QAptIntegration.cpp
-        MuonMainWindow.cpp
-        ApplicationBackend/LaunchListModel.cpp
-        ApplicationBackend/ApplicationUpdates.cpp
-        HistoryView/HistoryProxyModel.cpp
-        HistoryView/HistoryView.cpp
-        ReviewsBackend/ReviewsBackend.cpp #TODO: rename to AptReviewsBackend
-        ReviewsBackend/UbuntuLoginBackend.cpp
-    )
-    qt4_add_dbus_interface(muon_LIB_SRCS ReviewsBackend/ubuntu_sso_dbus_interface.xml ubuntu_sso -i "ReviewsBackend/LoginMetaTypes.h")
-endif(QAPT_FOUND)
-
-if(LIBATTICA_FOUND)
-    set(muon_LIB_SRCS ${muon_LIB_SRCS}
-        KNSBackend/KNSBackend.cpp
-        KNSBackend/KNSResource.cpp
-        KNSBackend/KNSReviews.cpp
-        KNSBackend/KNSUpdater.cpp
-    )
-endif(LIBATTICA_FOUND)
 
 kde4_add_kcfg_files(muon_LIB_SRCS GENERATE_MOC MuonDataSources.kcfgc)
 kde4_add_library(muonprivate SHARED ${muon_LIB_SRCS})
@@ -81,30 +38,20 @@ set_target_properties(muonprivate PROPERTIES
     SOVERSION 1
 )
 
-if(NOT qjson_LIBRARIES) #hack to compatibilize different qjson finder versions
-    set(qjson_LIBRARIES ${QJSON_LIBRARIES})
-endif()
-
 target_link_libraries(muonprivate
-    ${DEBCONF_KDE_LIB}
+    ${QT_QTXML_LIBRARY}
+    ${QT_QTGUI_LIBRARY}
     ${QT_QTDECLARATIVE_LIBRARY}
+    ${KDE4_KDECORE_LIBS}
     ${KDE4_KDEUI_LIBS}
-    ${KDE4_KIO_LIBS}
     ${KDE4_PHONON_LIBS}
-    ${KDE4_SOLID_LIBS}
-    ${QAPT_LIBRARY}
-    ${qjson_LIBRARIES}
-    ${QTOAUTH_LIBRARY}
-    ${KDE4_KNEWSTUFF3_LIBS}
+    ${KDE4_SOLID_LIBS} 
 )
-
-if(LIBATTICA_FOUND)
-    target_link_libraries(muonprivate ${LIBATTICA_LIBRARIES})
-endif(LIBATTICA_FOUND)
-
-file(GLOB muon_QMLS "${CMAKE_CURRENT_SOURCE_DIR}/mobile/qml/*.qml")
 
 install(TARGETS muonprivate ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES moo.ogg DESTINATION ${DATA_INSTALL_DIR}/libmuon)
-install(FILES ${muon_QMLS} DESTINATION ${DATA_INSTALL_DIR}/libmuon)
-install(FILES categories.xml DESTINATION ${DATA_INSTALL_DIR}/muon-installer)
+
+install(FILES
+    muonbackendplugin.desktop
+    DESTINATION ${SERVICETYPES_INSTALL_DIR}
+)

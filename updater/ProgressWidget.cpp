@@ -24,6 +24,7 @@
 #include <QtCore/QParallelAnimationGroup>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QStringBuilder>
+#include <QDebug>
 #include <QtGui/QLabel>
 #include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
@@ -33,99 +34,92 @@
 #include <KGlobal>
 #include <KIcon>
 #include <KLocale>
+#include <KMessageBox>
 
-ProgressWidget::ProgressWidget(QWidget *parent)
+#include <resources/AbstractBackendUpdater.h>
+#include <resources/ResourcesUpdatesModel.h>
+#include "ui_ProgressWidget.h"
+
+ProgressWidget::ProgressWidget(ResourcesUpdatesModel* updates, QWidget *parent)
     : QWidget(parent)
+    , m_updater(updates)
+    , m_lastRealProgress(0)
     , m_show(false)
+    , m_ui(new Ui::ProgressWidget)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setMargin(0);
-
-    m_statusLabel = new QLabel(this);
-    m_progressBar = new QProgressBar(this);
-
-    QWidget *widget = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    widget->setLayout(layout);
-
-    m_cancelButton = new QPushButton(widget);
-    m_cancelButton->setText(i18nc("@action:button Cancels the download", "Cancel"));
-    m_cancelButton->setIcon(KIcon("dialog-cancel"));
-    connect(m_cancelButton, SIGNAL(clicked()), this, SIGNAL(cancelDownload()));
-
-    layout->addWidget(m_progressBar);
-    layout->addWidget(m_cancelButton);
-
-    m_detailsLabel = new QLabel(this);
-
-    mainLayout->addWidget(m_statusLabel);
-    mainLayout->addWidget(widget);
-    mainLayout->addWidget(m_detailsLabel);
-
-    setLayout(mainLayout);
-
+    m_ui->setupUi(this);
     int finalHeight = sizeHint().height() + 20;
 
-    QPropertyAnimation *anim1 = new QPropertyAnimation(this, "maximumSize", this);
+    QPropertyAnimation *anim1 = new QPropertyAnimation(this, "maximumHeight", this);
     anim1->setDuration(500);
     anim1->setEasingCurve(QEasingCurve::OutQuart);
-    anim1->setStartValue(QSize(QWIDGETSIZE_MAX, 0));
-    anim1->setEndValue(QSize(QWIDGETSIZE_MAX, finalHeight));
-    QPropertyAnimation *anim2 = new QPropertyAnimation(this, "minimumSize", this);
+    anim1->setStartValue(0);
+    anim1->setEndValue(finalHeight);
+
+    QPropertyAnimation *anim2 = new QPropertyAnimation(this, "minimumHeight", this);
     anim2->setDuration(500);
     anim2->setEasingCurve(QEasingCurve::OutQuart);
-    anim2->setStartValue(QSize(QWIDGETSIZE_MAX, 0));
-    anim2->setEndValue(QSize(QWIDGETSIZE_MAX, finalHeight));
+    anim2->setStartValue(0);
+    anim2->setEndValue(finalHeight);
 
     m_expandWidget = new QParallelAnimationGroup(this);
     m_expandWidget->addAnimation(anim1);
     m_expandWidget->addAnimation(anim2);
+
+    // Connect the transaction all up to our slots
+    connect(m_updater, SIGNAL(progressChanged()),
+            this, SLOT(updateProgress()));
+    connect(m_updater, SIGNAL(downloadSpeedChanged()),
+            this, SLOT(downloadSpeedChanged()));
+    connect(m_updater, SIGNAL(etaChanged()), SLOT(etaChanged()));
+    connect(m_updater, SIGNAL(cancelableChanged()), SLOT(cancelChanged()));
+    connect(m_updater, SIGNAL(statusMessageChanged(QString)),
+            m_ui->header, SLOT(setText(QString)));
+    connect(m_updater, SIGNAL(statusDetailChanged(QString)),
+            m_ui->details, SLOT(setText(QString)));
+    connect(m_updater, SIGNAL(progressingChanged()),
+            SLOT(updateIsProgressing()));
+    
+    cancelChanged();
+    connect(m_ui->cancel, SIGNAL(clicked()), m_updater, SLOT(cancel()));
 }
 
-void ProgressWidget::setCommitProgress(int percentage)
+ProgressWidget::~ProgressWidget()
 {
-    m_progressBar->setValue(percentage);
+    delete m_ui;
 }
 
-void ProgressWidget::updateDownloadProgress(int percentage, int speed, int ETA)
+void ProgressWidget::updateIsProgressing()
 {
-    m_progressBar->setValue(percentage);
+    m_ui->progress->setMaximum(m_updater->isProgressing() ? 100 : 0);
+}
 
-    QString downloadSpeed;
-    if (speed > -1) {
-        downloadSpeed = i18nc("@label Download rate", "Download rate: %1/s",
-                              KGlobal::locale()->formatByteSize(speed));
+void ProgressWidget::updateProgress()
+{
+    qreal progress = m_updater->progress();
+    if (progress > 100 || progress<0) {
+        m_ui->progress->setMaximum(0);
+    } else if (progress > m_lastRealProgress) {
+        m_ui->progress->setMaximum(100);
+        m_ui->progress->setValue(progress);
+        m_lastRealProgress = progress;
     }
-
-    QString timeRemaining;
-    int ETAMilliseconds = ETA * 1000;
-
-    if (ETAMilliseconds > 0 && ETAMilliseconds < 14 * 24 * 60 * 60) {
-        // If ETA is greater than zero or less than 2 weeks
-        timeRemaining = i18nc("@item:intext Remaining time", "%1 remaining",
-                              KGlobal::locale()->prettyFormatDuration(ETAMilliseconds));
-    }
-
-    QString label = downloadSpeed;
-
-    if (!label.isEmpty() && !timeRemaining.isEmpty()) {
-        label.append(QLatin1String(" - ") % timeRemaining);
-    } else {
-        label = timeRemaining;
-    }
-
-    m_detailsLabel->setText(label);
 }
 
-void ProgressWidget::updateCommitProgress(const QString &message, int percentage)
+void ProgressWidget::downloadSpeedChanged()
 {
-    Q_UNUSED(message);
-    m_progressBar->setValue(percentage);
+    quint64 speed = m_updater->downloadSpeed();
+    if(speed>0) {
+        QString downloadSpeed = i18nc("@label Download rate", "Download rate: %1/s",
+                                KGlobal::locale()->formatByteSize(speed));
+        m_ui->downloadSpeed->setText(downloadSpeed);
+    } else
+        m_ui->downloadSpeed->clear();
 }
 
-void ProgressWidget::setHeaderText(const QString &text)
+void ProgressWidget::etaChanged()
 {
-    m_statusLabel->setText(text);
+    m_ui->details->setText(m_updater->remainingTime());
 }
 
 void ProgressWidget::show()
@@ -134,7 +128,6 @@ void ProgressWidget::show()
 
     if (!m_show) {
         m_show = true;
-        return; // FIXME: Disables anim, Workaround oxygen alloc'ing a GB of memory during anim.
         // Disconnect from previous animatedHide(), else we'll hide once we finish showing
         disconnect(m_expandWidget, SIGNAL(finished()), this, SLOT(hide()));
         m_expandWidget->setDirection(QAbstractAnimation::Forward);
@@ -146,16 +139,13 @@ void ProgressWidget::animatedHide()
 {
     m_show = false;
 
-    hide(); // FIXME: Disables anim, Workaround oxygen alloc'ing a GB of memory during anim.
-    return;
-
     m_expandWidget->setDirection(QAbstractAnimation::Backward);
     m_expandWidget->start();
     connect(m_expandWidget, SIGNAL(finished()), this, SLOT(hide()));
-    connect(m_expandWidget, SIGNAL(finished()), m_cancelButton, SLOT(show()));
+    connect(m_expandWidget, SIGNAL(finished()), m_ui->cancel, SLOT(show()));
 }
 
-void ProgressWidget::hideCancelButton()
+void ProgressWidget::cancelChanged()
 {
-    m_cancelButton->hide();
+    m_ui->cancel->setEnabled(m_updater->isCancelable());
 }

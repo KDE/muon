@@ -19,7 +19,16 @@
  ***************************************************************************/
 
 #include "AbstractResourcesBackend.h"
+#include <QHash>
 
 AbstractResourcesBackend::AbstractResourcesBackend(QObject* parent)
     : QObject(parent)
+{}
+
+void AbstractResourcesBackend::installApplication(AbstractResource* app)
+{
+    installApplication(app, AddonList());
+}
+
+void AbstractResourcesBackend::integrateMainWindow(MuonMainWindow*)
 {}

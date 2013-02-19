@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright © 2010 by Daniel Nicoletti <dantti85-pk@yahoo.com.br>       *
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,9 +20,7 @@
 
 #include "ApplicationLauncher.h"
 
-#include <ApplicationBackend/LaunchListModel.h>
-#include <ApplicationBackend/Application.h>
-#include <ApplicationBackend/ApplicationBackend.h>
+#include "LaunchListModel.h"
 
 #include <QtCore/QStringBuilder>
 #include <QtGui/QLabel>
@@ -31,14 +29,12 @@
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QVBoxLayout>
 
-#include <KConfigGroup>
-#include <KIcon>
 #include <KLocale>
-#include <KService>
 #include <KStandardGuiItem>
 
-ApplicationLauncher::ApplicationLauncher(ApplicationBackend* backend, QWidget* parent)
+ApplicationLauncher::ApplicationLauncher(LaunchListModel* model, QWidget* parent)
     : QDialog(parent)
+    , m_model(model)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -46,12 +42,12 @@ ApplicationLauncher::ApplicationLauncher(ApplicationBackend* backend, QWidget* p
     QLabel *label = new QLabel(this);
     label->setText(i18np("The following application was just installed, click on it to launch:",
                          "The following applications were just installed, click on them to launch:",
-                         backend->launchList().size()));
+                         model->rowCount()));
 
     QListView *appView = new QListView(this);
     appView->setIconSize(QSize(32, 32));
     connect(appView, SIGNAL(activated(QModelIndex)),
-            this, SLOT(onAppClicked(QModelIndex)));
+            m_model, SLOT(invokeApplication(QModelIndex)));
 
     QWidget *bottomBox = new QWidget(this);
     QHBoxLayout *bottomLayout = new QHBoxLayout(bottomBox);
@@ -71,22 +67,9 @@ ApplicationLauncher::ApplicationLauncher(ApplicationBackend* backend, QWidget* p
     bottomLayout->addWidget(bottomSpacer);
     bottomLayout->addWidget(closeButton);
 
-    m_model = new LaunchListModel(this);
-    m_model->setBackend(backend);
     appView->setModel(m_model);
 
     layout->addWidget(label);
     layout->addWidget(appView);
     layout->addWidget(bottomBox);
 }
-
-ApplicationLauncher::~ApplicationLauncher()
-{
-}
-
-void ApplicationLauncher::onAppClicked(const QModelIndex &index)
-{
-    m_model->invokeApplication(index.row());
-}
-
-#include "ApplicationLauncher.moc"

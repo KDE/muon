@@ -31,10 +31,6 @@ PackageModel::PackageModel(QObject *parent)
 {
 }
 
-PackageModel::~PackageModel()
-{
-}
-
 int PackageModel::rowCount(const QModelIndex & /*parent*/) const
 {
     return m_packages.size();
@@ -54,10 +50,10 @@ QVariant PackageModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case NameRole:
         if (package->isForeignArch()) {
-            return QString(package->latin1Name() % QLatin1String(" (")
+            return QString(package->name() % QLatin1String(" (")
                     % package->architecture() % ')');
         }
-        return package->latin1Name();
+        return package->name();
     case IconRole:
         return KIcon("application-x-deb");
     case DescriptionRole:
@@ -102,6 +98,13 @@ void PackageModel::clear()
     beginRemoveRows(QModelIndex(), 0, m_packages.size() - 1);
     m_packages.clear();
     endRemoveRows();
+}
+
+void PackageModel::externalDataChanged()
+{
+    // A package being changed means that any number of other packages can have
+    // changed, so say everything changed to trigger refreshes.
+    emit dataChanged(index(0, 0), index(m_packages.size() - 1, 0));
 }
 
 QApt::Package *PackageModel::packageAt(const QModelIndex &index) const

@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library/Lesser General Public License
+ *   version 2, or (at your option) any later version, as published by the
+ *   Free Software Foundation
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library/Lesser General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 import QtQuick 1.1
 import org.kde.plasma.components 0.1
 import org.kde.qtextracomponents 0.1
@@ -11,6 +30,7 @@ Item {
     property bool preferUpgrade: false
     property alias model: view.model
     property real actualWidth: width
+    property real proposedMargin: (view.width-actualWidth)/2
 
     ListView
     {
@@ -28,7 +48,7 @@ Item {
         delegate: ListItem {
                 checked: view.currentIndex==index
                 width: parentItem.actualWidth
-                x: (view.width-actualWidth)/2
+                x: parentItem.proposedMargin
                 property real contHeight: height*0.8
                 height: nameLabel.font.pixelSize*3
                 MouseArea {
@@ -101,7 +121,7 @@ Item {
                             id: upgradeButton
                             width: ratingsItem.width
                             visible: model.application.canUpgrade
-                            onClicked: resourcesModel.backendForResource(model.application).installApplication(model.application)
+                            onClicked: resourcesModel.installApplication(model.application)
                         }
                         
                         InstallApplicationButton {
@@ -117,7 +137,7 @@ Item {
             }
     }
     
-    ScrollBar {
+    NativeScrollBar {
         id: scroll
         orientation: Qt.Vertical
         flickableItem: view

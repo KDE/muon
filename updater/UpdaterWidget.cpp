@@ -23,11 +23,13 @@
 // Qt includes
 #include <QStandardItemModel>
 #include <QtCore/QDir>
+#include <QDateTime>
 #include <QtGui/QApplication>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QTreeView>
 #include <QtGui/QVBoxLayout>
+#include <qaction.h>
 
 // KDE includes
 #include <KIcon>
@@ -36,13 +38,14 @@
 #include <KPixmapSequence>
 #include <KPixmapSequenceOverlayPainter>
 #include <KDebug>
-
-// LibQApt includes
-#include <LibQApt/Backend>
+#include <KMessageWidget>
 
 // Libmuon includes
-#include <ApplicationBackend/Application.h>
-#include <ChangesDialog.h>
+#include <resources/AbstractResourcesBackend.h>
+#include <resources/AbstractResource.h>
+#include <resources/AbstractBackendUpdater.h>
+#include <resources/ResourcesUpdatesModel.h>
+// #include <resources/ResourcesModel.h>
 
 // Own includes
 #include "UpdateModel/UpdateModel.h"
@@ -61,18 +64,30 @@ UpdaterWidget::UpdaterWidget(QWidget *parent) :
     page1Layout->setSpacing(0);
     page1->setLayout(page1Layout);
 
+    QString text = i18nc("@label", "<em>Some packages were not marked for update.</em><p/>"
+                            "The update of these packages need some others to be installed or removed.<p/>"
+                            "Do you want to update those too?");
+    QAction* action = new QAction(KIcon("dialog-ok-apply"), i18n("Mark All"), this);
+    connect(action, SIGNAL(triggered(bool)), SLOT(markAllPackagesForUpgrade()));
+    m_upgradesWidget = new KMessageWidget(this);
+    m_upgradesWidget->setText(text);
+    m_upgradesWidget->addAction(action);
+    m_upgradesWidget->setCloseButtonVisible(true);
+    m_upgradesWidget->setVisible(false);
+    page1Layout->addWidget(m_upgradesWidget);
+
     m_updateModel = new UpdateModel(page1);
 
-    connect(m_updateModel, SIGNAL(checkApps(QList<Application*>,bool)),
-            this, SLOT(checkApps(QList<Application*>,bool)));
+    connect(m_updateModel, SIGNAL(checkApps(QList<AbstractResource*>,bool)),
+            this, SLOT(checkApps(QList<AbstractResource*>,bool)));
 
     m_updateView = new QTreeView(page1);
     m_updateView->setAlternatingRowColors(true);
+    m_updateView->setModel(m_updateModel);
     m_updateView->header()->setResizeMode(0, QHeaderView::Stretch);
     m_updateView->header()->setResizeMode(1, QHeaderView::ResizeToContents);
     m_updateView->header()->setResizeMode(2, QHeaderView::ResizeToContents);
     m_updateView->header()->setStretchLastSection(false);
-    m_updateView->setModel(m_updateModel);
     connect(m_updateView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
     page1Layout->addWidget(m_updateView);
@@ -115,177 +130,58 @@ UpdaterWidget::UpdaterWidget(QWidget *parent) :
     setCurrentWidget(page1);
 }
 
-void UpdaterWidget::setBackend(QApt::Backend *backend)
+void UpdaterWidget::setBackend(ResourcesUpdatesModel *updates)
 {
-    m_backend = backend;
-    connect(m_backend, SIGNAL(packageChanged()),
-            m_updateModel, SLOT(packageChanged()));
+    m_updatesBackends = updates;
+    connect(m_updatesBackends, SIGNAL(progressingChanged()), SLOT(activityChanged()));
+//     connect(ResourcesModel::global(), SIGNAL(allInitialized()), SLOT(populateUpdateModel()));
 
     populateUpdateModel();
+    setEnabled(true);
 }
 
-void UpdaterWidget::reload()
+void UpdaterWidget::activityChanged()
 {
-    m_updateModel->clear();
-    m_backend->reloadCache();
-
-    setCurrentIndex(0);
-    populateUpdateModel();
+    if(m_updatesBackends->isProgressing()) {
+        m_busyWidget->start();
+        setEnabled(false);
+        setCurrentIndex(-1);
+    } else {
+        populateUpdateModel();
+    }
 }
 
 void UpdaterWidget::populateUpdateModel()
 {
-    QApt::PackageList upgradeList = m_backend->upgradeablePackages();
-
-    if (upgradeList.isEmpty()) {
-        QApplication::restoreOverrideCursor();
-        m_busyWidget->stop();
+    m_busyWidget->stop();
+    QApplication::restoreOverrideCursor();
+    setEnabled(true);
+    if (!m_updatesBackends->hasUpdates()) {
         checkUpToDate();
         return;
     }
-
-    UpdateItem *securityItem = new UpdateItem(i18nc("@item:inlistbox", "Important Security Updates"),
-                                              KIcon("security-medium"));
-
-    UpdateItem *appItem = new UpdateItem(i18nc("@item:inlistbox", "Application Updates"),
-                                          KIcon("applications-other"));
-
-    UpdateItem *systemItem = new UpdateItem(i18nc("@item:inlistbox", "System Updates"),
-                                             KIcon("applications-system"));
-
-    QDir appDir("/usr/share/app-install/desktop/");
-    QStringList fileList = appDir.entryList(QDir::Files);
-
-    foreach(const QString &fileName, fileList) {
-        if (fileName.endsWith(QLatin1String(".menu"))) // Skip non-desktop files that can slip in
-            continue;
-        Application *app = new Application("/usr/share/app-install/desktop/" + fileName, m_backend);
-        QApt::Package *package = app->package();
-        if (!package || !upgradeList.contains(package)) {
-            delete app;
-            continue;
-        }
-        int state = package->state();
-
-        if (!(state & QApt::Package::Upgradeable)) {
-            delete app;
-            continue;
-        }
-
-        UpdateItem *updateItem = new UpdateItem(app);
-
-        // Set update type
-        bool securityFound = false;
-        for (const QString &archive : package->archives()) {
-            if (archive.contains(QLatin1String("security"))) {
-                securityFound = true;
-                break;
-            }
-        }
-
-        if (securityFound) {
-            securityItem->appendChild(updateItem);
-        } else {
-            appItem->appendChild(updateItem);
-        }
-
-        m_upgradeableApps.append(app);
-
-        upgradeList.removeAll(package);
-    }
-
-    // Remaining packages in the upgrade list aren't applications
-    foreach (QApt::Package *package, upgradeList) {
-        Application *app = new Application(package, m_backend);
-        UpdateItem *updateItem = new UpdateItem(app);
-
-        // Set update type
-        bool securityFound = false;
-        for (const QString &archive : package->archives()) {
-            if (archive.contains(QLatin1String("security"))) {
-                securityFound = true;
-                break;
-            }
-        }
-
-        if (securityFound) {
-            securityItem->appendChild(updateItem);
-        } else {
-            systemItem->appendChild(updateItem);
-        }
-
-        m_upgradeableApps.append(app);
-    }
-
-    // Add populated items to the model
-    if (securityItem->childCount()) {
-        securityItem->sort();
-        m_updateModel->addItem(securityItem);
-    } else {
-        delete securityItem;
-    }
-
-    if (appItem->childCount()) {
-        appItem->sort();
-        m_updateModel->addItem(appItem);
-    } else {
-        delete appItem;
-    }
-
-    if (systemItem->childCount()) {
-        systemItem->sort();
-        m_updateModel->addItem(systemItem);
-    } else {
-        delete systemItem;
-    }
+    m_updatesBackends->prepare();
+    m_updateModel->clear();
+    m_updateModel->addResources(m_updatesBackends->toUpdate());
 
     m_updateView->expand(m_updateModel->index(0,0)); // Expand apps category
     m_updateView->resizeColumnToContents(0);
     m_updateView->header()->setResizeMode(0, QHeaderView::Stretch);
-    m_busyWidget->stop();
-    QApplication::restoreOverrideCursor();
-    m_backend->markPackagesForUpgrade();
 
     checkAllMarked();
     checkUpToDate();
 }
 
-void UpdaterWidget::checkApps(QList<Application *> apps, bool checked)
+void UpdaterWidget::checkApps(const QList<AbstractResource*>& apps, bool checked)
 {
-    QApt::PackageList list;
-    foreach (Application *app, apps) {
-        list << app->package();
-    }
-
-    QApt::Package::State action = checked ? QApt::Package::ToInstall : QApt::Package::ToKeep;
-
-    if (list.size() > 1) {
+    if (apps.size() > 1) {
         QApplication::setOverrideCursor(Qt::WaitCursor);
     }
-
-    m_oldCacheState = m_backend->currentCacheState();
-    m_backend->saveCacheState();
-    m_backend->markPackages(list, action);
-
-    // Check for removals
-    auto changes = m_backend->stateChanges(m_oldCacheState, list);
-
-    checkChanges(changes);
-
+    if(checked)
+        m_updatesBackends->addResources(apps);
+    else
+        m_updatesBackends->removeResources(apps);
     QApplication::restoreOverrideCursor();
-}
-
-void UpdaterWidget::checkChanges(const QHash<QApt::Package::State, QApt::PackageList> &changes)
-{
-    if (changes.isEmpty()) {
-        return;
-    }
-
-    ChangesDialog *dialog = new ChangesDialog(this, changes);
-    int res = dialog->exec();
-
-    if (res != QDialog::Accepted)
-        m_backend->restoreCacheState(m_oldCacheState);
 }
 
 void UpdaterWidget::selectionChanged(const QItemSelection &selected,
@@ -294,55 +190,31 @@ void UpdaterWidget::selectionChanged(const QItemSelection &selected,
     Q_UNUSED(deselected);
 
     QModelIndexList indexes = selected.indexes();
-    QApt::Package *package = 0;
+    AbstractResource *res = 0;
 
-    if (indexes.isEmpty()) {
-        emit packageChanged(package);
-        return;
+    if (!indexes.isEmpty()) {
+        res = m_updateModel->itemFromIndex(indexes.first())->app();
     }
 
-    Application *app = m_updateModel->itemFromIndex(indexes.first())->app();
-    package = app ? app->package() : 0;
-
-    emit packageChanged(package);
+    emit selectedResourceChanged(res);
 }
 
 void UpdaterWidget::checkAllMarked()
 {
-    QApt::PackageList upgradeable = m_backend->upgradeablePackages();
-    int markedCount = m_backend->packageCount(QApt::Package::ToUpgrade);
+    m_upgradesWidget->setVisible(!m_updatesBackends->isAllMarked());
+}
 
-    if (markedCount < upgradeable.count())
-    {
-        QString text = i18nc("@label", "Not all packages could be marked for upgrade. "
-                             "The available upgrades may require new packages to "
-                             "be installed or removed. Do you want to mark upgrades "
-                             "that may require the installation or removal of additional "
-                             "packages?");
-        QString title = i18nc("@title:window", "Unable to Mark Upgrades");
-        KGuiItem markUpgrades(i18nc("@action", "Mark Upgrades"));
-
-        int res = KMessageBox::questionYesNo(this, text, title, markUpgrades);
-
-        if (res != KMessageBox::Yes)
-            return;
-
-        // Mark dist upgrade
-        m_oldCacheState = m_backend->currentCacheState();
-        m_backend->saveCacheState();
-        m_backend->markPackagesForDistUpgrade();
-
-        // Show user packages to be installed/removed
-        auto changes = m_backend->stateChanges(m_oldCacheState, upgradeable);
-        checkChanges(changes);
-    }
+void UpdaterWidget::markAllPackagesForUpgrade()
+{
+    m_updatesBackends->prepare();
+    m_upgradesWidget->hide();
 }
 
 void UpdaterWidget::checkUpToDate()
 {
-    if(m_backend->upgradeablePackages().isEmpty()) {
+    if(!m_updatesBackends->hasUpdates()) {
         setCurrentIndex(1);
-        QDateTime lastUpdate = m_backend->timeCacheLastUpdated();
+        QDateTime lastUpdate = m_updatesBackends->lastUpdate();
 
         // Unknown time since last update
         if (!lastUpdate.isValid()) {
@@ -376,3 +248,4 @@ void UpdaterWidget::checkUpToDate()
         }
     }
 }
+

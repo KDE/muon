@@ -23,7 +23,7 @@
 
 #include <QtCore/QAbstractItemModel>
 
-class Application;
+class AbstractResource;
 class UpdateItem;
 
 class UpdateModel : public QAbstractItemModel
@@ -49,8 +49,8 @@ public:
     QModelIndexList collectItems(const QModelIndex &parent) const;
     UpdateItem *itemFromIndex(const QModelIndex &index) const;
 
-    void addItem(UpdateItem *item);
     bool setData(const QModelIndex &index, const QVariant &value, int role);
+    void addResources(const QList<AbstractResource*>& res);
 
     enum Columns {
         NameColumn = 0,
@@ -59,13 +59,18 @@ public:
     };
 
 private:
+    void addResource(AbstractResource* res);
+    void addItem(UpdateItem *item);
     UpdateItem *m_rootItem;
+    UpdateItem* m_systemItem;
+    UpdateItem* m_appItem;
+    UpdateItem* m_securityItem;
 
 public Q_SLOTS:
     void packageChanged();
 
 Q_SIGNALS:
-    void checkApps(QList<Application *> apps, bool checked);
+    void checkApps(const QList<AbstractResource*>& apps, bool checked);
 };
 
 #endif // UPDATEMODEL_H

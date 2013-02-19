@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library/Lesser General Public License
+ *   version 2, or (at your option) any later version, as published by the
+ *   Free Software Foundation
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library/Lesser General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 import QtQuick 1.1
 import org.kde.plasma.components 0.1
 import org.kde.qtextracomponents 0.1
@@ -20,6 +39,7 @@ Page {
     property bool preferList: false
     property real actualWidth: width-Math.pow(width/70, 2)
     property real proposedMargin: (width-actualWidth)/2
+    property Component header: category==null ? null : categoryHeaderComponent
     clip: true
     
     onSearchChanged: {
@@ -56,6 +76,7 @@ Page {
                         appsModel.stringSortRole=role
                         appsModel.sortOrder=sorting
                         page.sectionProperty = section
+                        page.sectionDelegate = null
                         button.checked=false
                     }
                     checked: appsModel.stringSortRole==role
@@ -66,7 +87,7 @@ Page {
                 id: listViewShown
                 checkable: true
                 icon: "tools-wizard"
-                model: ["list", "grid2", "grid3"]
+                model: ["list", "grid2"]
                 delegate: ToolButton {
                     width: parent.width
                     text: modelData
@@ -125,7 +146,6 @@ Page {
     Loader {
         id: viewLoader
         anchors.fill: parent
-        property string delegateType: ""
     }
     
     Component {
@@ -149,7 +169,7 @@ Page {
                 }
             }
             
-            header: page.category==null ? null : categoryHeaderComponent
+            header: page.header
             model: appsModel
         }
     }
@@ -158,10 +178,10 @@ Page {
         id: gridComponent
         ApplicationsGrid {
             model: appsModel
-            header: page.category==null ? null : categoryHeaderComponent
+            header: page.header
             actualWidth: page.actualWidth
             
-            delegate: ApplicationsGridDelegate { requireClick: page.state=="grid3" }
+            delegate: ApplicationsGridDelegate {}
         }
     }
     
@@ -173,10 +193,6 @@ Page {
         },
         State {
             name: "grid2"
-            PropertyChanges { target: viewLoader; sourceComponent: gridComponent }
-        },
-        State {
-            name: "grid3"
             PropertyChanges { target: viewLoader; sourceComponent: gridComponent }
         }
     ]

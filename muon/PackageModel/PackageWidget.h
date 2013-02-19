@@ -59,7 +59,6 @@ public:
     };
 
     PackageWidget(QWidget *parent);
-    ~PackageWidget();
 
     void setPackagesType(int type);
     void setHeaderText(const QString &text);
@@ -100,6 +99,8 @@ private:
     void checkChanges();
     QApt::PackageList selectedPackages();
     QString digestReason(QApt::Package *pkg,
+                         const QApt::MarkingErrorInfo &info);
+    QString digestReason(QApt::Package *pkg,
                          QApt::BrokenReason failType,
                          QHash<QString, QVariantMap> failReason);
 
@@ -132,12 +133,12 @@ private Q_SLOTS:
     void setPackagesPurge();
     void setKeep(QApt::Package *package);
     void setPackagesKeep();
-    bool setLocked(QApt::Package *package, bool lock);
     void setPackagesLocked(bool lock);
     void showBrokenReason(QApt::Package *package);
 
 Q_SIGNALS:
     void packageChanged();
+    void doneSortingPackages(bool sorting);
 };
 
 #endif

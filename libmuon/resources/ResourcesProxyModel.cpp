@@ -30,7 +30,6 @@
 ResourcesProxyModel::ResourcesProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
     , m_sortByRelevancy(false)
-    , m_filterActive(false)
     , m_filterBySearch(false)
     , m_filteredCategory(0)
     , m_stateFilter(AbstractResource::Broken)
@@ -82,6 +81,9 @@ QString ResourcesProxyModel::originFilter() const
 
 void ResourcesProxyModel::setFiltersFromCategory(Category *category)
 {
+    if(category==m_filteredCategory)
+        return;
+
     if(category) {
         m_andFilters = category->andFilters();
         m_orFilters = category->orFilters();
@@ -141,9 +143,6 @@ bool ResourcesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
     if(!idx.isValid())
         return false;
 
-    if (m_filterActive && !idx.data(ResourcesModel::ActiveRole).toBool())
-        return false;
-    
     for(QHash<int, QVariant>::const_iterator it=m_roleFilters.constBegin(), itEnd=m_roleFilters.constEnd(); it!=itEnd; ++it) {
         if(idx.data(it.key())!=it.value()) {
             return false;
@@ -267,5 +266,8 @@ void ResourcesProxyModel::setMimeTypeFilter(const QString& mime)
 
 void ResourcesProxyModel::setFilterActive(bool filter)
 {
-    m_filterActive = filter;
+    if(filter)
+        m_roleFilters.insert(ResourcesModel::ActiveRole, true);
+    else
+        m_roleFilters.remove(ResourcesModel::ActiveRole);
 }

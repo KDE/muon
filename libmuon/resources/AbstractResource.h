@@ -37,6 +37,7 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
     Q_PROPERTY(QString icon READ icon CONSTANT)
     Q_PROPERTY(bool canExecute READ canExecute CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(QString status READ status NOTIFY stateChanged)
     Q_PROPERTY(QString category READ categories CONSTANT)
     Q_PROPERTY(bool isTechnical READ isTechnical CONSTANT)
     Q_PROPERTY(QUrl homepage READ homepage CONSTANT)
@@ -51,8 +52,8 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
     Q_PROPERTY(QString installedVersion READ installedVersion CONSTANT)
     Q_PROPERTY(QString availableVersion READ availableVersion CONSTANT)
     Q_PROPERTY(QString section READ section CONSTANT)
-    Q_PROPERTY(int popcon READ popularityContest CONSTANT)
     Q_PROPERTY(QString mimetypes READ mimetypes CONSTANT)
+    Q_PROPERTY(AbstractResourcesBackend* backend READ backend CONSTANT)
     public:
         enum State {
             Broken,
@@ -77,7 +78,7 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
         virtual QString icon() const = 0;
         
         ///@returns whether invokeApplication makes something
-        /// false if not overriden
+        /// false if not overridden
         virtual bool canExecute() const;
         
         ///executes the resource, if applies.
@@ -95,7 +96,8 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
         virtual QUrl thumbnailUrl() = 0;
         virtual QUrl screenshotUrl() = 0;
         
-        virtual QString sizeDescription() = 0;
+        virtual int downloadSize() = 0;
+        virtual QString sizeDescription();
         virtual QString license() = 0;
         
         virtual QString installedVersion() const = 0;
@@ -108,19 +110,23 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
         ///@returns what kind of mime types the resource can consume
         virtual QString mimetypes() const;
         
-        /** Popularity rating by Ubuntu.
-         * Maybe we should deprecate? we don't really have a scale for this
-         */
-        virtual int popularityContest() const;
-        
         virtual QList<PackageState> addonsInformation() = 0;
+        bool isSecure() const;
+        
+        virtual QStringList executables() const;
 
         bool canUpgrade();
         bool isInstalled();
+        
+        ///@returns a user-readable explaination of the resource status
+        ///by default, it will specify what state() is returning
+        virtual QString status();
 
         AbstractResourcesBackend* backend() const;
+
     public slots:
         virtual void fetchScreenshots();
+        virtual void fetchChangelog() = 0;
 
     signals:
         void stateChanged();
@@ -128,6 +134,7 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
         ///response to the fetchScreenshots method
         ///@p thumbnails and @p screenshots should have the same number of elements
         void screenshotsFetched(const QList<QUrl>& thumbnails, const QList<QUrl>& screenshots);
+        void changelogFetched(const QString& changelog);
 };
 
 #endif // ABSTRACTRESOURCE_H

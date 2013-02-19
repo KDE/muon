@@ -23,38 +23,39 @@
 
 #include <QtGui/QWidget>
 
+class ResourcesUpdatesModel;
 class QLabel;
 class QParallelAnimationGroup;
 class QPushButton;
 class QProgressBar;
 
+namespace Ui { class ProgressWidget; }
+
 class ProgressWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ProgressWidget(QWidget *parent = 0);
+    ProgressWidget(ResourcesUpdatesModel* updates, QWidget *parent);
+    virtual ~ProgressWidget();
 
 private:
-    QLabel *m_statusLabel;
-    QProgressBar *m_progressBar;
-    QPushButton *m_cancelButton;
-    QLabel *m_detailsLabel;
+    ResourcesUpdatesModel* m_updater;
+    qreal m_lastRealProgress;
     bool m_show;
 
     QParallelAnimationGroup *m_expandWidget;
+    Ui::ProgressWidget* m_ui;
 
 public Q_SLOTS:
-    void setCommitProgress(int percentage);
-    void updateDownloadProgress(int percentage, int speed, int ETA);
-    void updateCommitProgress(const QString &message, int percentage);
-    void setHeaderText(const QString &text);
-
     void show();
     void animatedHide();
-    void hideCancelButton();
 
-Q_SIGNALS:
-    void cancelDownload();
+private Q_SLOTS:
+    void updateProgress();
+    void downloadSpeedChanged();
+    void etaChanged();
+    void cancelChanged();
+    void updateIsProgressing();
 };
 
 #endif // PROGRESSWIDGET_H

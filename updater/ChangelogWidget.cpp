@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "ChangelogWidget.h"
+#include <resources/AbstractResource.h>
 
 // Qt includes
 #include <QtCore/QParallelAnimationGroup>
@@ -39,13 +40,8 @@
 #include <KTextBrowser>
 #include <KDebug>
 
-// LibQApt includes
-#include <LibQApt/Backend>
-#include <LibQApt/Changelog>
-
 ChangelogWidget::ChangelogWidget(QWidget *parent)
         : QWidget(parent)
-        , m_backend(0)
         , m_package(0)
         , m_show(false)
 {
@@ -89,32 +85,37 @@ ChangelogWidget::ChangelogWidget(QWidget *parent)
 
     int finalHeight = sizeHint().height();
 
-    QPropertyAnimation *anim1 = new QPropertyAnimation(this, "maximumSize", this);
+    QPropertyAnimation *anim1 = new QPropertyAnimation(this, "maximumHeight", this);
     anim1->setDuration(500);
     anim1->setEasingCurve(QEasingCurve::OutQuart);
-    anim1->setStartValue(QSize(QWIDGETSIZE_MAX, 0));
-    anim1->setEndValue(QSize(QWIDGETSIZE_MAX, finalHeight));
-    QPropertyAnimation *anim2 = new QPropertyAnimation(this, "minimumSize", this);
+    anim1->setStartValue(0);
+    anim1->setEndValue(finalHeight);
+
+    QPropertyAnimation *anim2 = new QPropertyAnimation(this, "minimumHeight", this);
     anim2->setDuration(500);
     anim2->setEasingCurve(QEasingCurve::OutQuart);
-    anim2->setStartValue(QSize(QWIDGETSIZE_MAX, 0));
-    anim2->setEndValue(QSize(QWIDGETSIZE_MAX, finalHeight));
+    anim2->setStartValue(0);
+    anim2->setEndValue(finalHeight);
 
     m_expandWidget = new QParallelAnimationGroup(this);
     m_expandWidget->addAnimation(anim1);
     m_expandWidget->addAnimation(anim2);
 }
 
-void ChangelogWidget::setBackend(QApt::Backend *backend)
+void ChangelogWidget::setResource(AbstractResource* package)
 {
-    m_backend = backend;
-}
+    if (m_package==package)
+        return;
 
-void ChangelogWidget::setPackage(QApt::Package *package)
-{
+    if(m_package)
+        disconnect(m_package, SIGNAL(changelogFetched(QString)), this, SLOT(changelogFetched(QString)));
+
     m_package = package;
-
-    package ? fetchChangelog() : animatedHide();
+    if (m_package) {
+        connect(m_package, SIGNAL(changelogFetched(QString)), SLOT(changelogFetched(QString)));
+        fetchChangelog();
+    } else
+        animatedHide();
 }
 
 void ChangelogWidget::show()
@@ -139,55 +140,18 @@ void ChangelogWidget::animatedHide()
     connect(m_expandWidget, SIGNAL(finished()), this, SLOT(hide()));
 }
 
-void ChangelogWidget::stopPendingJobs()
+void ChangelogWidget::changelogFetched(const QString& changelog)
 {
-    auto iter = m_jobHash.constBegin();
-    while (iter != m_jobHash.constEnd()) {
-        KJob *getJob = iter.key();
-        disconnect(getJob, SIGNAL(result(KJob*)),
-                   this, SLOT(changelogFetched(KJob*)));
-        iter++;
-    }
-
-    m_jobHash.clear();
-}
-
-void ChangelogWidget::changelogFetched(KJob *job)
-{
-    if (!m_package) {
-        m_jobHash.remove(job);
-        return;
-    }
-
-    // Work around http://bugreports.qt.nokia.com/browse/QTBUG-2533 by forcibly resetting the CharFormat
-    QTextCharFormat format;
-    m_changelogBrowser->setCurrentCharFormat(format);
-    QFile changelogFile(m_jobHash[job]);
-    m_jobHash.remove(job);
-
-    if (job->error() || !changelogFile.open(QFile::ReadOnly)) {
-        if (m_package->origin() == QLatin1String("Ubuntu")) {
-            m_changelogBrowser->setText(i18nc("@info/rich", "The list of changes is not yet available. "
-                                            "Please use <link url='%1'>Launchpad</link> instead.",
-                                            QString("http://launchpad.net/ubuntu/+source/" + m_package->sourcePackage())));
-        } else {
-            m_changelogBrowser->setText(i18nc("@info", "The list of changes is not yet available."));
-        }
-    }
-    else {
-        QTextStream stream(&changelogFile);
-        const QApt::Changelog log(stream.readAll(), m_package->sourcePackage());
-        QString description = buildDescription(log);
-
-        m_changelogBrowser->setHtml(description);
+    if (m_package) {
+        // Work around http://bugreports.qt.nokia.com/browse/QTBUG-2533 by forcibly resetting the CharFormat
+        m_changelogBrowser->setCurrentCharFormat(QTextCharFormat());
+        m_changelogBrowser->setHtml(changelog);
     }
 
     m_busyWidget->stop();
     if (!m_show) {
         animatedHide();
     }
-
-    changelogFile.remove();
 }
 
 void ChangelogWidget::fetchChangelog()
@@ -195,49 +159,5 @@ void ChangelogWidget::fetchChangelog()
     show();
     m_changelogBrowser->clear();
     m_busyWidget->start();
-
-    KTemporaryFile *changelogFile = new KTemporaryFile;
-    changelogFile->setAutoRemove(false);
-    changelogFile->setPrefix("muon");
-    changelogFile->setSuffix(".txt");
-    changelogFile->open();
-    QString filename = changelogFile->fileName();
-    delete changelogFile;
-
-    KIO::FileCopyJob *getJob = KIO::file_copy(m_package->changelogUrl(),
-                               filename, -1,
-                               KIO::Overwrite | KIO::HideProgressInfo);
-
-    m_jobHash[getJob] = filename;
-    connect(getJob, SIGNAL(result(KJob*)),
-            this, SLOT(changelogFetched(KJob*)));
-}
-
-QString ChangelogWidget::buildDescription(const QApt::Changelog &changelog)
-{
-    QString description;
-
-    QApt::ChangelogEntryList entries = changelog.newEntriesSince(m_package->installedVersion());
-
-    if (entries.size() < 1) {
-        return description;
-    }
-
-    foreach(const QApt::ChangelogEntry &entry, entries) {
-        description += i18nc("@info:label Refers to a software version, Ex: Version 1.2.1:",
-                             "Version %1:", entry.version());
-
-        QString issueDate = KGlobal::locale()->formatDateTime(entry.issueDateTime(), KLocale::ShortDate);
-        description += QLatin1String("<p>") %
-                       i18nc("@info:label", "This update was issued on %1", issueDate) %
-                       QLatin1String("</p>");
-
-        QString updateText = entry.description();
-        updateText.replace('\n', QLatin1String("<br/>"));
-        description += QLatin1String("<p><pre>") %
-                       updateText %
-                       QLatin1String("</pre></p>");
-    }
-
-    return description;
+    m_package->fetchChangelog();
 }

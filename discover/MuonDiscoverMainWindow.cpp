@@ -18,6 +18,8 @@
  */
 
 #include "MuonDiscoverMainWindow.h"
+#include "DiscoverAction.h"
+#include "NativeScrollBar.h"
 
 // Qt includes
 #include <QDebug>
@@ -27,6 +29,8 @@
 #include <QDesktopServices>
 #include <QTimer>
 #include <QGraphicsObject>
+#include <QToolButton>
+#include <QLayout>
 #include <qdeclarative.h>
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
@@ -43,65 +47,32 @@
 #include <Plasma/Theme>
 #include <KStandardDirs>
 #include <KMessageBox>
+#include <KToolBar>
+#include <KLineEdit>
+#include <KMenu>
+#include <KMenuBar>
+#include <KXMLGUIFactory>
+#include <KToolBarPopupAction>
 
 // Libmuon includes
-#include <resources/ResourcesModel.h>
-#include <resources/ResourcesUpdatesModel.h>
-#include <Category/CategoryModel.h>
-#include <Transaction/TransactionListener.h>
-#include <Transaction/Transaction.h>
-#include <ReviewsBackend/Rating.h>
-#include <resources/ResourcesModel.h>
-#include <resources/ResourcesUpdatesModel.h>
-#include <ReviewsBackend/AbstractReviewsBackend.h>
-
-#ifdef QAPT_ENABLED
-#include "OriginsBackend.h"
-#endif
-
-// Own includes
-#include "ApplicationProxyModelHelper.h"
-#include "BackendsSingleton.h"
-#include "ReviewsModel.h"
-#include "ApplicationAddonsModel.h"
-#include "ScreenshotsModel.h"
 #include <libmuon/MuonDataSources.h>
+#include <resources/ResourcesModel.h>
+#include <Transaction/TransactionModel.h>
+#include <Category/Category.h>
 
-QML_DECLARE_TYPE(ResourcesModel)
-QML_DECLARE_TYPE(AbstractResourcesBackend)
-
-
-class CachedNetworkAccessManager : public QNetworkAccessManager {
-    public:
-        explicit CachedNetworkAccessManager(QObject* parent = 0) : QNetworkAccessManager(parent) {}
-    
-        virtual QNetworkReply* createRequest(Operation op, const QNetworkRequest& request, QIODevice* outgoingData = 0) {
-            QNetworkRequest req(request);
-            req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
-            return QNetworkAccessManager::createRequest(op, request, outgoingData);
-        }
-};
-
-class CachedNAMFactory : public QDeclarativeNetworkAccessManagerFactory
-{
-    virtual QNetworkAccessManager* create(QObject* parent) {
-        CachedNetworkAccessManager* ret = new CachedNetworkAccessManager(parent);
-        QString cacheDir = KStandardDirs::locateLocal("cache", "screenshotsCache", true);
-        QNetworkDiskCache* cache = new QNetworkDiskCache(ret);
-        cache->setCacheDirectory(cacheDir);
-        ret->setCache(cache);
-        return ret;
-    }
-};
+Q_DECLARE_METATYPE(ResourcesModel*)
+Q_DECLARE_METATYPE(TransactionModel*)
 
 MuonDiscoverMainWindow::MuonDiscoverMainWindow()
-    : KXmlGuiWindow(0)
+    : MuonMainWindow()
 {
+    initialize();
     m_view = new QDeclarativeView(this);
-    m_view->setBackgroundRole(QPalette::Background);
+    m_view->setBackgroundRole(QPalette::AlternateBase);
+    qreal bgGrayness = m_view->backgroundBrush().color().blackF();
     
     Plasma::Theme::defaultTheme()->setUseGlobalSettings(false); //don't change every plasma theme!
-    Plasma::Theme::defaultTheme()->setThemeName("appdashboard");
+    Plasma::Theme::defaultTheme()->setThemeName(bgGrayness>0.5 ? "muon-contenttheme" : "oxygen");
     
     KDeclarative kdeclarative;
     kdeclarative.setDeclarativeEngine(m_view->engine());
@@ -109,35 +80,20 @@ MuonDiscoverMainWindow::MuonDiscoverMainWindow()
     //binds things like kconfig and icons
     kdeclarative.setupBindings();
     
-    qmlRegisterType<CategoryModel>("org.kde.muon", 1, 0, "CategoryModel");
-    qmlRegisterType<ApplicationProxyModelHelper>("org.kde.muon", 1, 0, "ApplicationProxyModel");
-    qmlRegisterType<TransactionListener>("org.kde.muon", 1, 0, "TransactionListener");
-    qmlRegisterType<ReviewsModel>("org.kde.muon", 1, 0, "ReviewsModel");
-    qmlRegisterType<ApplicationAddonsModel>("org.kde.muon", 1, 0, "ApplicationAddonsModel");
-    qmlRegisterType<ScreenshotsModel>("org.kde.muon", 1, 0, "ScreenshotsModel");
-    qmlRegisterType<ResourcesUpdatesModel>("org.kde.muon", 1, 0, "ResourcesUpdatesModel");
-    qmlRegisterType<Rating>();
-    qmlRegisterType<AbstractResource>();
-    qmlRegisterType<AbstractResourcesBackend>();
-    qmlRegisterType<AbstractReviewsBackend>();
-    qmlRegisterType<Category>();
-    qmlRegisterType<ResourcesModel>();
-    qmlRegisterType<Transaction>();
-#ifdef QAPT_ENABLED
-    qmlRegisterType<OriginsBackend>("org.kde.muon", 1, 0, "OriginsBackend");
-    qmlRegisterType<Source>();
-    qmlRegisterType<Entry>();
-#endif
+    qmlRegisterType<DiscoverAction>("org.kde.muon.discover", 1, 0, "DiscoverAction");
+    qmlRegisterType<NativeScrollBar>("org.kde.muon.discover", 1, 0, "NativeScrollBar");
+    qmlRegisterType<KXmlGuiWindow>();
+    
+    m_searchText = new KLineEdit;
+    m_searchText->setPlaceholderText(i18n("Search..."));
     
     //Here we set up a cache for the screenshots
-//     m_view->engine()->setNetworkAccessManagerFactory(new CachedNAMFactory);
-    ResourcesModel* resourcesModel = BackendsSingleton::self()->appsModel();
-    m_view->engine()->rootContext()->setContextProperty("resourcesModel", qVariantFromValue<ResourcesModel*>(resourcesModel));
+    m_view->engine()->rootContext()->setContextProperty("resourcesModel",
+                                                        qVariantFromValue<ResourcesModel*>(ResourcesModel::global()));
+    m_view->engine()->rootContext()->setContextProperty("transactionModel",
+                                                        qVariantFromValue<TransactionModel*>(TransactionModel::global()));
     m_view->engine()->rootContext()->setContextProperty("app", this);
     m_view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-// #if !defined(QT_NO_OPENGL)
-//     m_view->setViewport(new QGLWidget);
-// #endif
     
     m_view->setSource(QUrl("qrc:/qml/Main.qml"));
     if(!m_view->errors().isEmpty()) {
@@ -159,7 +115,15 @@ MuonDiscoverMainWindow::MuonDiscoverMainWindow()
     restoreState(window.readEntry<QByteArray>("windowState", QByteArray()));
     
     setCentralWidget(m_view);
-    BackendsSingleton::self()->initialize(this);
+    setupActions();
+}
+
+void MuonDiscoverMainWindow::initialize()
+{
+    ResourcesModel *m = ResourcesModel::global();
+
+    m->registerAllBackends();
+    m->integrateMainWindow(this);
 }
 
 MuonDiscoverMainWindow::~MuonDiscoverMainWindow()
@@ -175,6 +139,37 @@ QAction* MuonDiscoverMainWindow::getAction(const QString& name)
     return actionCollection()->action(name);
 }
 
+QStringList MuonDiscoverMainWindow::modes() const
+{
+    QStringList ret;
+    QGraphicsObject* obj = m_view->rootObject();
+    for(int i = obj->metaObject()->propertyOffset(); i<obj->metaObject()->propertyCount(); i++) {
+        QMetaProperty p = obj->metaObject()->property(i);
+        QByteArray name = p.name();
+        if(name.startsWith("top") && name.endsWith("Comp")) {
+            name = name.mid(3);
+            name = name.left(name.length()-4);
+            name[0] = name[0] - 'A' + 'a';
+            ret += name;
+        }
+    }
+    return ret;
+}
+
+void MuonDiscoverMainWindow::openMode(const QByteArray& _mode)
+{
+    if(!modes().contains(_mode))
+        kWarning() << "unknown mode" << _mode;
+    
+    QByteArray mode = _mode;
+    if(mode[0]>'Z')
+        mode[0] = mode[0]-'a'+'A';
+    QGraphicsObject* obj = m_view->rootObject();
+    QByteArray propertyName = "top"+mode+"Comp";
+    QVariant modeComp = obj->property(propertyName);
+    obj->setProperty("currentTopLevel", modeComp);
+}
+
 void MuonDiscoverMainWindow::openMimeType(const QString& mime)
 {
     emit listMimeInternal(mime);
@@ -182,8 +177,7 @@ void MuonDiscoverMainWindow::openMimeType(const QString& mime)
 
 void MuonDiscoverMainWindow::openCategory(const QString& category)
 {
-    Category* c = new Category(category, this);
-    emit listCategoryInternal(c);
+    emit listCategoryInternal(category);
 }
 
 void MuonDiscoverMainWindow::openApplication(const QString& app)
@@ -192,16 +186,16 @@ void MuonDiscoverMainWindow::openApplication(const QString& app)
     m_appToBeOpened = app;
     triggerOpenApplication();
     if(!m_appToBeOpened.isEmpty())
-        connect(BackendsSingleton::self()->appsModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), SLOT(triggerOpenApplication()));
+        connect(ResourcesModel::global(), SIGNAL(rowsInserted(QModelIndex,int,int)), SLOT(triggerOpenApplication()));
 }
 
 void MuonDiscoverMainWindow::triggerOpenApplication()
 {
-    AbstractResource* app = BackendsSingleton::self()->appsModel()->resourceByPackageName(m_appToBeOpened);
+    AbstractResource* app = ResourcesModel::global()->resourceByPackageName(m_appToBeOpened);
     if(app) {
         emit openApplicationInternal(app);
         m_appToBeOpened.clear();
-        disconnect(BackendsSingleton::self()->appsModel(), SIGNAL(rowsInserted(QModelIndex, int, int)), this, SLOT(triggerOpenApplication()));
+        disconnect(ResourcesModel::global(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(triggerOpenApplication()));
     }
 }
 
@@ -213,4 +207,40 @@ QSize MuonDiscoverMainWindow::sizeHint() const
 QUrl MuonDiscoverMainWindow::featuredSource() const
 {
     return MuonDataSources::featuredSource();
+}
+
+QUrl MuonDiscoverMainWindow::prioritaryFeaturedSource() const
+{
+    return QUrl::fromLocalFile(KGlobal::dirs()->findResource("appdata", "featured.json"));
+}
+
+void MuonDiscoverMainWindow::setupActions()
+{
+    setupGUI(StandardWindowOption(KXmlGuiWindow::Default & ~KXmlGuiWindow::StatusBar));
+    MuonMainWindow::setupActions();
+
+    menuBar()->setVisible(false);
+
+    QToolBar* t = toolBar();
+    QMenu* configMenu = new QMenu(this);
+    configMenu->addMenu(qobject_cast<QMenu*>(factory()->container("settings", this)));
+    configMenu->addMenu(helpMenu());
+    
+    KToolBarPopupAction* configureButton = new KToolBarPopupAction(KIcon("applications-system"), i18n("Menu"), t);
+    configureButton->setToolTip(i18n("Configure and learn about Muon Discover"));
+    configureButton->setMenu(configMenu);
+    configureButton->setDelayed(false);
+    configureButton->setPriority(QAction::LowPriority);
+    
+    QWidget* wideWidget = new QWidget(t);
+    t->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    
+    t->addWidget(wideWidget);
+    t->addWidget(m_searchText);
+    t->addAction(configureButton);
+}
+
+QObject* MuonDiscoverMainWindow::searchWidget() const
+{
+    return m_searchText;
 }

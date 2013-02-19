@@ -20,6 +20,9 @@
 
 #include "AbstractResource.h"
 #include "AbstractResourcesBackend.h"
+#include <KLocalizedString>
+#include <KGlobal>
+#include <KLocale>
 
 AbstractResource::AbstractResource(AbstractResourcesBackend* parent)
     : QObject(parent)
@@ -48,14 +51,15 @@ bool AbstractResource::isInstalled()
     return state() >= Installed;
 }
 
-int AbstractResource::popularityContest() const
-{
-    return -1;
-}
-
 void AbstractResource::fetchScreenshots()
 {
-    emit screenshotsFetched(QList<QUrl>() << thumbnailUrl(), QList<QUrl>() << screenshotUrl());
+    QList<QUrl> thumbs, screens;
+    QUrl thumbnail = thumbnailUrl();
+    if(!thumbnail.isEmpty()) {
+        thumbs << thumbnail;
+        screens << screenshotUrl();
+    }
+    emit screenshotsFetched(thumbs, screens);
 }
 
 QString AbstractResource::mimetypes() const
@@ -63,7 +67,33 @@ QString AbstractResource::mimetypes() const
     return QString();
 }
 
+QStringList AbstractResource::executables() const
+{
+    return QStringList();
+}
+
 AbstractResourcesBackend* AbstractResource::backend() const
 {
     return static_cast<AbstractResourcesBackend*>(parent());
+}
+
+QString AbstractResource::status()
+{
+    switch(state()) {
+        case Broken: return i18n("Broken");
+        case None: return i18n("Available");
+        case Installed: return i18n("Installed");
+        case Upgradeable: return i18n("Upgradeable");
+    }
+    return QString();
+}
+
+bool AbstractResource::isSecure() const
+{
+    return false;
+}
+
+QString AbstractResource::sizeDescription()
+{
+    return KGlobal::locale()->formatByteSize(downloadSize());
 }

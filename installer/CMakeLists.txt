@@ -1,8 +1,4 @@
-include_directories(../libmuon)
-
-if (LIBATTICA_FOUND)
-    add_definitions(-DATTICA_ENABLED)
-endif (LIBATTICA_FOUND)
+include_directories(../libmuon ../libmuonapt/)
 
 set(muon_installer_SRCS
     main.cpp
@@ -27,16 +23,19 @@ set(muon_installer_SRCS
     ClickableLabel.cpp
     effects/GraphicsOpacityDropShadowEffect.cpp
     ProgressView.cpp
+    qml/src/mousecursor.cpp
     ReviewsWidget/ReviewWidget.cpp
     ReviewsWidget/ReviewsWidget.cpp
     ScreenShotOverlay.cpp
-    ViewSwitcher.cpp)
+    ViewSwitcher.cpp
+    LaunchListModel.cpp
+)
 
 kde4_add_kcfg_files(muon_installer_SRCS GENERATE_MOC config/MuonInstallerSettings.kcfgc)
 
 kde4_add_executable(muon-installer ${muon_installer_SRCS})
 
-target_link_libraries(muon-installer muonprivate
+target_link_libraries(muon-installer muonprivate muonapt
                                      ${KDE4_KIO_LIBS}
                                      ${QAPT_LIBRARY}
                                      ${qjson_LIBRARIES}
@@ -46,6 +45,8 @@ install(TARGETS muon-installer ${INSTALL_TARGETS_DEFAULT_ARGS} )
 
 ########### install files ###############
 
+file(GLOB muon_QMLS "${CMAKE_CURRENT_SOURCE_DIR}/qml/qml/*.qml")
 install( PROGRAMS muon-installer.desktop  DESTINATION ${XDG_APPS_INSTALL_DIR} )
 install(FILES muon-installerui.rc  DESTINATION  ${DATA_INSTALL_DIR}/muon-installer)
+install(FILES ${muon_QMLS} DESTINATION ${DATA_INSTALL_DIR}/muon-installer)
 install(FILES config/muon-installer.kcfg DESTINATION ${KCFG_INSTALL_DIR})

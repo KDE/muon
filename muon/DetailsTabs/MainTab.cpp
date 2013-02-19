@@ -173,13 +173,14 @@ void MainTab::refresh()
     // Append a newline to give a bit of separation for the support string
     m_descriptionBrowser->append(QString());
     if (m_package->isSupported()) {
+        QDateTime endDate = m_package->supportedUntil();
         m_descriptionBrowser->append(i18nc("@info Tells how long Canonical, Ltd. will support a package",
                                         "Canonical provides critical updates for %1 until %2.",
-                                        m_package->latin1Name(), m_package->supportedUntil()));
+                                        m_package->name(), KGlobal::locale()->formatDate(endDate.date())));
     } else {
         m_descriptionBrowser->append(i18nc("@info Tells how long Canonical, Ltd. will support a package",
                                         "Canonical does not provide updates for %1. Some updates "
-                                        "may be provided by the Ubuntu community.", m_package->latin1Name()));
+                                        "may be provided by the Ubuntu community.", m_package->name()));
     }
 }
 

@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#! /usr/bin/python3
 
 # releasechecker.py
 #
@@ -24,22 +23,24 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, time
-sys.path.insert(0, '/usr/lib/update-notifier')
+sys.path.insert(0, '/usr/lib/python3/dist-packages/')
 
 from UpdateManager.Core.MetaRelease import MetaReleaseCore
+from UpdateManager.Core.utils import init_proxy
 
 if __name__ == "__main__":
     """ check for updates, if there are any say so """
+
+    init_proxy()
     #FIXME: implement command line options for MetaReleaseCore args
     metaRelease = MetaReleaseCore(False, False)
     while metaRelease.downloading:
-        time.sleep(1)
+        time.sleep(0.5)
     new_dist = metaRelease.new_dist
 
     if new_dist is not None:
-        print("we haz an release")
+        print("Found a release")
         sys.exit(0)
     else:
-        print("No new release at this moment")
         sys.exit(1)
 

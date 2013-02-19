@@ -22,36 +22,14 @@
 
 #include <KDebug>
 #include <KProcess>
-#include <KStandardDirs>
 
 DistUpgradeEvent::DistUpgradeEvent(QObject* parent, QString name)
         : Event(parent, name)
 {
 }
 
-DistUpgradeEvent::~DistUpgradeEvent()
-{
-}
-
-bool DistUpgradeEvent::upgradeAvailable()
-{
-    QString checkerFile = KStandardDirs::locate("data", "muon-notifier/releasechecker");
-    KProcess checkerProcess;
-    checkerProcess.setProgram(QStringList() << "/usr/bin/python" << checkerFile);
-
-    if (checkerProcess.execute() == 0) {
-        return true;
-    }
-    return false;
-}
-
 void DistUpgradeEvent::show()
 {
-    if (!upgradeAvailable()) {
-        kDebug() << "No upgrade available";
-        return;
-    }
-
     QString icon = "system-software-update";
     QString text(i18nc("Notification when a new version of Kubuntu is available",
                        "A new version of Kubuntu is available"));
@@ -66,9 +44,6 @@ void DistUpgradeEvent::show()
 
 void DistUpgradeEvent::run()
 {
-    KProcess::startDetached(QStringList() << "python"
-                            << "/usr/share/pyshared/UpdateManager/DistUpgradeFetcherKDE.py");
+    KProcess::startDetached(QStringList() << "/usr/bin/kubuntu-devel-release-upgrade");
     Event::run();
 }
-
-#include "distupgradeevent.moc"

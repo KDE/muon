@@ -37,10 +37,8 @@
 #include <Nepomuk/KRatingPainter>
 #include <KDebug>
 
-// LibQApt includes
-#include <LibQApt/Backend>
-
-//Libmuon includes
+// Libmuon includes
+#include <Transaction/TransactionModel.h>
 #include <resources/AbstractResource.h>
 #include <resources/ResourcesModel.h>
 
@@ -127,12 +125,16 @@ void ResourceDelegate::paint(QPainter *painter,
             m_ratingPainter->paint(painter, rect, rating);
         }
     } else {
+        TransactionModel *transModel = TransactionModel::global();
+        AbstractResource* res = qobject_cast<AbstractResource*>( index.data(ResourcesModel::ApplicationRole).value<QObject*>());
+        Transaction *trans = transModel->transactionFromResource(res);
+        QModelIndex transIndex = transModel->indexOf(trans);
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = rect;
         progressBarOption.minimum = 0;
         progressBarOption.maximum = 100;
-        progressBarOption.progress = index.data(ResourcesModel::ProgressRole).toInt();
-        progressBarOption.text = index.data(ResourcesModel::ProgressTextRole).toString();
+        progressBarOption.progress = transIndex.data(TransactionModel::ProgressRole).toInt();
+        progressBarOption.text = transIndex.data(TransactionModel::StatusTextRole).toString();
         progressBarOption.textVisible = true;
         KApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarOption, painter);
     }

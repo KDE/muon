@@ -21,76 +21,93 @@
 #include "ResourcesModel.h"
 
 #include <KGlobal>
+#include <KDebug>
 
-#include "resources/AbstractResourcesBackend.h"
 #include "AbstractResource.h"
+#include "resources/AbstractResourcesBackend.h"
 #include <ReviewsBackend/Rating.h>
 #include <ReviewsBackend/AbstractReviewsBackend.h>
 #include <Transaction/Transaction.h>
+#include <MuonBackendsFactory.h>
+#include <MuonMainWindow.h>
+#include "Transaction/TransactionModel.h"
 #include <QDebug>
+#include <QCoreApplication>
+#include <QThread>
 
-K_GLOBAL_STATIC_WITH_ARGS(ResourcesModel, globalResourcesModel, (0))
+static const KCatalogLoader loader("libmuon");
+
+ResourcesModel *ResourcesModel::s_self = nullptr;
 
 ResourcesModel *ResourcesModel::global()
 {
-    return globalResourcesModel;
+    if(!s_self)
+        s_self = new ResourcesModel;
+    return s_self;
 }
 
 ResourcesModel::ResourcesModel(QObject* parent)
     : QAbstractListModel(parent)
+    , m_initializingBackends(0)
+    , m_mainwindow(0)
 {
+    Q_ASSERT(!s_self);
+    Q_ASSERT(QCoreApplication::instance()->thread()==QThread::currentThread());
+
     QHash< int, QByteArray > roles = roleNames();
     roles[NameRole] = "name";
     roles[IconRole] = "icon";
     roles[CommentRole] = "comment";
-    roles[ActionRole] = "action";
     roles[StateRole] = "state";
     roles[RatingRole] = "rating";
     roles[RatingPointsRole] = "ratingPoints";
     roles[SortableRatingRole] = "sortableRating";
     roles[ActiveRole] = "active";
-    roles[ProgressRole] = "progress";
-    roles[ProgressTextRole] = "progressText";
     roles[InstalledRole] = "isInstalled";
     roles[ApplicationRole] = "application";
-    roles[PopConRole] = "popcon";
     roles[OriginRole] = "origin";
-    roles[UntranslatedNameRole] = "untranslatedName";
     roles[CanUpgrade] = "canUpgrade";
     roles[PackageNameRole] = "packageName";
     roles[IsTechnicalRole] = "isTechnical";
     roles[CategoryRole] = "category";
     roles[SectionRole] = "section";
     roles[MimeTypes] = "mimetypes";
+    roles.remove(Qt::EditRole);
+    roles.remove(Qt::WhatsThisRole);
     setRoleNames(roles);
+
+    connect(TransactionModel::global(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+            this, SLOT(transactionChanged(QModelIndex)));
 }
 
-void ResourcesModel::addResourcesBackend(AbstractResourcesBackend* resources)
+ResourcesModel::~ResourcesModel()
 {
-    Q_ASSERT(!m_backends.contains(resources));
-    QVector<AbstractResource*> newResources = resources->allResources();
-    int current = rowCount();
-    beginInsertRows(QModelIndex(), current, current+newResources.size());
-    m_backends += resources;
-    m_resources.append(newResources);
-    endInsertRows();
+    qDeleteAll(m_backends);
+}
+
+void ResourcesModel::addResourcesBackend(AbstractResourcesBackend* backend)
+{
+    Q_ASSERT(!m_backends.contains(backend));
+    QVector<AbstractResource*> newResources = backend->allResources();
+    if(!newResources.isEmpty()) {
+        int current = rowCount();
+        beginInsertRows(QModelIndex(), current, current+newResources.size());
+        m_backends += backend;
+        m_resources.append(newResources);
+        endInsertRows();
+    } else {
+        m_backends += backend;
+        m_resources.append(newResources);
+    }
+    if(m_mainwindow)
+        backend->integrateMainWindow(m_mainwindow);
     
-    connect(resources, SIGNAL(backendReady()), SLOT(resetCaller()));
-    connect(resources, SIGNAL(reloadStarted()), SLOT(cleanCaller()));
-    connect(resources, SIGNAL(reloadFinished()), SLOT(resetCaller()));
-    connect(resources, SIGNAL(updatesCountChanged()), SIGNAL(updatesCountChanged()));
-    connect(resources, SIGNAL(allDataChanged()), SLOT(updateCaller()));
-    connect(resources, SIGNAL(searchInvalidated()), SIGNAL(searchInvalidated()));
-    
-    connect(resources, SIGNAL(transactionAdded(Transaction*)), SIGNAL(transactionAdded(Transaction*)));
-    connect(resources, SIGNAL(transactionCancelled(Transaction*)), SIGNAL(transactionCancelled(Transaction*)));
-    connect(resources, SIGNAL(transactionProgressed(Transaction*,int)), SIGNAL(transactionProgressed(Transaction*,int)));
-    connect(resources, SIGNAL(transactionRemoved(Transaction*)), SIGNAL(transactionRemoved(Transaction*)));
-    connect(resources, SIGNAL(transactionsEvent(TransactionStateTransition,Transaction*)), SIGNAL(transactionsEvent(TransactionStateTransition,Transaction*)));
-    
-    connect(this, SIGNAL(transactionAdded(Transaction*)), SLOT(transactionChanged(Transaction*)));
-    connect(this, SIGNAL(transactionRemoved(Transaction*)), SLOT(transactionChanged(Transaction*)));
-    connect(this, SIGNAL(transactionCancelled(Transaction*)), SLOT(transactionChanged(Transaction*)));
+    connect(backend, SIGNAL(backendReady()), SLOT(resetCaller()));
+    connect(backend, SIGNAL(reloadStarted()), SLOT(cleanCaller()));
+    connect(backend, SIGNAL(reloadFinished()), SLOT(resetCaller()));
+    connect(backend, SIGNAL(updatesCountChanged()), SIGNAL(updatesCountChanged()));
+    connect(backend, SIGNAL(allDataChanged()), SLOT(updateCaller()));
+    connect(backend, SIGNAL(searchInvalidated()), SIGNAL(searchInvalidated()));
 
     emit backendsChanged();
 }
@@ -133,18 +150,24 @@ QVariant ResourcesModel::data(const QModelIndex& index, int role) const
     AbstractResource* resource = resourceAt(index.row());
     switch(role) {
         case ActiveRole: {
-            //TODO: Maybe move to AbstractResource?
-            Transaction* t = resource->backend()->currentTransactionState().second;
-            return t && t->resource() == resource;
+            Transaction* t = TransactionModel::global()->transactionFromResource(resource);
+
+            return (t != nullptr);
         }
         case ApplicationRole:
             return qVariantFromValue<QObject*>(resource);
         case RatingPointsRole:
         case RatingRole:
-        case SortableRatingRole:{
-            Rating* rating = backendForResource(resource)->reviewsBackend()->ratingForApplication(resource);
+        case SortableRatingRole: {
+            AbstractReviewsBackend* ratings = resource->backend()->reviewsBackend();
+            Rating* rating = ratings ? ratings->ratingForApplication(resource) : nullptr;
             return rating ? rating->property(roleNames().value(role)) : -1;
         }
+        case Qt::DecorationRole:
+        case Qt::DisplayRole:
+        case Qt::StatusTipRole:
+        case Qt::ToolTipRole:
+            return QVariant();
         default: {
             QByteArray roleText = roleNames().value(role);
             if(roleText.isEmpty())
@@ -160,16 +183,20 @@ QVariant ResourcesModel::data(const QModelIndex& index, int role) const
 
 int ResourcesModel::rowCount(const QModelIndex& parent) const
 {
-    if(parent.isValid()) return 0;
+    if(parent.isValid())
+        return 0; // Not the root element, and children don't have subchildren
+
+    // The root element parents all resources from all backends
     int ret = 0;
-    foreach(const QVector<AbstractResource*>& resources, m_resources) {
+    for (const QVector<AbstractResource*>& resources : m_resources)
         ret += resources.size();
-    }
+
     return ret;
 }
 
 void ResourcesModel::cleanCaller()
 {
+    m_initializingBackends++;
     AbstractResourcesBackend* backend = qobject_cast<AbstractResourcesBackend*>(sender());
     Q_ASSERT(backend);
     int pos = m_backends.indexOf(backend);
@@ -212,6 +239,9 @@ void ResourcesModel::resetCaller()
         endInsertRows();
         emit updatesCountChanged();
     }
+    m_initializingBackends--;
+    if(m_initializingBackends==0)
+        emit allInitialized();
 }
 
 void ResourcesModel::updateCaller()
@@ -220,7 +250,7 @@ void ResourcesModel::updateCaller()
     int pos = m_backends.indexOf(backend);
     QVector<AbstractResource*>* backendsResources = &m_resources[pos];
     int before = 0;
-    for(QVector<QVector<AbstractResource*> >::const_iterator it=m_resources.constBegin();
+    for(auto it=m_resources.constBegin();
         it!=m_resources.constEnd() && it!=backendsResources;
         ++it)
     {
@@ -247,19 +277,6 @@ AbstractResource* ResourcesModel::resourceByPackageName(const QString& name)
     return 0;
 }
 
-
-AbstractResourcesBackend* ResourcesModel::backendForResource(AbstractResource* resource) const
-{
-    foreach(AbstractResourcesBackend* backend, m_backends)
-    {
-        if(backend->providesResouce(resource)) {
-            return backend;
-        }
-    }
-    Q_ASSERT(!resource && "all resources should have a backend");
-    return 0;
-}
-
 int ResourcesModel::updatesCount() const
 {
     int ret = 0;
@@ -273,26 +290,70 @@ int ResourcesModel::updatesCount() const
 
 void ResourcesModel::installApplication(AbstractResource* app)
 {
-    backendForResource(app)->installApplication(app);
+    app->backend()->installApplication(app);
 }
 
-void ResourcesModel::installApplication(AbstractResource* app, const QHash< QString, bool >& state)
+void ResourcesModel::installApplication(AbstractResource* app, AddonList addons)
 {
-    backendForResource(app)->installApplication(app, state);
+    app->backend()->installApplication(app, addons);
 }
 
 void ResourcesModel::removeApplication(AbstractResource* app)
 {
-    backendForResource(app)->removeApplication(app);
+    app->backend()->removeApplication(app);
 }
 
 void ResourcesModel::cancelTransaction(AbstractResource* app)
 {
-    backendForResource(app)->cancelTransaction(app);
+    app->backend()->cancelTransaction(app);
 }
 
-void ResourcesModel::transactionChanged(Transaction* t)
+void ResourcesModel::transactionChanged(QModelIndex tIndex)
 {
-    QModelIndex idx = resourceIndex(t->resource());
+    Transaction *trans = TransactionModel::global()->transactionFromIndex(tIndex);
+    QModelIndex idx = resourceIndex(trans->resource());
     dataChanged(idx, idx);
 }
+
+QMap<int, QVariant> ResourcesModel::itemData(const QModelIndex& index) const
+{
+    QMap<int, QVariant> ret;
+    QHash<int, QByteArray> names = roleNames();
+    for (auto it = names.constBegin(); it != names.constEnd(); ++it) {
+        ret.insert(it.key(), data(index, it.key()));
+    }
+    return ret;
+}
+
+void ResourcesModel::registerAllBackends()
+{
+    MuonBackendsFactory f;
+    m_initializingBackends += f.backendsCount();
+    if(m_initializingBackends==0) {
+        kWarning() << "Couldn't find any backends";
+        emit allInitialized();
+    } else {
+        QList<AbstractResourcesBackend*> backends = f.allBackends();
+        foreach(AbstractResourcesBackend* b, backends) {
+            addResourcesBackend(b);
+        }
+    }
+}
+
+void ResourcesModel::registerBackendByName(const QString& name)
+{
+    MuonBackendsFactory f;
+    addResourcesBackend(f.backend(name));
+    m_initializingBackends++;
+}
+
+void ResourcesModel::integrateMainWindow(MuonMainWindow* w)
+{
+    Q_ASSERT(w->thread()==thread());
+    m_mainwindow = w;
+    setParent(w);
+    foreach(AbstractResourcesBackend* b, m_backends) {
+        b->integrateMainWindow(w);
+    }
+}
+

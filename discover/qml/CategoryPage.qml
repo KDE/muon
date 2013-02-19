@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library/Lesser General Public License
+ *   version 2, or (at your option) any later version, as published by the
+ *   Free Software Foundation
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library/Lesser General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 import QtQuick 1.1
 import org.kde.plasma.components 0.1
 import org.kde.qtextracomponents 0.1
@@ -8,6 +27,7 @@ Page {
     id: page
     property QtObject category
     property real actualWidth: width-Math.pow(width/70, 2)
+    property alias categories: categoryModel
     
     function searchFor(text) {
         if(category)
@@ -18,7 +38,7 @@ Page {
     
     Component {
         id: categoryDelegate
-        ListItem {
+        GridItem {
             property int minCellWidth: 130
             width: parent.width/Math.ceil(parent.width/minCellWidth)-10
             height: 100
@@ -42,23 +62,15 @@ Page {
                     wrapMode: Text.WordWrap
                 }
             }
-            onClicked: {
-                switch(categoryType) {
-                    case CategoryModel.CategoryType:
-                        Navigation.openApplicationList(category.icon, category.name, category, "")
-                        break;
-                    case CategoryModel.SubCatType:
-                        Navigation.openCategory(category)
-                        break;
-                }
-            }
+            onClicked: Navigation.openCategory(category)
         }
     }
     
-    ScrollBar {
+    NativeScrollBar {
         id: scroll
         orientation: Qt.Vertical
         flickableItem: flick
+
         anchors {
             top: parent.top
             right: parent.right 
@@ -69,17 +81,16 @@ Page {
     Flickable {
         id: flick
         anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            bottom: parent.bottom
+            fill: parent
             bottomMargin: 10
+            rightMargin: scroll.width
         }
-        width: page.actualWidth
         contentHeight: conts.height
         
         Column {
             id: conts
-            width: parent.width
+            width: page.actualWidth
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: 10
             Loader {
                 width: parent.width
@@ -106,6 +117,7 @@ Page {
                 spacing: 10
                 Repeater {
                     model: CategoryModel {
+                        id: categoryModel
                         displayedCategory: page.category
                     }
                     delegate: categoryDelegate
@@ -116,32 +128,28 @@ Page {
                 height: Math.min(200, page.height/2)
                 width: parent.width
                 ApplicationsTop {
-                    id: top1
                     width: parent.width/2-5
                     anchors {
                         top: parent.top
                         left: parent.left
                         bottom: parent.bottom
                     }
-                    sortRole: "popcon"
+                    sortRole: "sortableRating"
                     filteredCategory: page.category
-                    header: Label { text: i18n("<b>Popularity Contest</b>"); width: top1.width; horizontalAlignment: Text.AlignHCenter }
-                    roleDelegate: Label { property variant model: null; text: i18n("points: %1", model.popcon) }
-                    Component.onCompleted: top1.sortModel()
+                    title: i18n("Popularity Contest")
+                    roleDelegate: Label { property variant model; text: i18n("points: %1", model.sortableRating.toFixed(2)) }
                 }
                 ApplicationsTop {
-                    id: top2
-                    interactive: false
+                    width: parent.width/2-5
                     anchors {
                         top: parent.top
                         right: parent.right
                         bottom: parent.bottom
                     }
-                    width: parent.width/2-5
                     sortRole: "ratingPoints"
                     filteredCategory: page.category
-                    header: Label { text: i18n("<b>Best Ratings</b>"); width: top2.width; horizontalAlignment: Text.AlignHCenter }
-                    roleDelegate: Rating { property variant model: null; rating: model.rating; height: 10 }
+                    title: i18n("Best Ratings")
+                    roleDelegate: Rating { property variant model; rating: model.rating; height: 10 }
                 }
             }
         }

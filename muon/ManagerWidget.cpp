@@ -36,7 +36,7 @@
 #include <LibQApt/Backend>
 
 // Own includes
-#include "../libmuon/MuonStrings.h"
+#include "../libmuonapt/MuonStrings.h"
 #include "DetailsWidget.h"
 #include "PackageModel/PackageModel.h"
 #include "PackageModel/PackageProxyModel.h"
@@ -50,10 +50,6 @@ ManagerWidget::ManagerWidget(QWidget *parent)
 
     hideHeaderLabel();
     showSearchEdit();
-}
-
-ManagerWidget::~ManagerWidget()
-{
 }
 
 void ManagerWidget::reload()

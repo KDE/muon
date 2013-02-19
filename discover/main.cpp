@@ -28,12 +28,12 @@
 static const char description[] =
     I18N_NOOP("An application discoverer");
 
-static const char version[] = "1.2.95 \"Daring Dalek\"";
+static const char version[] = "1.9.80";
 
 int main(int argc, char** argv)
 {
     KAboutData about("muon-discover", "muon-discover", ki18n("Muon Discover"), version, ki18n(description),
-                     KAboutData::License_GPL, ki18n("©2010, 2011 Jonathan Thomas"), KLocalizedString(), 0);
+                     KAboutData::License_GPL, ki18n("©2010-2012 Jonathan Thomas"), KLocalizedString(), 0);
     about.addAuthor(ki18n("Jonathan Thomas"), KLocalizedString(), "echidnaman@kubuntu.org");
     about.addAuthor(ki18n("Aleix Pol Gonzalez"), KLocalizedString(), "aleixpol@blue-systems.com");
     about.setProgramIconName("muondiscover");
@@ -44,6 +44,8 @@ int main(int argc, char** argv)
     options.add("application <name>", ki18n("Directly open the specified application by its package name."));
     options.add("mime <name>", ki18n("Open with a program that can deal with the given mimetype."));
     options.add("category <name>", ki18n("Display a list of entries with a category."));
+    options.add("mode <name>", ki18n("Open Muon Discover in a said mode. Modes correspond to the toolbar buttons."));
+    options.add("listmodes", ki18n("List all the available modes and output them on stdout."));
     KCmdLineArgs::addCmdLineOptions( options );
 
     if (!KUniqueApplication::start()) {
@@ -52,11 +54,6 @@ int main(int argc, char** argv)
     }
 
     KUniqueApplication app;
-    // Translations
-    KGlobal::locale()->insertCatalog("app-install-data");
-    KGlobal::locale()->insertCatalog("libmuon");
-    // Needed for KIcon compatibility w/ application icons from app-install-data
-    KGlobal::dirs()->addResourceDir("appicon", "/usr/share/app-install/icons/");
     app.disableSessionManagement();
     KCmdLineArgs* args = KCmdLineArgs::parsedArgs();
     
@@ -67,6 +64,14 @@ int main(int argc, char** argv)
         mainWindow->openMimeType(args->getOption("mime"));
     else if(args->isSet("category"))
         mainWindow->openCategory(args->getOption("category"));
+    else if(args->isSet("mode"))
+        mainWindow->openMode(args->getOption("mode").toLocal8Bit());
+    else if(args->isSet("listmodes")) {
+        fprintf(stdout, "%s", qPrintable(i18n("Available modes:\n")));
+        foreach(const QString& mode, mainWindow->modes())
+            fprintf(stdout, " * %s\n", qPrintable(mode));
+        return 0;
+    }
     mainWindow->show();
 
     return app.exec();

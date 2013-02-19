@@ -23,22 +23,16 @@
 
 #include <QtGui/QStackedWidget>
 
-// LibQApt includes
-#include <LibQApt/Globals>
-#include <LibQApt/Package>
-
+class ResourcesUpdatesModel;
+class KMessageWidget;
+class AbstractResource;
+class AbstractResourcesBackend;
 class QItemSelection;
 class QLabel;
 class QStandardItemModel;
 class QTreeView;
 
 class KPixmapSequenceOverlayPainter;
-
-namespace QApt {
-    class Backend;
-}
-
-class Application;
 class UpdateModel;
 
 class UpdaterWidget : public QStackedWidget
@@ -48,32 +42,31 @@ public:
     explicit UpdaterWidget(QWidget *parent = 0);
 
 private:
-    QApt::Backend *m_backend;
-    QApt::CacheState m_oldCacheState;
     UpdateModel *m_updateModel;
-    QList<Application *> m_upgradeableApps;
 
     QTreeView *m_updateView;
     KPixmapSequenceOverlayPainter *m_busyWidget;
     QLabel *m_updateStatusIcon;
     QLabel *m_notifyTitle;
     QLabel *m_notifyDesc;
+    ResourcesUpdatesModel* m_updatesBackends;
+    KMessageWidget* m_upgradesWidget;
 
 public Q_SLOTS:
-    void setBackend(QApt::Backend *backend);
-    void reload();
+    void setBackend(ResourcesUpdatesModel* backend);
+    void activityChanged();
 
 private Q_SLOTS:
     void populateUpdateModel();
-    void checkApps(QList<Application *> apps, bool checked);
-    void checkChanges(const QHash<QApt::Package::State, QApt::PackageList> &removals);
     void selectionChanged(const QItemSelection &selected,
                           const QItemSelection &deselected);
     void checkAllMarked();
     void checkUpToDate();
+    void markAllPackagesForUpgrade();
+    void checkApps(const QList<AbstractResource*>& apps, bool checked);
 
 signals:
-    void packageChanged(QApt::Package *Package);
+    void selectedResourceChanged(AbstractResource* res);
 };
 
 #endif // UPDATERWIDGET_H

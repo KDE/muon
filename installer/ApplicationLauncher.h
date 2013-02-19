@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright © 2008 by Daniel Nicoletti <dantti85-pk@yahoo.com.br>       *
- *   Copyright © 2010 Jonathan Thomas <echidnaman@kubuntu.org>             *
+ *   Copyright © 2010-2012 Jonathan Thomas <echidnaman@kubuntu.org>        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -23,11 +23,8 @@
 
 #include <QtGui/QDialog>
 
-class ApplicationBackend;
-class Application;
 class LaunchListModel;
 class QModelIndex;
-class QStandardItemModel;
 
 class KService;
 
@@ -35,14 +32,10 @@ class ApplicationLauncher : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ApplicationLauncher(ApplicationBackend* backend, QWidget* parent = 0);
-    ~ApplicationLauncher();
+    explicit ApplicationLauncher(LaunchListModel* backend, QWidget* parent = nullptr);
 
 private:
     LaunchListModel *m_model;
-
-private Q_SLOTS:
-    void onAppClicked(const QModelIndex &index);
 };
 
 #endif

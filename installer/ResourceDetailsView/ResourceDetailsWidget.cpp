@@ -57,13 +57,12 @@
 #include <Nepomuk/KRatingWidget>
 
 // Libmuon includes
-#include <ApplicationBackend/Application.h>
+#include <resources/AbstractResource.h>
+#include <resources/AbstractResourcesBackend.h>
 #include <MuonStrings.h>
 #include <ReviewsBackend/Rating.h>
 #include <ReviewsBackend/Review.h>
 #include <ReviewsBackend/AbstractReviewsBackend.h>
-#include <Transaction/TransactionListener.h>
-#include <mobile/src/mousecursor.h>
 #include <resources/AbstractResource.h>
 
 // std includes
@@ -72,6 +71,7 @@
 // Own includes
 #include "AddonsWidget.h"
 #include "ClickableLabel.h"
+#include "qml/src/mousecursor.h"
 #include "ReviewsWidget/ReviewsWidget.h"
 #include "ScreenShotOverlay.h"
 
@@ -291,13 +291,12 @@ ResourceDetailsWidget::ResourceDetailsWidget(QWidget *parent)
     layout->addWidget(detailsWidget);
     layout->addWidget(m_reviewsWidget);
     layout->addWidget(verticalSpacer);
-    
-    m_listener = new TransactionListener(this);
 
-    connect(m_listener, SIGNAL(progressChanged()), SLOT(progressChanged()));
-    connect(m_listener, SIGNAL(commentChanged()), SLOT(progressCommentChanged()));
-    connect(m_listener, SIGNAL(running(bool)), SLOT(applicationRunningChanged(bool)));
-    connect(m_listener, SIGNAL(downloading(bool)), SLOT(applicationDownloadingChanged(bool)));
+    // FIXME
+//    connect(m_listener, SIGNAL(progressChanged()), SLOT(progressChanged()));
+//    connect(m_listener, SIGNAL(commentChanged()), SLOT(progressCommentChanged()));
+//    connect(m_listener, SIGNAL(running(bool)), SLOT(applicationRunningChanged(bool)));
+//    connect(m_listener, SIGNAL(downloading(bool)), SLOT(applicationDownloadingChanged(bool)));
 
     setWidget(widget);
 }
@@ -310,10 +309,9 @@ ResourceDetailsWidget::~ResourceDetailsWidget()
 void ResourceDetailsWidget::setResource(AbstractResource *resource)
 {
     m_resource = resource;
-    m_listener->setResource(m_resource);
-    m_listener->setBackend(m_resource->backend());
+//    m_listener->setResource(m_resource);
 
-    Application *app = qobject_cast<Application *>(resource);
+    AbstractResource *app = qobject_cast<AbstractResource*>(resource);
 
     // FIXME: Always keep label size at 48x48, and render the largest size
     // we can up to that point. Otherwise some icons will be blurry
@@ -335,7 +333,7 @@ void ResourceDetailsWidget::setResource(AbstractResource *resource)
     }
     
     if (app) {
-        QString menuPathString = app->menuPath();
+        QString menuPathString = app->property("menuPath").toString();
         if (!menuPathString.isEmpty()) {
             m_menuPathLabel->setText(menuPathString);
         } else {
@@ -523,12 +521,14 @@ void ResourceDetailsWidget::applicationDownloadingChanged(bool downloading)
 
 void ResourceDetailsWidget::progressChanged()
 {
-    m_progressBar->setValue(m_listener->progress());
+    // FIXME
+    //m_progressBar->setValue(m_listener->progress());
 }
 
 void ResourceDetailsWidget::progressCommentChanged()
 {
-    m_progressBar->setFormat(m_listener->comment());
+    // FIMXE
+    //m_progressBar->setFormat(m_listener->comment());
 }
 
 void ResourceDetailsWidget::updateActionButton()
@@ -536,13 +536,12 @@ void ResourceDetailsWidget::updateActionButton()
     if (!m_resource)
         return;
 
+    m_statusLabel->setText(m_resource->status());
     if (!m_resource->isInstalled()) {
-        m_statusLabel->setText(MuonStrings::global()->packageStateName(QApt::Package::NotInstalled));
         m_actionButton->setText(i18nc("@action", "Install"));
         m_actionButton->setIcon(KIcon("download"));
         m_actionButton->show();
     } else {
-        m_statusLabel->setText(MuonStrings::global()->packageStateName(QApt::Package::Installed));
         m_actionButton->setText(i18nc("@action", "Remove"));
         m_actionButton->setIcon(KIcon("edit-delete"));
     }

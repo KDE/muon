@@ -1,4 +1,29 @@
-1.4 (as of beta 1)
+2.0 (as of alpha 1)
+======
+- Features:
+  * Added a KNewStuff backend, adding categories for Plasma Widgets and Plasma Comics.
+  * Added a Bodega resource backend to Muon Discover and the Muon Software Center.
+  * The QApt backend is now optional for Muon Discover, and other backends can be used
+    on platforms other than Debian-based linux distributions.
+  * Miscellaenous improvements/polish for Muon Discover
+  * Port to LibQApt2.
+  * User interface consistency improvements for Muon Discover, integrating better with KDE.
+- Bugfixes:
+  * Prevent changelog fetch jobs from being processed during a cache reload, by manually
+    controlling the lifetime of the KJobs and deleting them before we start reloading.
+    (BKO: #301161)
+  * Fix a bug in the transaction advancement system. (Fixed by switching to QApt2)
+    (BKO: #299131)
+  * Reparent Application objects created in a separate thread by QConcurrent, fixing
+    a crash when reloading the ApplicationBackend. (BKO: #306536)
+  * Fixed a bug where applications that had been removed from the archive, but could
+    still be referenced locally by APT despite not being installed would show up as
+    Applications if their data had not been removed from app-install-data. (BKO: #309283)
+- Optimizations:
+  * Improve startup time by 2% by using a fast integer-to-power approximation when
+    calculating the normal distribution for an application rating.
+
+1.4.0
 ======
 - Features:
   * Introducing Muon Discover, a new type of software center focused around finding
@@ -12,7 +37,7 @@
   * Add support to the Muon Software Center for fetching additional pages of reviews.
   * Add an "In Progress" view to the Muon Software Center, to show in-progress and pending
     transactions.
-  * Display the archive component of the selected package. (LP: #883996) (MPM)
+  * Display the archive component of selected packages. (LP: #883996) (MPM)
   * Added support for Debian's "education" and "introspection" package categories in the
     Muon Package Manager
   * Added a "busy indication" throbber to the central view of the Muon Software Center to
@@ -28,6 +53,7 @@
     install localization and internationalization files for the package being installed.
   * The color-coded columns within the Muon Package Manager now take their colors from the
     KDE color scheme.
+  * A version column was added to the updates view in the Muon Update Manager (BKO: #288902)
 - Bugfixes:
   * If a user manually clicks the package name column header, sort alphabetically even if we
     are showing relevancy-based quicksearch results. (BKO: #284181)
@@ -36,6 +62,8 @@
     updates to display. (MUM)
   * At startup, the Muon Notifier will wait 2 minutes before showing update notifications,
     helping to make the login process less busy.
+  * Decreased startup time of the Muon Software Center, Muon Update Manager, and Muon Discover
+    by 10% by performing a more efficient check for special extras.ubuntu.com apps.
 
 1.3.2:
 ======

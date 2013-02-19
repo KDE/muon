@@ -30,7 +30,7 @@
 #include <KIconLoader>
 
 // Own
-#include "../libmuon/MuonStrings.h"
+#include "../libmuonapt/MuonStrings.h"
 #include "PackageModel.h"
 
 PackageDelegate::PackageDelegate(QObject *parent)
@@ -42,10 +42,6 @@ PackageDelegate::PackageDelegate(QObject *parent)
     m_spacing  = 4;
 
     m_iconSize = KIconLoader::SizeSmallMedium;
-}
-
-PackageDelegate::~PackageDelegate()
-{
 }
 
 void PackageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -284,5 +280,3 @@ int PackageDelegate::calcItemHeight(const QStyleOptionViewItem &option) const
     int textHeight = QFontInfo(name_item.font).pixelSize() + QFontInfo(description_item.font).pixelSize();
     return qMax(textHeight, m_iconSize) + 2 * m_spacing;
 }
-
-#include "PackageDelegate.moc"

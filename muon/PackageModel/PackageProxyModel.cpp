@@ -30,16 +30,16 @@
 #include "PackageModel.h"
 #include "MuonSettings.h"
 
-static const int status_sort_magic = (QApt::Package::Installed
-//                                       | QApt::Package::Outdated
-                                      | QApt::Package::New);
+constexpr int status_sort_magic = (QApt::Package::Installed |
+                                   QApt::Package::New);
+
 bool packageStatusLessThan(QApt::Package *p1, QApt::Package *p2)
 {
     return (p1->state() & (status_sort_magic))  <
            (p2->state() & (status_sort_magic));
 }
 
-static const int requested_sort_magic = (QApt::Package::ToInstall
+constexpr int requested_sort_magic = (QApt::Package::ToInstall
                                          | QApt::Package::ToRemove
                                          | QApt::Package::ToKeep);
 
@@ -55,10 +55,6 @@ PackageProxyModel::PackageProxyModel(QObject *parent)
     , m_stateFilter((QApt::Package::State)0)
     , m_sortByRelevancy(false)
     , m_useSearchResults(false)
-{
-}
-
-PackageProxyModel::~PackageProxyModel()
 {
 }
 
@@ -117,15 +113,15 @@ void PackageProxyModel::setArchFilter(const QString &arch)
 
 bool PackageProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    //Our "main"-method
+    // Our "main"-method
     QApt::Package *package = static_cast<PackageModel *>(sourceModel())->packageAt(sourceModel()->index(sourceRow, 1, sourceParent));
-    //We have a package as internal pointer
+    // We have a package as internal pointer
     if (!package) {
         return false;
     }
 
     if (!m_groupFilter.isEmpty()) {
-        if (!package->section().contains(m_groupFilter)) {
+        if (!QString(package->section()).contains(m_groupFilter)) {
             return false;
         }
     }
@@ -187,11 +183,7 @@ bool PackageProxyModel::lessThan(const QModelIndex &left, const QModelIndex &rig
               // This is expensive for very large datasets. It takes about 3 seconds with 30,000 packages
               // The order in m_packages is based on relevancy when returned by m_backend->search()
               // Use this order to determine less than
-              if (m_searchPackages.indexOf(leftPackage) < m_searchPackages.indexOf(rightPackage)) {
-                  return false;
-              } else {
-                  return true;
-              }
+              return (m_searchPackages.indexOf(leftPackage) > m_searchPackages.indexOf(rightPackage));
           } else {
               QString leftString = left.data(PackageModel::NameRole).toString();
               QString rightString = right.data(PackageModel::NameRole).toString();

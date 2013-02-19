@@ -34,12 +34,13 @@ Q_PROPERTY(int rating READ rating CONSTANT)
 Q_PROPERTY(int ratingPoints READ ratingPoints CONSTANT)
 public:
     explicit Rating(const QVariantMap &data);
+    explicit Rating(const QString& packageName, const QString& appName, int ratingCount, int rating, const QString& histogram);
     ~Rating();
 
     QString packageName() const;
     QString applicationName() const;
     Q_SCRIPTABLE quint64 ratingCount() const;
-    // 0.0 - 5.0 ranged rating multiplied by two and rounded for KRating*
+    // 0.0 - 10.0 ranged rating multiplied by two and rounded for KRating*
     Q_SCRIPTABLE int rating() const;
     int ratingPoints() const;
     // Returns a dampened rating calculated with the Wilson Score Interval algorithm

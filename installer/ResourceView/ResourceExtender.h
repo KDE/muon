@@ -18,8 +18,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef APPLICATIONEXTENDER_H
-#define APPLICATIONEXTENDER_H
+#ifndef RESOURCEEXTENDER_H
+#define RESOURCEEXTENDER_H
 
 #include <QtGui/QWidget>
 
@@ -44,7 +44,7 @@ private:
     QPushButton *m_cancelButton;
 
 private Q_SLOTS:
-    void workerEvent(TransactionStateTransition workerEvent, Transaction *transaction);
+    void setupTransaction(Transaction *trans);
     void transactionCancelled(Transaction *trans);
     void emitInfoButtonClicked();
     void removeButtonClicked();

@@ -39,18 +39,13 @@ class MUONPRIVATE_EXPORT ResourcesModel : public QAbstractListModel
             NameRole = Qt::UserRole,
             IconRole,
             CommentRole,
-            ActionRole,
             StateRole,
             RatingRole,
             RatingPointsRole,
             SortableRatingRole,
             ActiveRole,
-            ProgressRole,
-            ProgressTextRole,
             InstalledRole,
             ApplicationRole,
-            PopConRole,
-            UntranslatedNameRole,
             OriginRole,
             CanUpgrade,
             PackageNameRole,
@@ -59,49 +54,52 @@ class MUONPRIVATE_EXPORT ResourcesModel : public QAbstractListModel
             SectionRole,
             MimeTypes
         };
-        explicit ResourcesModel(QObject* parent=0);
         static ResourcesModel* global();
+        virtual ~ResourcesModel();
         
         virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
         virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-        
-        void addResourcesBackend(AbstractResourcesBackend* resources);
         
         AbstractResource* resourceAt(int row) const;
         QModelIndex resourceIndex(AbstractResource* res) const;
         QVector< AbstractResourcesBackend* > backends() const;
         int updatesCount() const;
+        virtual QMap< int, QVariant > itemData(const QModelIndex& index) const;
         
         Q_SCRIPTABLE AbstractResource* resourceByPackageName(const QString& name);
-        Q_SCRIPTABLE AbstractResourcesBackend* backendForResource(AbstractResource* resource) const;
-        
+
+        void registerBackendByName(const QString& name);
+        void registerAllBackends();
+        void integrateMainWindow(MuonMainWindow* w);
+
     public slots:
-        void installApplication(AbstractResource* app, const QHash<QString, bool>& state);
+        void installApplication(AbstractResource* app, AddonList addons);
         void installApplication(AbstractResource* app);
         void removeApplication(AbstractResource* app);
         void cancelTransaction(AbstractResource* app);
-        void transactionChanged(Transaction* t);
 
     signals:
+        void allInitialized();
         void backendsChanged();
         void updatesCountChanged();
         void searchInvalidated();
-
-        //Transactions forwarding
-        void transactionProgressed(Transaction *transaction, int progress);
-        void transactionAdded(Transaction *transaction);
-        void transactionCancelled(Transaction *transaction);
-        void transactionRemoved(Transaction* transaction);
-        void transactionsEvent(TransactionStateTransition transition, Transaction* transaction);
 
     private slots:
         void cleanCaller();
         void resetCaller();
         void updateCaller();
-        
+        void transactionChanged(QModelIndex tIndex);
+
     private:
+        explicit ResourcesModel(QObject* parent=0);
+        void addResourcesBackend(AbstractResourcesBackend* resources);
+
         QVector< AbstractResourcesBackend* > m_backends;
         QVector< QVector<AbstractResource*> > m_resources;
+        int m_initializingBackends;
+        MuonMainWindow* m_mainwindow;
+
+        static ResourcesModel* s_self;
 };
 
 #endif // RESOURCESMODEL_H

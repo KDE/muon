@@ -1,3 +1,22 @@
+/*
+ *   Copyright (C) 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library/Lesser General Public License
+ *   version 2, or (at your option) any later version, as published by the
+ *   Free Software Foundation
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details
+ *
+ *   You should have received a copy of the GNU Library/Lesser General Public
+ *   License along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 import QtQuick 1.1
 import org.kde.plasma.components 0.1
 import org.kde.qtextracomponents 0.1
@@ -6,9 +25,9 @@ import org.kde.muon 1.0
 Item {
     id: appInfo
     property QtObject application: null
-    property variant reviewsBackend: resourcesModel.backendForResource(application).reviewsBackend
+    property variant reviewsBackend: application.backend.reviewsBackend
     
-    ScrollBar {
+    NativeScrollBar {
         id: scroll
         orientation: Qt.Vertical
         flickableItem: overviewContentsFlickable
@@ -34,7 +53,7 @@ Item {
             width: parent.width
             spacing: 10
             
-            property QtObject ratingInstance: appInfo.reviewsBackend.ratingForApplication(appInfo.application)
+            property QtObject ratingInstance: appInfo.reviewsBackend!=null ? appInfo.reviewsBackend.ratingForApplication(appInfo.application) : null
             Rating {
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: overviewContents.ratingInstance!=null
@@ -55,16 +74,15 @@ Item {
             }
             
             Button {
-                visible: application.isInstalled
+                visible: application.isInstalled && application.canExecute
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: i18n("Launch")
-                enabled: application.canExecute
                 onClicked: application.invokeApplication()
             }
             
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: application.isInstalled
+                visible: appInfo.reviewsBackend != null && application.isInstalled
                 text: i18n("Review")
                 onClicked: reviewDialog.open()
             }
@@ -119,6 +137,7 @@ Item {
             asynchronous: true
             fillMode: Image.PreserveAspectFit
             source: thumbnailsView.currentIndex>=0 ? screenshotsModel.screenshotAt(thumbnailsView.currentIndex) : "image://icon/image-missing"
+            smooth: true
             
             onStatusChanged: if(status==Image.Error) {
                 sourceSize.width = sourceSize.height = 200
@@ -145,9 +164,13 @@ Item {
                 PropertyChanges { target: thumbnailsView; opacity: 0.3 }
             }
         ]
-        Behavior on y { NumberAnimation { easing.type: Easing.OutQuad; duration: 500 } }
-        Behavior on width { NumberAnimation { easing.type: Easing.OutQuad; duration: 500 } }
-        Behavior on height { NumberAnimation { easing.type: Easing.OutQuad; duration: 500 } }
+        transitions: Transition {
+            SequentialAnimation {
+                PropertyAction { target: screenshot; property: "smooth"; value: false }
+                NumberAnimation { properties: "y,width,height"; easing.type: Easing.OutQuad; duration: 500 }
+                PropertyAction { target: screenshot; property: "smooth"; value: true }
+            }
+        }
         
         MouseArea {
             anchors.fill: parent

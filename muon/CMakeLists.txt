@@ -5,7 +5,6 @@ set(muon_SRCS
     MainWindow.cpp
     ManagerWidget.cpp
     ReviewWidget.cpp
-    CommitWidget.cpp
     DetailsTabs/DetailsTab.cpp
     DetailsTabs/MainTab.cpp
     DetailsTabs/ChangelogTab.cpp
@@ -16,7 +15,6 @@ set(muon_SRCS
     DetailsWidget.cpp
     DownloadModel/DownloadModel.cpp
     DownloadModel/DownloadDelegate.cpp
-    DownloadWidget.cpp
     FilterWidget/ArchitectureFilter.cpp
     FilterWidget/CategoryFilter.cpp
     FilterWidget/FilterModel.cpp
@@ -29,6 +27,7 @@ set(muon_SRCS
     PackageModel/PackageDelegate.cpp
     PackageModel/PackageWidget.cpp
     StatusWidget.cpp
+    TransactionWidget.cpp
     config/ManagerSettingsDialog.cpp
     config/GeneralSettingsPage.cpp)
 
@@ -37,7 +36,7 @@ install(FILES config/muon.kcfg DESTINATION ${KCFG_INSTALL_DIR})
 
 kde4_add_executable(muon ${muon_SRCS})
 
-target_link_libraries(muon muonprivate
+target_link_libraries(muon muonprivate muonapt
                            ${KDE4_KIO_LIBS}
                            ${QAPT_LIBRARY}
                            ${DEBCONF_KDE_LIB})

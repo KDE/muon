@@ -21,10 +21,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-// Own includes
-#include "../libmuon/MuonMainWindow.h"
+// KDE includes
 #include <KService>
 
+// Own includes
+#include "../libmuon/MuonMainWindow.h"
+
+class AbstractResourcesBackend;
+class LaunchListModel;
 class QAbstractItemView;
 class QModelIndex;
 class QSplitter;
@@ -50,7 +54,7 @@ public:
     ~MainWindow();
 
 private:
-    ApplicationBackend *m_appBackend;
+    AbstractResourcesBackend *m_appBackend;
     QSplitter *m_mainWidget;
     QStackedWidget *m_viewStack;
     QWidget *m_busyWidget;
@@ -59,36 +63,27 @@ private:
     QHash<QModelIndex, QWidget *> m_viewHash;
     KAction *m_loadSelectionsAction;
     KAction *m_saveSelectionsAction;
+    LaunchListModel *m_launches;
     KMessageWidget *m_launcherMessage;
     ApplicationLauncher *m_appLauncher;
     ProgressView *m_progressView;
     QStandardItem *m_progressItem;
-
-    QVector<KService::Ptr> m_launchableApps;
-    int m_transactionCount;
 
 private Q_SLOTS:
     void initGUI();
     void initObject();
     void loadSplitterSizes();
     void saveSplitterSizes();
-    void setupActions();
     void clearViews();
-    void checkForUpdates();
-    void setActionsEnabled(bool enabled = true);
-    void workerEvent(QApt::WorkerEvent event);
     void populateViews();
     void changeView(const QModelIndex &index);
     void selectFirstRow(const QAbstractItemView *itemView);
-    void runSourcesEditor();
-    void sourcesEditorFinished(int reload);
+    void sourcesEditorFinished();
     void showLauncherMessage();
     void launchSingleApp();
     void showAppLauncher();
     void onAppLauncherClosed();
     void clearMessageActions();
-    void transactionAdded();
-    void transactionRemoved();
     void addProgressItem();
     void removeProgressItem();
 };

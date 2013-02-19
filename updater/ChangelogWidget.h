@@ -21,21 +21,16 @@
 #ifndef CHANGELOGWIDGET_H
 #define CHANGELOGWIDGET_H
 
-#include <QtCore/QHash>
+#include <QtCore/QSet>
 #include <QtGui/QWidget>
 
+class AbstractResource;
 class QParallelAnimationGroup;
 
 class KJob;
 class KPixmapSequenceOverlayPainter;
 class KTemporaryFile;
 class KTextBrowser;
-
-namespace QApt {
-    class Backend;
-    class Changelog;
-    class Package;
-}
 
 class ChangelogWidget : public QWidget
 {
@@ -44,9 +39,7 @@ public:
     explicit ChangelogWidget(QWidget *parent = 0);
 
 private:
-    QApt::Backend *m_backend;
-    QApt::Package *m_package;
-    QHash<KJob *, QString> m_jobHash;
+    AbstractResource *m_package;
     QString m_jobFileName;
     bool m_show;
 
@@ -54,18 +47,16 @@ private:
     KTextBrowser *m_changelogBrowser;
     KPixmapSequenceOverlayPainter *m_busyWidget;
 
-    QString buildDescription(const QApt::Changelog &log);
+    QString buildDescription(const QByteArray& data, const QString& source);
 
 public Q_SLOTS:
-    void setBackend(QApt::Backend *backend);
-    void setPackage(QApt::Package *package);
+    void setResource(AbstractResource *package);
     void show();
     void animatedHide();
-    void stopPendingJobs();
 
 private Q_SLOTS:
     void fetchChangelog();
-    void changelogFetched(KJob *job);
+    void changelogFetched(const QString& changelog);
 };
 
 #endif

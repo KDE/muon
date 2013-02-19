@@ -23,6 +23,23 @@
 #include <QDebug>
 #include <qmath.h>
 
+inline double fastPow(double a, double b) {
+    union {
+        double d;
+        int x[2];
+    } u = { a };
+
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+    u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
+    u.x[0] = 0;
+#else
+    u.x[1] = 0;
+    u.x[0] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
+#endif
+
+    return u.d;
+}
+
 // Converted from a Ruby example, returns an inverse normal distribution
 double pnormaldist(double qn)
 {
@@ -41,7 +58,7 @@ double pnormaldist(double qn)
     w1 = b[0];
 
     for(int i = 1; i < 11; i++)
-        w1 += b[i] * qPow(w3,i);
+        w1 += b[i] * fastPow(w3,i);
 
     if(qn > 0.5)
         return qSqrt(w1*w3);
@@ -79,17 +96,21 @@ double dampenedRating(const QVector<int> &ratings, double power = 0.1)
     return sum_scores + 3;
 }
 
-///TODO: improve API
 Rating::Rating(const QVariantMap &data)
+    : Rating(data.value("package_name").toString(), data.value("app_name").toString(),
+             data.value("ratings_total").toULongLong(), data.value("ratings_average").toDouble() * 2, data.value("histogram").toString())
 {
-    m_packageName = data.value("package_name").toString();
-    m_appName = data.value("app_name").toString();
-    m_ratingCount = data.value("ratings_total").toULongLong();
-    m_rating = data.value("ratings_average").toDouble() * 2;
-    
-    m_sortableRating = 0;
-    m_ratingPoints = 0;
-    QString histogram = data.value("histogram").toString();
+}
+
+Rating::Rating(const QString& packageName, const QString& appName, int ratingCount, int rating, const QString& histogram)
+    : QObject()
+    , m_packageName(packageName)
+    , m_appName(appName)
+    , m_ratingCount(ratingCount)
+    , m_rating(rating)
+    , m_ratingPoints(0)
+    , m_sortableRating(0)
+{
     QStringList histo = histogram.mid(1,histogram.size()-2).split(", ");
     QVector<int> spread = QVector<int>();
 

@@ -32,6 +32,7 @@
 #include <KAction>
 #include <KActionCollection>
 #include <KIcon>
+#include <KMessageBox>
 #include <KMessageWidget>
 #include <KPixmapSequence>
 #include <KPixmapSequenceOverlayPainter>
@@ -41,15 +42,13 @@
 // LibQApt includes
 #include <LibQApt/Backend>
 
-// Libmuon includes
-#include <ApplicationBackend/Application.h>
-#include <ApplicationBackend/ApplicationBackend.h>
+//libmuonapt includes
 #include <HistoryView/HistoryView.h>
-#include <resources/ResourcesModel.h>
+#include "../libmuonapt/QAptActions.h"
 
-#ifdef ATTICA_ENABLED
-#include <KNSBackend/KNSBackend.h>
-#endif
+// Libmuon includes
+#include <Transaction/TransactionModel.h>
+#include <resources/ResourcesModel.h>
 
 // Own includes
 #include "ApplicationLauncher.h"
@@ -57,15 +56,16 @@
 #include "AvailableView.h"
 #include "ProgressView.h"
 #include "ViewSwitcher.h"
+#include "LaunchListModel.h"
 #include "MuonInstallerSettings.h"
 
 enum ViewModelRole {
     /// A role for storing ViewType
     ViewTypeRole = Qt::UserRole + 1,
     /// A role for storing origin filter data
-    OriginFilterRole = Qt::UserRole + 2,
+    OriginFilterRole,
     /// A role for storing state filter data
-    StateFilterRole = Qt::UserRole + 3
+    StateFilterRole
 };
 
 enum ViewType {
@@ -85,10 +85,11 @@ enum ViewType {
 
 MainWindow::MainWindow()
     : MuonMainWindow()
+    , m_appBackend(nullptr)
+    , m_launches(nullptr)
     , m_launcherMessage(nullptr)
     , m_appLauncher(nullptr)
     , m_progressItem(nullptr)
-    , m_transactionCount(0)
 {
     initGUI();
     QTimer::singleShot(10, this, SLOT(initObject()));
@@ -109,7 +110,7 @@ void MainWindow::initGUI()
     // Set up the navigational sidebar on the right
     m_viewSwitcher = new ViewSwitcher(this);
     connect(m_viewSwitcher, SIGNAL(activated(QModelIndex)),
-           this, SLOT(changeView(QModelIndex)));
+            this, SLOT(changeView(QModelIndex)));
     m_mainWidget->addWidget(m_viewSwitcher);
 
     // Set up the main pane
@@ -137,58 +138,40 @@ void MainWindow::initGUI()
     m_viewModel = new QStandardItemModel(this);
     m_viewSwitcher->setModel(m_viewModel);
 
+    QAptActions *actions = QAptActions::self();
+    actions->setMainWindow(this);
+
     setupActions();
-    setupGUI((StandardWindowOption)(KXmlGuiWindow::Default & ~KXmlGuiWindow::StatusBar));
+    setupGUI(StandardWindowOption(KXmlGuiWindow::Default & ~KXmlGuiWindow::StatusBar));
 }
 
 void MainWindow::initObject()
 {
     ResourcesModel *resourcesModel = ResourcesModel::global();
-    connect(resourcesModel, SIGNAL(transactionAdded(Transaction*)),
-            this, SLOT(transactionAdded()));
-    connect(resourcesModel, SIGNAL(transactionRemoved(Transaction*)),
-            this, SLOT(transactionRemoved()));
 
-    // Create APT backend
-    m_appBackend = new ApplicationBackend(this);
-    connect(this, SIGNAL(backendReady(QApt::Backend*)),
-            m_appBackend, SLOT(setBackend(QApt::Backend*)));
-    connect(m_appBackend, SIGNAL(workerEvent(QApt::WorkerEvent,Transaction*)),
-            this, SLOT(workerEvent(QApt::WorkerEvent)));
-    connect(m_appBackend, SIGNAL(errorSignal(QApt::ErrorCode,QVariantMap)),
-            this, SLOT(errorOccurred(QApt::ErrorCode,QVariantMap)));
-    connect(m_appBackend, SIGNAL(backendReady()),
-            this, SLOT(populateViews()));
-    connect(m_appBackend, SIGNAL(reloadStarted()),
-            this, SLOT(removeProgressItem()));
-    connect(m_appBackend, SIGNAL(reloadFinished()),
-            this, SLOT(showLauncherMessage()));
-    connect(m_appBackend, SIGNAL(startingFirstTransaction()),
+    TransactionModel *transModel = TransactionModel::global();
+    connect(transModel, SIGNAL(startingFirstTransaction()),
             this, SLOT(addProgressItem()));
+    connect(transModel, SIGNAL(lastTransactionFinished()),
+            this, SLOT(removeProgressItem()));
+    m_launches = new LaunchListModel(this);
 
-    MuonMainWindow::initObject();
-    // Our modified ApplicationBackend provides us events in a way that
-    // makes queuing things while committing possible
-    disconnect(m_backend, SIGNAL(workerEvent(QApt::WorkerEvent)),
-               this, SLOT(workerEvent(QApt::WorkerEvent)));
-    disconnect(m_backend, SIGNAL(errorOccurred(QApt::ErrorCode,QVariantMap)),
-               this, SLOT(errorOccurred(QApt::ErrorCode,QVariantMap)));
+    resourcesModel->registerAllBackends();
+    QVector<AbstractResourcesBackend*> backends = resourcesModel->backends();
 
-    // Other backends
-    QList<AbstractResourcesBackend*> backends;
-
-#ifdef ATTICA_ENABLED
-    backends += new KNSBackend("comic.knsrc", "face-smile-big", this);
-    backends += new KNSBackend("plasmoids.knsrc", "plasma", this);
-#else
-    qDebug() << "ya dun goofed.";
-#endif
-
+    //TODO: should add the appBackend here too
     for (AbstractResourcesBackend *backend : backends) {
-        resourcesModel->addResourcesBackend(backend);
+        if(backend->metaObject()->className()==QLatin1String("ApplicationBackend")) {
+            m_appBackend = backend;
+            connect(m_appBackend, SIGNAL(backendReady()),
+                    this, SLOT(populateViews()));
+            connect(m_appBackend, SIGNAL(reloadFinished()),
+                    this, SLOT(showLauncherMessage()));
+            connect(m_appBackend, SIGNAL(sourcesEditorFinished()),
+                    this, SLOT(sourcesEditorFinished()));
+        }
     }
-
-    setActionsEnabled();
+    resourcesModel->integrateMainWindow(this);
 }
 
 void MainWindow::loadSplitterSizes()
@@ -207,35 +190,9 @@ void MainWindow::saveSplitterSizes()
     MuonInstallerSettings::self()->writeConfig();
 }
 
-void MainWindow::setupActions()
-{
-    MuonMainWindow::setupActions();
-
-    m_loadSelectionsAction = actionCollection()->addAction("open_markings");
-    m_loadSelectionsAction->setIcon(KIcon("document-open"));
-    m_loadSelectionsAction->setText(i18nc("@action", "Read Markings..."));
-    connect(m_loadSelectionsAction, SIGNAL(triggered()), this, SLOT(loadSelections()));
-
-    m_saveSelectionsAction = actionCollection()->addAction("save_markings");
-    m_saveSelectionsAction->setIcon(KIcon("document-save-as"));
-    m_saveSelectionsAction->setText(i18nc("@action", "Save Markings As..."));
-    connect(m_saveSelectionsAction, SIGNAL(triggered()), this, SLOT(saveSelections()));
-}
-
-void MainWindow::setActionsEnabled(bool enabled)
-{
-    MuonMainWindow::setActionsEnabled(enabled);
-    if (!enabled) {
-        return;
-    }
-
-    m_loadSelectionsAction->setEnabled(true);
-    m_saveSelectionsAction->setEnabled(m_backend->areChangesMarked());
-}
-
 void MainWindow::clearViews()
 {
-    m_canExit = false; // APT is reloading at this point
+    setCanExit(false); // APT is reloading at this point
     foreach (QWidget *widget, m_viewHash) {
         delete widget;
     }
@@ -243,74 +200,86 @@ void MainWindow::clearViews()
     m_viewModel->clear();
 }
 
-void MainWindow::checkForUpdates()
+QStandardItem* createOriginItem(const QString& originName, const QString& originLabel)
 {
-    m_backend->updateCache();
+    // We must spread the word of Origin. Hallowed are the Ori! ;P
+    QStandardItem *viewItem = new QStandardItem;
+    viewItem->setEditable(false);
+    viewItem->setText(originLabel);
+    viewItem->setData(originName, OriginFilterRole);
+    viewItem->setData(AppView, ViewTypeRole);
+
+    if (originName == "Ubuntu") {
+        viewItem->setText(i18nc("@item:inlistbox", "Provided by Kubuntu"));
+        viewItem->setIcon(KIcon("ubuntu-logo"));
+    }
+
+    if (originName == "Debian") {
+        viewItem->setText(i18nc("@item:inlistbox", "Provided by Debian"));
+        viewItem->setIcon(KIcon("emblem-debian"));
+    }
+
+    if (originName == "Canonical") {
+        viewItem->setText(i18nc("@item:inlistbox The name of the repository provided by Canonical, Ltd. ",
+                                "Canonical Partners"));
+        viewItem->setIcon(KIcon("partner"));
+    }
+
+    if (originName.startsWith(QLatin1String("LP-PPA"))) {
+        viewItem->setIcon(KIcon("user-identity"));
+
+        if (originName == QLatin1String("LP-PPA-app-review-board")) {
+            viewItem->setText(i18nc("@item:inlistbox An independent software source",
+                                    "Independent"));
+            viewItem->setIcon(KIcon("system-users"));
+        } else
+            viewItem->setIcon(KIcon("user-identity"));
+    }
+    return viewItem;
 }
 
-void MainWindow::workerEvent(QApt::WorkerEvent event)
+bool repositoryNameLessThan(const QString& a, const QString& b)
 {
-    MuonMainWindow::workerEvent(event);
- 
-    switch (event) {
-    case QApt::CommitChangesFinished:
-        if (m_warningStack.size() > 0) {
-            showQueuedWarnings();
-            m_warningStack.clear();
-        }
-        if (m_errorStack.size() > 0) {
-            showQueuedErrors();
-            m_errorStack.clear();
-        }
-        break;
-    case QApt::InvalidEvent:
-    default:
-        break;
+    static QStringList prioritary(QStringList() << "Debian" << "Ubuntu" << "Canonical" << "LP-PPA-app-review-board");
+    int idxA = prioritary.indexOf(a), idxB = prioritary.indexOf(b);
+    if(idxA == idxB)
+        return a<b;
+    else if((idxB == -1) ^ (idxA == -1))
+        return idxB == -1;
+    else
+        return idxA<idxB;
+}
+
+QPair<QStringList, QStringList> fetchOrigins()
+{
+    QSet<QString> originSet, instOriginSet;
+    
+    ResourcesModel *resourcesModel = ResourcesModel::global();
+    for(int i=0; i<resourcesModel->rowCount(); i++) {
+        AbstractResource* app = resourcesModel->resourceAt(i);
+        if (app->isInstalled())
+            instOriginSet << app->origin();
+        else
+            originSet << app->origin();
     }
+
+    originSet.remove(QString());
+    instOriginSet.remove(QString());
+    originSet += instOriginSet;
+    
+    QStringList originList=originSet.toList(), instOriginList=instOriginSet.toList();
+    qSort(originList.begin(), originList.end(), repositoryNameLessThan);
+    qSort(instOriginList.begin(), instOriginList.end(), repositoryNameLessThan);
+    return qMakePair(originList, instOriginList);
 }
 
 void MainWindow::populateViews()
 {
-    ResourcesModel *resourcesModel = ResourcesModel::global();
-    resourcesModel->addResourcesBackend(m_appBackend);
-    m_canExit = true; // APT is done reloading at this point
-    QStringList originNames = m_appBackend->appOrigins().toList();
-    QStringList originLabels;
-    foreach (const QString &originName, originNames) {
-        originLabels << m_backend->originLabel(originName);
-    }
-
-    if (originNames.contains("Ubuntu")) {
-        int index = originNames.indexOf("Ubuntu");
-        originNames.move(index, 0); // Move to front of the list
-
-        if (originNames.contains("Canonical")) {
-            int index = originNames.indexOf("Canonical");
-            if (originNames.size() >= 2)
-                originNames.move(index, 1); // Move to 2nd spot
-        }
-
-        if (originNames.contains("LP-PPA-app-review-board")) {
-            int index = originNames.indexOf("LP-PPA-app-review-board");
-            if (originNames.size() >= 3)
-                originNames.move(index, 2); // Move to third spot
-        }
-    }
-
-    if (originNames.contains("Debian")) {
-        int index = originNames.indexOf("Debian");
-        originNames.move(index, 0); // Move to front of the list
-    }
-
-    QStandardItem *parentItem = m_viewModel->invisibleRootItem();
-
     QStandardItem *availableItem = new QStandardItem;
     availableItem->setEditable(false);
     availableItem->setIcon(KIcon("applications-other").pixmap(32,32));
     availableItem->setText(i18nc("@item:inlistbox Parent item for available software", "Get Software"));
     availableItem->setData(CatView, ViewTypeRole);
-    parentItem->appendRow(availableItem);
-    m_viewHash[availableItem->index()] = 0;
 
     QStandardItem *installedItem = new QStandardItem;
     installedItem->setEditable(false);
@@ -318,120 +287,31 @@ void MainWindow::populateViews()
     installedItem->setText(i18nc("@item:inlistbox Parent item for installed software", "Installed Software"));
     installedItem->setData(AppView, ViewTypeRole);
     installedItem->setData(AbstractResource::State::Installed, StateFilterRole);
-    parentItem->appendRow(installedItem);
-    m_viewHash[installedItem->index()] = 0;
-
-    parentItem = availableItem;
+    
+    QPair< QStringList, QStringList > origins = fetchOrigins();
+    QStringList originNames = origins.first;
+    QApt::Backend* backend = qobject_cast<QApt::Backend*>(m_appBackend->property("backend").value<QObject*>());
     foreach(const QString &originName, originNames) {
-        QString originLabel = m_backend->originLabel(originName);
-        QStandardItem *viewItem = new QStandardItem;
-        viewItem->setEditable(false);
-        viewItem->setText(originLabel);
-        viewItem->setData(originName, OriginFilterRole);
-        viewItem->setData(AppView, ViewTypeRole);
-
-        if (originName == "Ubuntu") {
-            viewItem->setText(i18nc("@item:inlistbox", "Provided by Kubuntu"));
-            viewItem->setIcon(KIcon("ubuntu-logo"));
-        }
-
-        if (originName == "Debian") {
-            viewItem->setText(i18nc("@item:inlistbox", "Provided by Debian"));
-            viewItem->setIcon(KIcon("emblem-debian"));
-        }
-
-        if (originName == "Canonical") {
-            viewItem->setText(i18nc("@item:inlistbox The name of the repository provided by Canonical, Ltd. ",
-                                    "Canonical Partners"));
-            viewItem->setIcon(KIcon("partner"));
-        }
-
-        if (originName.startsWith(QLatin1String("LP-PPA"))) {
-            viewItem->setIcon(KIcon("user-identity"));
-
-            if (originName == QLatin1String("LP-PPA-app-review-board")) {
-                viewItem->setText(i18nc("@item:inlistbox An independent software source",
-                                        "Independent"));
-                viewItem->setIcon(KIcon("system-users"));
-            }
-        }
-
-        availableItem->appendRow(viewItem);
-        m_viewHash[viewItem->index()] = 0;
+        availableItem->appendRow(createOriginItem(originName, backend->originLabel(originName)));
     }
 
-    QStringList instOriginNames = m_appBackend->installedAppOrigins().toList();
-    QStringList instOriginLabels;
-    foreach (const QString &originName, instOriginNames) {
-        instOriginLabels << m_backend->originLabel(originName);
-    }
-
-    if (instOriginNames.contains("Ubuntu")) {
-        int index = instOriginNames.indexOf("Ubuntu");
-        instOriginNames.move(index, 0); // Move to front of the list
-
-        if (instOriginNames.contains("Canonical")) {
-            int index = instOriginNames.indexOf("Canonical");
-            if (originNames.size() >= 2)
-                instOriginNames.move(index, 1); // Move to 2nd spot
-        }
-
-        if (instOriginNames.contains("LP-PPA-app-review-board")) {
-            int index = instOriginNames.indexOf("LP-PPA-app-review-board");
-            if (originNames.size() >= 3)
-                originNames.move(index, 2); // Move to third spot
-        }
-    }
-
-    if (instOriginNames.contains("Debian")) {
-        int index = instOriginNames.indexOf("Debian");
-        instOriginNames.move(index, 0); // Move to front of the list
-    }
-
-    parentItem = installedItem;
+    QStringList instOriginNames = origins.second;
     foreach(const QString & originName, instOriginNames) {
-        // We must spread the word of Origin. Hallowed are the Ori! ;P
-        QString originLabel = m_backend->originLabel(originName);
-        QStandardItem *viewItem = new QStandardItem;
-        viewItem->setEditable(false);
-        viewItem->setText(originLabel);
+        QStandardItem* viewItem = createOriginItem(originName, backend->originLabel(originName));
+
         viewItem->setData(AbstractResource::State::Installed, StateFilterRole);
-        viewItem->setData(originName, OriginFilterRole);
-        viewItem->setData(AppView, ViewTypeRole);
-
-        if (originName == "Ubuntu") {
-            viewItem->setText(i18nc("@item:inlistbox", "Provided by Kubuntu"));
-            viewItem->setIcon(KIcon("ubuntu-logo"));
-        }
-
-        if (originName == "Canonical") {
-            viewItem->setText(i18nc("@item:inlistbox The name of the repository provided by Canonical, Ltd. ",
-                                    "Canonical Partners"));
-            viewItem->setIcon(KIcon("partner"));
-        }
-
-        if (originName.startsWith(QLatin1String("LP-PPA"))) {
-            if (originName == QLatin1String("LP-PPA-app-review-board")) {
-                viewItem->setText(i18nc("@item:inlistbox An independent software source",
-                                        "Independent"));
-            }
-            viewItem->setIcon(KIcon("user-identity"));
-        }
-
         installedItem->appendRow(viewItem);
-        m_viewHash[viewItem->index()] = 0;
     }
-
-    parentItem = m_viewModel->invisibleRootItem();
 
     QStandardItem *historyItem = new QStandardItem;
     historyItem->setEditable(false);
     historyItem->setIcon(KIcon("view-history").pixmap(32,32));
     historyItem->setText(i18nc("@item:inlistbox Item for showing the history view", "History"));
     historyItem->setData(History, ViewTypeRole);
-    parentItem->appendRow(historyItem);
-    m_viewHash[historyItem->index()] = 0;
 
+    m_viewModel->appendRow(availableItem);
+    m_viewModel->appendRow(installedItem);
+    m_viewModel->appendRow(historyItem);
     selectFirstRow(m_viewSwitcher);
 }
 
@@ -455,7 +335,7 @@ void MainWindow::changeView(const QModelIndex &index)
             if (originFilter != QLatin1String("Ubuntu") && originFilter != QLatin1String("Debian"))
                 appView->setShouldShowTechnical(true);
         }
-        break;
+            break;
         case CatView:
             view = new AvailableView(this);
             break;
@@ -489,50 +369,29 @@ void MainWindow::selectFirstRow(const QAbstractItemView *itemView)
     changeView(firstRow);
 }
 
-void MainWindow::runSourcesEditor()
+void MainWindow::sourcesEditorFinished()
 {
-    // Let QApt Batch handle the update GUI
-    MuonMainWindow::runSourcesEditor(true);
-}
-
-void MainWindow::sourcesEditorFinished(int reload)
-{
-    m_appBackend->reload();
     clearViews();
     populateViews();
-    MuonMainWindow::sourcesEditorFinished(reload);
+    find(effectiveWinId())->setEnabled(true);
 }
 
 void MainWindow::showLauncherMessage()
 {
     clearMessageActions();
 
-    QVector<KService::Ptr> apps;
-    foreach (Application *app, m_appBackend->launchList()) {
-        app->clearPackage();
-        app->package(); // Regenerate package
-        if (!app->isInstalled()) {
-            continue;
-        }
-        apps << app->executables();
-    }
-
-    m_appBackend->clearLaunchList();
-    m_launchableApps = apps;
-
-    if (apps.size() == 1) {
-        KService::Ptr service = apps.first();
-        QString name = service->genericName().isEmpty() ?
-                       service->property("Name").toString() :
-                       service->property("Name").toString() % QLatin1Literal(" - ") % service->genericName();
+    if (m_launches->rowCount()==1) {
+        QModelIndex index = m_launches->index(0, 0);
+        QString name = index.data().toString();
         m_launcherMessage->setText(i18nc("@info", "%1 was successfully installed.", name));
 
-        KAction *launchAction = new KAction(KIcon(service->icon()), i18nc("@action", "Start"), this);
+        KIcon launchIcon = KIcon(index.data(Qt::DecorationRole).value<QIcon>());
+        KAction *launchAction = new KAction(launchIcon, i18nc("@action", "Start"), this);
         connect(launchAction, SIGNAL(activated()), this, SLOT(launchSingleApp()));
 
         m_launcherMessage->addAction(launchAction);
         m_launcherMessage->animatedShow();
-    } else if (apps.size() > 1) {
+    } else if (m_launches->rowCount() > 1) {
         m_launcherMessage->setText(i18nc("@info", "Applications successfully installed."));
         KAction *launchAction = new KAction(i18nc("@action", "Run New Applications..."), this);
         connect(launchAction, SIGNAL(activated()), this, SLOT(showAppLauncher()));
@@ -543,19 +402,19 @@ void MainWindow::showLauncherMessage()
 
 void MainWindow::launchSingleApp()
 {
-    KToolInvocation::startServiceByDesktopPath(m_launchableApps.first()->desktopEntryPath());
+    m_launches->invokeApplication(0);
     m_launcherMessage->animatedHide();
     m_launcherMessage->removeAction(m_launcherMessage->actions().first());
 }
 
 void MainWindow::showAppLauncher()
 {
-    if (!m_appLauncher && !m_launchableApps.isEmpty()) {
-        m_appLauncher = new ApplicationLauncher(m_appBackend);
+    if (!m_appLauncher && !m_launches->rowCount()==0) {
+        m_appLauncher = new ApplicationLauncher(m_launches);
         connect(m_appLauncher, SIGNAL(destroyed(QObject*)),
-            this, SLOT(onAppLauncherClosed()));
+                this, SLOT(onAppLauncherClosed()));
         connect(m_appLauncher, SIGNAL(finished(int)),
-            this, SLOT(onAppLauncherClosed()));
+                this, SLOT(onAppLauncherClosed()));
         m_appLauncher->setWindowTitle(i18nc("@title:window", "Installation Complete"));
         m_appLauncher->show();
     }
@@ -572,20 +431,6 @@ void MainWindow::clearMessageActions()
     foreach (QAction *action, m_launcherMessage->actions()) {
         m_launcherMessage->removeAction(action);
     }
-}
-
-void MainWindow::transactionAdded()
-{
-    m_transactionCount++;
-}
-
-void MainWindow::transactionRemoved()
-{
-    if (m_transactionCount)
-        m_transactionCount--;
-
-    if (!m_transactionCount)
-        removeProgressItem();
 }
 
 void MainWindow::addProgressItem()
@@ -610,11 +455,10 @@ void MainWindow::removeProgressItem()
     if (!m_progressItem)
         return;
 
-    QObject *progressView = m_viewHash[m_progressItem->index()];
+    QObject *progressView = m_viewHash.take(m_progressItem->index());
     if (progressView)
-            progressView->deleteLater();
+        progressView->deleteLater();
 
-    m_viewHash.remove(m_progressItem->index());
-    m_viewModel->removeRow(m_viewModel->indexFromItem(m_progressItem).row());
+    m_viewModel->removeRow(m_progressItem->row());
     m_progressItem = nullptr;
 }
