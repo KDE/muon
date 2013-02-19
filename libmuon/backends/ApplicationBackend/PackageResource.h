@@ -60,7 +60,6 @@ public:
 
     State state();
     void fetchScreenshots();
-    void fetchChangelog();
 
 private:
     QString m_packageName;

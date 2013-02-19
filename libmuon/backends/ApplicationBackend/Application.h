@@ -85,18 +85,12 @@ public:
     bool canExecute() const;
     QString section();
     
-    virtual State state();
-    virtual void fetchScreenshots();
-    virtual void fetchChangelog();
+    State state();
+    void fetchScreenshots();
     
     bool isSecure() const;
 
-private slots:
-    void processChangelog(KJob*);
-
 private:
-    QString buildDescription(const QByteArray& data, const QString& source);
-    
     KSharedConfigPtr m_data;
     QByteArray m_packageName;
 

@@ -219,8 +219,3 @@ void PackageResource::fetchScreenshots()
 {
     // FIXME: Implement
 }
-
-void PackageResource::fetchChangelog()
-{
-    // FIXME: Implement
-}

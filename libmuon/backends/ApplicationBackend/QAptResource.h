@@ -26,6 +26,8 @@
 // Libmuon includes
 #include "resources/AbstractResource.h"
 
+class KJob;
+
 namespace QApt {
     class Backend;
     class Package;
@@ -44,6 +46,8 @@ public:
     void clearPackage();
     QList<PackageState> addonsInformation();
 
+    void fetchChangelog();
+
 protected:
     QApt::Backend *m_backend;
     QApt::Package *m_package;
@@ -51,6 +55,10 @@ protected:
 
 private:
     QApt::PackageList addons();
+    QString buildDescription(const QByteArray& data, const QString& source);
+
+private slots:
+    void processChangelog(KJob *job);
 };
 
 #endif // QAPTRESOURCE_H
