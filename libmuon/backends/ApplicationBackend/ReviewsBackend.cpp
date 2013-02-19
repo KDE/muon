@@ -37,7 +37,7 @@
 
 #include <QtOAuth/interface.h>
 
-#include <Application.h>
+#include "QAptResource.h"
 #include <ReviewsBackend/Rating.h>
 #include <ReviewsBackend/Review.h>
 #include <ReviewsBackend/AbstractLoginBackend.h>
@@ -99,15 +99,6 @@ void ReviewsBackend::setAptBackend(QApt::Backend *aptBackend)
 {
     m_aptBackend = aptBackend;
 }
-
-// void ReviewsBackend::clearReviewCache()
-// {
-//     foreach (QList<Review *> reviewList, m_reviewsCache) {
-//         qDeleteAll(reviewList);
-//     }
-// 
-//     m_reviewsCache.clear();
-// }
 
 void ReviewsBackend::fetchRatings()
 {
@@ -196,9 +187,9 @@ void ReviewsBackend::stopPendingJobs()
 
 void ReviewsBackend::fetchReviews(AbstractResource* res, int page)
 {
-    Application* app = qobject_cast<Application*>(res);
+    QAptResource *app = qobject_cast<QAptResource *>(res);
     // Check our cache before fetching from the 'net
-    QString hashName = app->package()->name() + app->untranslatedName();
+    QString hashName = app->package()->name() + app->name();
     
     QList<Review*> revs = m_reviewsCache.value(hashName);
     if (revs.size()>(page*10)) { //there are 10 reviews per page
@@ -267,7 +258,7 @@ void ReviewsBackend::reviewsFetched(KJob *job)
         reviewsList << review;
     }
 
-    Application *app = m_jobHash.value(job);
+    QAptResource *app = m_jobHash.value(job);
     m_jobHash.remove(job);
 
     if (!app)
@@ -304,7 +295,7 @@ void ReviewsBackend::submitUsefulness(Review* r, bool useful)
 void ReviewsBackend::submitReview(AbstractResource* application, const QString& summary,
                       const QString& review_text, const QString& rating)
 {
-    Application* app = qobject_cast<Application*>(application);
+    QAptResource *app = qobject_cast<QAptResource *>(application);
     
     QVariantMap data;
     data["app_name"] = app->name();
