@@ -10,6 +10,8 @@ if(BODEGA_FOUND)
     add_subdirectory(BodegaBackend)
 endif(BODEGA_FOUND)
 
+add_subdirectory(USCBackend)
+
 OPTION(BUILD_DummyBackend "Build the DummyBackend" "OFF")
 if(BUILD_DummyBackend)
     add_subdirectory(DummyBackend)

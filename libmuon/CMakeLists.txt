@@ -27,7 +27,6 @@ set(muon_LIB_SRCS
     MuonBackendsFactory.cpp
     ScreenshotsModel.cpp
     ApplicationAddonsModel.cpp
-    USCBackend/USCResource.cpp
 )
 
 kde4_add_kcfg_files(muon_LIB_SRCS GENERATE_MOC MuonDataSources.kcfgc)
