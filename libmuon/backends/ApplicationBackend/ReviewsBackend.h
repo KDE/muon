@@ -25,8 +25,7 @@
 #include <QtCore/QVariant>
 #include <KUrl>
 
-#include "libmuonprivate_export.h"
-#include <ReviewsBackend/AbstractReviewsBackend.h>
+#include "ReviewsBackend/AbstractReviewsBackend.h"
 
 namespace QOAuth {
     class Interface;
@@ -44,7 +43,7 @@ class QAptResource;
 class Rating;
 class Review;
 
-class MUONPRIVATE_EXPORT ReviewsBackend : public AbstractReviewsBackend
+class ReviewsBackend : public AbstractReviewsBackend
 {
     Q_OBJECT
 public:

@@ -30,7 +30,6 @@
 
 #include <LibQApt/Package>
 
-#include "libmuonprivate_export.h"
 #include "QAptResource.h"
 
 class KJob;
@@ -38,7 +37,7 @@ namespace QApt {
     class Backend;
 }
 
-class MUONPRIVATE_EXPORT Application : public QAptResource
+class Application : public QAptResource
 {
 Q_OBJECT
 // Q_PROPERTY(QString mimetypes READ mimetypes CONSTANT)

@@ -31,7 +31,6 @@
 #include <LibQApt/Package>
 #include <LibQApt/Backend>
 
-#include <libmuonprivate_export.h>
 #include "resources/AbstractResourcesBackend.h"
 
 namespace QApt {
@@ -50,7 +49,7 @@ class QAptActions;
 class QAptResource;
 class KJob;
 
-class MUONPRIVATE_EXPORT ApplicationBackend : public AbstractResourcesBackend
+class ApplicationBackend : public AbstractResourcesBackend
 {
     Q_OBJECT
     Q_INTERFACES(AbstractResourcesBackend)
