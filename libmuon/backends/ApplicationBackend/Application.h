@@ -21,20 +21,22 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+// Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QHash>
 #include <QtCore/QStringList>
 
+// KDE includes
 #include <KUrl>
 #include <KService>
 
-#include <LibQApt/Package>
-
+// Own includes
 #include "QAptResource.h"
 
 class KJob;
 namespace QApt {
     class Backend;
+    class Package;
 }
 
 class Application : public QAptResource

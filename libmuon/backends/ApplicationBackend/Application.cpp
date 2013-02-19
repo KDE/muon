@@ -19,15 +19,11 @@
  ***************************************************************************/
 
 #include "Application.h"
-#include "resources/PackageState.h"
-#include "ApplicationBackend.h"
-#include <MuonDataSources.h>
 
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
-#include <QThread>
 
 // KDE includes
 #include <KIconLoader>
@@ -43,11 +39,14 @@
 
 // QApt includes
 #include <LibQApt/Backend>
-#include <LibQApt/Config>
 #include <LibQApt/Changelog>
+#include <LibQApt/Package>
 
-//QJSON includes
+// QJSON includes
 #include <qjson/parser.h>
+
+// Libmuon includes
+#include "MuonDataSources.h"
 
 Application::Application(const QString& fileName, QApt::Backend* backend)
         : QAptResource(nullptr, backend)

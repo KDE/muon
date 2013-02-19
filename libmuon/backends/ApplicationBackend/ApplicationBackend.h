@@ -28,7 +28,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QVector>
 
-#include <LibQApt/Package>
 #include <LibQApt/Backend>
 
 #include "resources/AbstractResourcesBackend.h"
@@ -41,7 +40,6 @@ namespace DebconfKde {
     class DebconfGui;
 }
 
-class Application;
 class ApplicationUpdates;
 class ReviewsBackend;
 class Transaction;
