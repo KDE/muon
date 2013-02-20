@@ -124,8 +124,8 @@ void ApplicationUpdates::start()
 void ApplicationUpdates::addResources(const QList<AbstractResource*>& apps)
 {
     QList<QApt::Package*> packages;
-    foreach(AbstractResource* res, apps) {
-        Application* app = qobject_cast<Application*>(res);
+    for (AbstractResource* res : apps) {
+        QAptResource* app = qobject_cast<QAptResource*>(res);
         Q_ASSERT(app);
         packages += app->package();
     }
@@ -136,7 +136,7 @@ void ApplicationUpdates::removeResources(const QList<AbstractResource*>& apps)
 {
     QList<QApt::Package*> packages;
     foreach(AbstractResource* res, apps) {
-        Application* app = qobject_cast<Application*>(res);
+        QAptResource *app = qobject_cast<QAptResource *>(res);
         Q_ASSERT(app);
         packages += app->package();
     }
