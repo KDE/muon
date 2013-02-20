@@ -22,8 +22,9 @@
 
 #include <QtCore/QStringList>
 
-USCResource::USCResource(const QVariantMap &data)
-    : AbstractResource(nullptr)
+USCResource::USCResource(ApplicationBackend *parent,
+                         QApt::Backend *backend, const QVariantMap &data)
+    : QAptResource(parent, backend)
 {
     m_name = data.value("name").toString();
     QString desc = data.value("description").toString();
@@ -45,13 +46,6 @@ USCResource::USCResource(const QVariantMap &data)
     QList<QVariant> variantList = data.value("screenshot_urls").toList();
     for (const QVariant &variant : variantList)
         m_screenshotUrls += variant.toUrl();
-}
-
-AbstractResource::State USCResource::state()
-{
-    State ret = None;
-
-    return ret;
 }
 
 QString USCResource::name()

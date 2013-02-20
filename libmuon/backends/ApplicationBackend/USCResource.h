@@ -23,15 +23,15 @@
 
 #include <QtCore/QVariantMap>
 
-#include <resources/AbstractResource.h>
+#include "QAptResource.h"
 
-class USCResource : public AbstractResource
+class USCResource : public QAptResource
 {
     Q_OBJECT
 public:
-    explicit USCResource(const QVariantMap &data);
+    explicit USCResource(ApplicationBackend *parent,
+                         QApt::Backend *backend, const QVariantMap &data);
 
-    AbstractResource::State state();
     QString name();
     QString icon() const;
     QString comment();
@@ -42,7 +42,6 @@ public:
     QUrl screenshotUrl();
     QString license();
     QString longDescription() const;
-    QList<PackageState> addonsInformation() { return QList<PackageState>(); }
     QString sizeDescription() { return QString(); }
     QString availableVersion() const;
     QString installedVersion() const;
