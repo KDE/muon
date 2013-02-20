@@ -33,7 +33,8 @@ PackageResource::PackageResource(ApplicationBackend *parent, QApt::Backend *back
 {
     m_packageName = package->name().latin1();
 
-    if (package->architecture() != m_backend->nativeArchitecture())
+    QString arch = m_package->architecture();
+    if (arch != m_backend->nativeArchitecture() && arch != QLatin1String("all"))
         m_packageName.append(QByteArray(":") + m_package->architecture().toLatin1());
 }
 

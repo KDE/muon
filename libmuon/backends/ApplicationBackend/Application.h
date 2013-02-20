@@ -87,7 +87,7 @@ public:
     QString section();
     void fetchScreenshots();
     
-    bool isSecure() const;
+    bool isFromSecureOrigin() const;
 
 private:
     KSharedConfigPtr m_data;
