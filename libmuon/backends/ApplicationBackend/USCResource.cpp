@@ -33,6 +33,7 @@ USCResource::USCResource(ApplicationBackend *parent,
 {
     m_name = data.value("name").toString();
     QString desc = data.value("description").toString();
+    desc.replace(QLatin1String("\r\n"), QLatin1String("<br>"));
     QStringList descSplit = desc.split('\n');
 
     m_comment = descSplit.takeFirst();
@@ -126,11 +127,13 @@ QString USCResource::origin() const
 
 int USCResource::downloadSize()
 {
-    // TODO
+    if (m_package)
+        return m_package->downloadSize();
+
     return 0;
 }
 
 void USCResource::fetchScreenshots()
 {
-    //TODO
+    emit screenshotsFetched(m_screenshotUrls, m_screenshotUrls);
 }
