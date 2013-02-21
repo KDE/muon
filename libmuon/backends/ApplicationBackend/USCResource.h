@@ -46,7 +46,6 @@ public:
     QString longDescription() const;
     QString sizeDescription() { return QString(); }
     QString availableVersion() const;
-    QString installedVersion() const;
     QString origin() const;
     int downloadSize();
     QString section() { return QString(); }

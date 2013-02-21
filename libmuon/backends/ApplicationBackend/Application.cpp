@@ -298,12 +298,6 @@ QString Application::availableVersion() const
     return m_package->availableVersion();
 }
 
-QString Application::installedVersion() const
-{
-    if(!m_package) return QString();
-    return m_package->installedVersion();
-}
-
 QString Application::sizeDescription()
 {
     if (!isInstalled()) {

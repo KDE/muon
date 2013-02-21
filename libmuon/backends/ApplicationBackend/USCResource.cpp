@@ -20,8 +20,12 @@
 
 #include "USCResource.h"
 
+// Qt includes
 #include <QtCore/QStringList>
 #include <QDebug>
+
+// LibQApt includes
+#include <LibQApt/Backend>
 
 USCResource::USCResource(ApplicationBackend *parent,
                          QApt::Backend *backend, const QVariantMap &data)
@@ -51,6 +55,11 @@ USCResource::USCResource(ApplicationBackend *parent,
 
 QApt::Package *USCResource::package()
 {
+    if (!m_package && m_backend) {
+        m_package = m_backend->package(m_packageName);
+        emit stateChanged();
+    }
+
     return m_package;
 }
 
@@ -108,12 +117,6 @@ QString USCResource::license()
 QString USCResource::availableVersion() const
 {
     return m_version;
-}
-
-QString USCResource::installedVersion() const
-{
-    // TODO
-    return QString();
 }
 
 QString USCResource::origin() const

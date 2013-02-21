@@ -55,6 +55,14 @@ void QAptResource::clearPackage()
     m_package = nullptr;
 }
 
+QString QAptResource::installedVersion() const
+{
+    if (m_package)
+        return m_package->installedVersion();
+
+    return QString();
+}
+
 AbstractResource::State QAptResource::state()
 {
     State ret = None;
