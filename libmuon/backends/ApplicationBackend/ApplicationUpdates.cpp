@@ -77,9 +77,7 @@ QList<AbstractResource*> ApplicationUpdates::toUpdate() const
     auto changes = m_aptBackend->stateChanges(m_updatesCache, QApt::PackageList());
     for(auto pkgList : changes.values()) {
         for(QApt::Package* it : pkgList) {
-            AbstractResource* res = m_appBackend->resourceByPackageName(it->name());
-            if(!res) //If we couldn't find it by its name, try with
-                res = m_appBackend->resourceByPackageName(QString("%1:%2").arg(it->name()).arg(it->architecture()));
+            AbstractResource* res = m_appBackend->resourceByPackage(it);
             Q_ASSERT(res);
             ret += res;
         }

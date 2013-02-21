@@ -59,6 +59,7 @@ public:
     bool isValid() const;
     AbstractReviewsBackend *reviewsBackend() const;
     Q_SCRIPTABLE AbstractResource* resourceByPackageName(const QString& name) const;
+    QAptResource *resourceByPackage(QApt::Package *pkg) const;
     QApt::Backend* backend() const;
 
     int updatesCount() const;

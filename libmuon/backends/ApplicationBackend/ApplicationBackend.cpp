@@ -503,6 +503,16 @@ AbstractResource* ApplicationBackend::resourceByPackageName(const QString& name)
     return nullptr;
 }
 
+QAptResource* ApplicationBackend::resourceByPackage(QApt::Package *pkg) const
+{
+    for (QAptResource* app : m_appList) {
+        if(app->package() == pkg)
+            return app;
+    }
+
+    return nullptr;
+}
+
 QStringList ApplicationBackend::searchPackageName(const QString& searchText)
 {
     QApt::PackageList packages = m_backend->search(searchText);
