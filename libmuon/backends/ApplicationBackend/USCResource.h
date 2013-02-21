@@ -32,6 +32,8 @@ public:
     explicit USCResource(ApplicationBackend *parent,
                          QApt::Backend *backend, const QVariantMap &data);
 
+    QApt::Package *package();
+
     QString name();
     QString icon() const;
     QString comment();
@@ -46,6 +48,7 @@ public:
     QString availableVersion() const;
     QString installedVersion() const;
     QString origin() const;
+    int downloadSize();
     QString section() { return QString(); }
     void fetchScreenshots();
 

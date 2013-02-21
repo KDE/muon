@@ -116,6 +116,8 @@ private Q_SLOTS:
     void setupTransaction(QApt::Transaction *trans);
     void sourcesEditorClosed();
     void checkForUpdates();
+    void fetchUSCResourceList();
+    void initUSCResources(KJob *j);
 
 Q_SIGNALS:
 	void startingFirstTransaction();

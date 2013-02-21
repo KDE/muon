@@ -54,6 +54,7 @@
 // Own includes
 #include "Application.h"
 #include "PackageResource.h"
+#include "USCResource.h"
 #include "ReviewsBackend.h"
 #include "Transaction/Transaction.h"
 #include "Transaction/TransactionModel.h"
@@ -141,7 +142,7 @@ QVector<QAptResource *> init(QApt::Backend *backend, QThread* thread)
 
 void ApplicationBackend::setApplications()
 {
-    m_appList = m_watcher->future().result();
+    m_appList += m_watcher->future().result();
     for (QAptResource* app : m_appList)
         app->setParent(this);
 
@@ -487,8 +488,9 @@ int ApplicationBackend::updatesCount() const
         return 0;
 
     int count = 0;
-    for (QAptResource* app : m_appList)
+    for (QAptResource* app : m_appList) {
         count += app->canUpgrade();
+    }
 
     return count;
 }
@@ -572,12 +574,16 @@ void ApplicationBackend::initBackend()
     m_reviewsBackend->setAptBackend(m_backend);
     m_backendUpdater->setBackend(m_backend);
 
+    // Initialize APT resources
     QFuture<QVector<QAptResource*> > future = QtConcurrent::run(init, m_backend, QThread::currentThread());
     m_watcher->setFuture(future);
     connect(m_backend, SIGNAL(transactionQueueChanged(QString,QStringList)),
             this, SLOT(aptTransactionsChanged(QString)));
     connect(m_backend, SIGNAL(xapianUpdateFinished()),
             this, SIGNAL(searchInvalidated()));
+
+    // Initialize USC resources
+    fetchUSCResourceList();
 }
 
 void ApplicationBackend::setupTransaction(QApt::Transaction *trans)
@@ -645,4 +651,41 @@ void ApplicationBackend::checkForUpdates()
     m_backendUpdater->setupTransaction(transaction);
     transaction->run();
 
+}
+
+void ApplicationBackend::fetchUSCResourceList()
+{
+    // FIXME: de-hardcode stuff
+    QString urlBase = QLatin1String("https://software-center.ubuntu.com");
+    KIO::StoredTransferJob* job = KIO::storedGet(KUrl(urlBase, "/api/2.0/applications/en/ubuntu/quantal/amd64/"),
+                                                 KIO::NoReload, KIO::DefaultFlags|KIO::HideProgressInfo);
+    connect(job, SIGNAL(finished(KJob*)), SLOT(initUSCResources(KJob*)));
+}
+
+void ApplicationBackend::initUSCResources(KJob *j)
+{
+    KIO::StoredTransferJob* job = qobject_cast<KIO::StoredTransferJob*>(j);
+    Q_ASSERT(job);
+
+    if (job->error())
+        qDebug() << "Error fetching USC Resource list: " << job->errorText();
+
+    QJson::Parser parser;
+    bool ok = false;
+    QVariant resources = parser.parse(job->data(), &ok);
+
+    if (!ok) {
+        qWarning() << "error while parsing USC resource list";
+        return;
+    }
+
+    // TODO: Thread?
+    for (const QVariant &resourceData : resources.toList()) {
+        USCResource *res = new USCResource(this, m_backend, resourceData.toMap());
+        qDebug() << "USCResource:" << res->name();
+        if (res->isValid())
+            m_appList.append(res);
+    }
+
+    emit backendReady();
 }

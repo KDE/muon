@@ -21,6 +21,7 @@
 #include "USCResource.h"
 
 #include <QtCore/QStringList>
+#include <QDebug>
 
 USCResource::USCResource(ApplicationBackend *parent,
                          QApt::Backend *backend, const QVariantMap &data)
@@ -46,6 +47,11 @@ USCResource::USCResource(ApplicationBackend *parent,
     QList<QVariant> variantList = data.value("screenshot_urls").toList();
     for (const QVariant &variant : variantList)
         m_screenshotUrls += variant.toUrl();
+}
+
+QApt::Package *USCResource::package()
+{
+    return m_package;
 }
 
 QString USCResource::name()
@@ -113,6 +119,12 @@ QString USCResource::installedVersion() const
 QString USCResource::origin() const
 {
     return m_origin;
+}
+
+int USCResource::downloadSize()
+{
+    // TODO
+    return 0;
 }
 
 void USCResource::fetchScreenshots()
