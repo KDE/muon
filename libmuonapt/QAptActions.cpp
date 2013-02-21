@@ -179,7 +179,6 @@ void QAptActions::setActionsEnabledInternal(bool enabled)
     actionCollection()->action("save_markings")->setEnabled(changesPending);
     actionCollection()->action("save_download_list")->setEnabled(changesPending);
     actionCollection()->action("dist-upgrade")->setEnabled(false);
-    checkDistUpgrade();
 }
 
 bool QAptActions::isConnected() const {
