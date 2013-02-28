@@ -39,9 +39,5 @@ add_subdirectory(exporter)
 
 macro_log_feature(QAPT_FOUND "LibQApt" "Qt wrapper around the libapt-pkg library"
                   "http://www.kde.org" FALSE "" "Required to build the APT backend")
-macro_log_feature(LIBATTICA_FOUND "LibAttica" "Qt library that implements the Open Collaboration Services API"
-                  "http://www.kde.org" FALSE "" "Required to build the KNewStuff3 backend")
-macro_log_feature(BODEGA_FOUND "Bodega" "Library that exposes Bodega resources"
-                  "http://www.kde.org" FALSE "" "Required to build the Bodega backend")
 
 macro_display_feature_log()

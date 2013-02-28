@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Muon/Backend
+Exec=blubb
+Icon=application-other
+Name=Chakra Bundles
+GenericName=CInstall
+Comment=Any application for your Chakra
+X-KDE-Library=muon-cinstallbackend
+X-KDE-PluginInfo-Name=muon-cinstallbackend
+X-KDE-PluginInfo-License=GPL

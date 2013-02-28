@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Menu>
+
+  <Menu>
+    <Name>Chakra Bundles</Name>
+    <Icon>applications-other</Icon>
+    <Include>
+      <Or>
+        <Category>cbundle</Category>
+      </Or>
+    </Include>
+  </Menu>
+
+</Menu>

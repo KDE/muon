@@ -14,3 +14,5 @@ OPTION(BUILD_DummyBackend "Build the DummyBackend" "OFF")
 if(BUILD_DummyBackend)
     add_subdirectory(DummyBackend)
 endif(BUILD_DummyBackend)
+
+add_subdirectory(ChakraCInstallBackend)
