@@ -51,7 +51,7 @@ static QString getArchitecture() {
 
 QString installBundle(const QString& bundle)
 {
-    Bundle b("muon", bundle, QStringList(), 0);
+    Bundle b("cinstall", bundle, QStringList(), 0);
     b.setExecuting(false);
     b.run();
     b.unmount();
@@ -235,7 +235,7 @@ void CInstallBackend::bundleDownladed(KJob* job)
     //if we are upgrading the bundle, we remove the old one first
     if (res->state()==AbstractResource::Upgradeable) {
         QString oldBundle = res->installedVersionCompleteName()+ "-" + m_currentArch;
-        Bundle::remove(m_repoDir.filePath(oldBundle + ".cb"), "muon");
+        Bundle::remove(m_repoDir.filePath(oldBundle + ".cb"), "cinstall");
     }
 
     QString bundleName = res->bundleInfo().completeName + "-" + m_currentArch;
