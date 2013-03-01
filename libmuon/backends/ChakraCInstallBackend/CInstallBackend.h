@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>       *
+ *   Copyright © 2013 Aleix Pol Gonzalez <aleixpol@blue-systems.com>       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -38,7 +38,7 @@ public:
     
     virtual void cancelTransaction(AbstractResource* app);
     virtual void removeApplication(AbstractResource* app);
-    virtual void installApplication(AbstractResource* app, AddonList addons);
+    virtual void installApplication(AbstractResource* app, AddonList);
     virtual void installApplication(AbstractResource* app) { installApplication(app, AddonList()); }
     virtual AbstractResource* resourceByPackageName(const QString& name) const;
     virtual int updatesCount() const;
@@ -57,6 +57,7 @@ public:
 private slots:
     void addInstalledBundles();
     void addAvailableBundles(KJob *job);
+    void bundleDownladed(KJob* job);
 
 private:
     QString m_currentArch;

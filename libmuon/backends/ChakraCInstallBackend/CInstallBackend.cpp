@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>       *
+ *   Copyright © 2013 Aleix Pol Gonzalez <aleixpol@blue-systems.com>       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -22,11 +22,18 @@
 #include <KPluginFactory>
 #include <KIO/FileCopyJob>
 #include <KIO/Job>
+#include <KDebug>
+#include <cbundle/bundle.h>
+#include <cbundle/MountPointException.h>
 #include "CInstallBackend.h"
 #include "CInstallResource.h"
+#include "CInstallTransaction.h"
 #include <resources/StandardBackendUpdater.h>
+#include <Transaction/Transaction.h>
+#include <Transaction/TransactionModel.h>
 #include <QFile>
 #include <QDebug>
+#include <qmetaobject.h>
 #include <qjson/parser.h>
 #include <sys/utsname.h>
 
@@ -41,9 +48,19 @@ static QString getArchitecture() {
     }
     return un.machine;
 }
+
+QString installBundle(const QString& bundle)
+{
+    Bundle b("muon", bundle, QStringList(), 0);
+    b.setExecuting(false);
+    b.run();
+    b.unmount();
+    return b.getBundleName() + "-" + b.getBundleVersion() + "-" + b.getBundleArch();
 }
 
-CInstallBackend::CInstallBackend(QObject* parent, const QVariantList& args)
+}
+
+CInstallBackend::CInstallBackend(QObject* parent, const QVariantList& )
     : AbstractResourcesBackend(parent)
     , m_currentArch(getArchitecture())
     , m_cacheDir(QDir::homePath() + "/.cinstall/cache")
@@ -171,11 +188,60 @@ QStringList CInstallBackend::searchPackageName(const QString& searchText)
     return ret;
 }
 
-void CInstallBackend::cancelTransaction(AbstractResource* app)
-{}
+void CInstallBackend::installApplication(AbstractResource* app, AddonList )
+{
+    CInstallResource* res = qobject_cast<CInstallResource*>(app);
+    CInstallTransaction* t = new CInstallTransaction(res, Transaction::InstallRole);
+    TransactionModel::global()->addTransaction(t);
 
-void CInstallBackend::installApplication(AbstractResource* app, AddonList addons)
-{}
+    BundleEntryInfo info = res->bundleInfo();
+    QString bundleName = info.completeName + "-" + m_currentArch;
+
+    KUrl url ("http://chakra-project.org/repo/bundles/" + m_currentArch + "/" + bundleName + ".cb");
+    KIO::FileCopyJob *fcJob = KIO::file_copy(url, "/tmp/" + bundleName + ".cb", -1, KIO::Overwrite | KIO::HideProgressInfo);
+    connect(fcJob, SIGNAL(finished(KJob*)), SLOT(bundleDownladed(KJob*)));
+    t->setJob(fcJob);
+}
 
 void CInstallBackend::removeApplication(AbstractResource* app)
-{}
+{
+    CInstallResource* res = qobject_cast<CInstallResource*>(app);
+    Transaction* t = new Transaction(this, app, Transaction::RemoveRole);
+    TransactionModel::global()->addTransaction(t);
+    res->removeBundle();
+    TransactionModel::global()->removeTransaction(t);
+}
+
+void CInstallBackend::cancelTransaction(AbstractResource* app)
+{
+    CInstallTransaction* t = qobject_cast<CInstallTransaction*>(app->property("transaction").value<QObject*>());
+    if(t) {
+        t->job()->kill();
+        TransactionModel::global()->removeTransaction(t);
+    }
+}
+
+void CInstallBackend::bundleDownladed(KJob* job)
+{
+    CInstallTransaction* t = qobject_cast<CInstallTransaction*>(job->property("transaction").value<QObject*>());
+    if(job->error()!=0 || !t) {
+        kWarning() << "couldn't figure out bundle download" << job;
+        TransactionModel::global()->removeTransaction(t);
+        delete t;
+        return;
+    }
+
+    CInstallResource* res = qobject_cast<CInstallResource*>(t->resource());
+    //if we are upgrading the bundle, we remove the old one first
+    if (res->state()==AbstractResource::Upgradeable) {
+        QString oldBundle = res->installedVersionCompleteName()+ "-" + m_currentArch;
+        Bundle::remove(m_repoDir.filePath(oldBundle + ".cb"), "muon");
+    }
+
+    QString bundleName = res->bundleInfo().completeName + "-" + m_currentArch;
+    if (installBundle("/tmp/" + bundleName + ".cb") != QString())
+        res->initFromPath(bundleName + ".desktop");
+
+    TransactionModel::global()->removeTransaction(t);
+    delete t;
+}

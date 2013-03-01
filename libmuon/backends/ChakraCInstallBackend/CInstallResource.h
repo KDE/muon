@@ -47,7 +47,7 @@ class CInstallResource : public AbstractResource
 {
     Q_OBJECT
     public:
-        explicit CInstallResource(const QString& BundlePath, CInstallBackend* parent);
+        explicit CInstallResource(const QString& bundlePath, CInstallBackend* parent);
         explicit CInstallResource(const BundleEntryInfo& info, AbstractResourcesBackend* parent);
         
         virtual QUrl homepage() const { return QUrl(); }
@@ -72,11 +72,18 @@ class CInstallResource : public AbstractResource
         virtual bool canExecute() const { return true; }
         virtual void invokeApplication() const;
 
+        void initFromPath(const QString& path);
+        QString installedVersionCompleteName() const { return m_installedVersionCompleteName; }
         void updateData(const BundleEntryInfo& info);
+        const BundleEntryInfo& bundleInfo() const { return m_info; }
+        void removeBundle();
 
     private:
+        void setState(State newState);
+
         BundleEntryInfo m_info;
         AbstractResource::State m_state;
+        QString m_installedVersionCompleteName;
 };
 
 #endif // CINSTALLRESOURCE_H
