@@ -217,7 +217,7 @@ void CInstallBackend::cancelTransaction(AbstractResource* app)
     CInstallTransaction* t = qobject_cast<CInstallTransaction*>(app->property("transaction").value<QObject*>());
     if(t) {
         t->job()->kill();
-        TransactionModel::global()->removeTransaction(t);
+        TransactionModel::global()->cancelTransaction(t);
     }
 }
 
