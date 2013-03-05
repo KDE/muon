@@ -49,13 +49,12 @@ static QString getArchitecture() {
     return un.machine;
 }
 
-QString installBundle(const QString& bundle)
+void installBundle(const QString& bundle)
 {
     Bundle b("cinstall", bundle, QStringList(), 0);
     b.setExecuting(false);
     b.run();
     b.unmount();
-    return b.getBundleName() + "-" + b.getBundleVersion() + "-" + b.getBundleArch();
 }
 
 }
@@ -239,8 +238,8 @@ void CInstallBackend::bundleDownladed(KJob* job)
     }
 
     QString bundleName = res->bundleInfo().completeName + "-" + m_currentArch;
-    if (installBundle("/tmp/" + bundleName + ".cb") != QString())
-        res->initFromPath(bundleName + ".desktop");
+    installBundle("/tmp/" + bundleName + ".cb");
+    res->initFromPath(bundleName + ".desktop");
 
     TransactionModel::global()->removeTransaction(t);
     delete t;
