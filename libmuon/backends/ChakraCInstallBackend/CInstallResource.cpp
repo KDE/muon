@@ -22,6 +22,7 @@
 #include "CInstallBackend.h"
 #include <KProcess>
 #include <KDesktopFile>
+#include <cbundle/bundle.h>
 #include <QDebug>
 #include <QFileInfo>
 
@@ -105,8 +106,12 @@ void CInstallResource::initFromPath(const QString& path)
 
 void CInstallResource::removeBundle()
 {
-    m_installedVersionCompleteName.clear();
-    setState(None);
+    CInstallBackend* b = qobject_cast<CInstallBackend*>(parent());
+
+    if(Bundle::remove(b->repoDir().filePath(m_installedVersionCompleteName+"-"+b->architecture()+".cb"), "cinstall")) {
+        m_installedVersionCompleteName.clear();
+        setState(None);
+    }
 }
 
 void CInstallResource::setState(AbstractResource::State newState)

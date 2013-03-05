@@ -236,8 +236,7 @@ void CInstallBackend::bundleDownladed(KJob* job)
     CInstallResource* res = qobject_cast<CInstallResource*>(t->resource());
     //if we are upgrading the bundle, we remove the old one first
     if (res->state()==AbstractResource::Upgradeable) {
-        QString oldBundle = res->installedVersionCompleteName()+ "-" + m_currentArch;
-        Bundle::remove(m_repoDir.filePath(oldBundle + ".cb"), "cinstall");
+        res->removeBundle();
     }
 
     QString bundleName = res->bundleInfo().completeName + "-" + m_currentArch;
