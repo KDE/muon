@@ -209,14 +209,17 @@ void CInstallBackend::removeApplication(AbstractResource* app)
     TransactionModel::global()->addTransaction(t);
     res->removeBundle();
     TransactionModel::global()->removeTransaction(t);
+    delete t;
 }
 
 void CInstallBackend::cancelTransaction(AbstractResource* app)
 {
     CInstallTransaction* t = qobject_cast<CInstallTransaction*>(app->property("transaction").value<QObject*>());
     if(t) {
-        t->job()->kill();
         TransactionModel::global()->cancelTransaction(t);
+        t->job()->disconnect();
+        t->job()->kill();
+        delete t;
     }
 }
 
