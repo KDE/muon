@@ -55,7 +55,7 @@ AbstractResource::State CInstallResource::state()
 
 QString CInstallResource::icon() const
 {
-    return m_info.icon;
+    return m_info.icon.isEmpty() ? "applications-other" : m_info.icon;
 }
 
 int CInstallResource::downloadSize()
