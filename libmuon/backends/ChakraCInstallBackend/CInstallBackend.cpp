@@ -118,6 +118,11 @@ void CInstallBackend::addAvailableBundles(KJob* job)
         info.version = propertyMap["version"].toString();
         info.release = propertyMap["release"].toInt();
         info.size = propertyMap["size"].toULongLong();
+        info.license = propertyMap["license"].toString();
+        info.thumbnailUrl = propertyMap["thumbnail"].toUrl();
+        info.screenshotUrl = propertyMap["screenshot"].toUrl();
+        info.comment = propertyMap["description"].toString();
+        info.homepage = propertyMap["url"].toUrl();
         info.completeName = info.name + "-" + info.version + "-" + QString::number(info.release);
 
         // skip hidden (unfinished) files

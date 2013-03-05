@@ -39,16 +39,6 @@ CInstallResource::CInstallResource(const BundleEntryInfo& info, AbstractResource
     , m_state(None)
 {}
 
-QUrl CInstallResource::screenshotUrl()
-{
-    return QUrl();
-}
-
-QUrl CInstallResource::thumbnailUrl()
-{
-    return QUrl();
-}
-
 AbstractResource::State CInstallResource::state()
 {
     return m_state;
@@ -57,11 +47,6 @@ AbstractResource::State CInstallResource::state()
 QString CInstallResource::icon() const
 {
     return m_info.icon.isEmpty() ? "applications-other" : m_info.icon;
-}
-
-int CInstallResource::downloadSize()
-{
-    return m_info.size;
 }
 
 void CInstallResource::fetchChangelog()

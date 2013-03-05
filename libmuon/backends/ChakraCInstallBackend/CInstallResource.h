@@ -41,6 +41,10 @@ struct BundleEntryInfo
     qulonglong size;
     QString icon;
     QString comment;
+    QString license;
+    QUrl screenshotUrl;
+    QUrl thumbnailUrl;
+    QUrl homepage;
 };
 
 class CInstallResource : public AbstractResource
@@ -50,11 +54,9 @@ class CInstallResource : public AbstractResource
         explicit CInstallResource(const QString& bundlePath, CInstallBackend* parent);
         explicit CInstallResource(const BundleEntryInfo& info, AbstractResourcesBackend* parent);
         
-        virtual QUrl homepage() const { return QUrl(); }
         virtual QString section() { return "123"; }
         virtual QString installedVersion() const { return "only"; }
         virtual QString origin() const { return "fuuu"; }
-        virtual QString license() { return "maybe gpl, but who knows"; }
         virtual QString categories() { return "cbundle"; }
 
         virtual QList<PackageState> addonsInformation() { return QList<PackageState>(); }
@@ -63,10 +65,12 @@ class CInstallResource : public AbstractResource
         virtual QString comment() { return m_info.comment; }
         virtual QString longDescription() const { return m_info.comment; }
         virtual QString packageName() const { return m_info.completeName; }
-        virtual int downloadSize();
+        virtual QString license() { return m_info.license; }
+        virtual int downloadSize() { return m_info.size; }
+        virtual QUrl homepage() const { return m_info.homepage; }
+        virtual QUrl screenshotUrl() { return m_info.screenshotUrl; }
+        virtual QUrl thumbnailUrl() { return m_info.thumbnailUrl; }
         virtual void fetchChangelog();
-        virtual QUrl screenshotUrl();
-        virtual QUrl thumbnailUrl();
         virtual State state();
         virtual QString icon() const;
         virtual bool canExecute() const { return true; }
