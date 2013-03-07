@@ -244,6 +244,7 @@ void ApplicationBackend::transactionEvent(QApt::TransactionStatus status)
     case QApt::WaitingMediumStatus:
     case QApt::WaitingConfigFilePromptStatus:
     case QApt::LoadingCacheStatus:
+        m_currentTransaction->setStatus(Transaction::SetupStatus);
         break;
     case QApt::RunningStatus:
         m_currentTransaction->setStatus(Transaction::QueuedStatus);

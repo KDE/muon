@@ -33,7 +33,7 @@ Transaction::Transaction(QObject *parent, AbstractResource *resource,
     : QObject(parent)
     , m_resource(resource)
     , m_role(role)
-    , m_status(SetupStatus)
+    , m_status(CommittingStatus)
     , m_addons(addons)
     , m_isCancellable(true)
     , m_progress(0)
@@ -72,20 +72,26 @@ int Transaction::progress() const
 
 void Transaction::setStatus(Status status)
 {
-    m_status = status;
-    emit statusChanged(m_status);
+    if(m_status != status) {
+        m_status = status;
+        emit statusChanged(m_status);
+    }
 }
 
 void Transaction::setCancellable(bool isCancellable)
 {
-    m_isCancellable = isCancellable;
-    emit cancellableChanged(m_isCancellable);
+    if(m_isCancellable != isCancellable) {
+        m_isCancellable = isCancellable;
+        emit cancellableChanged(m_isCancellable);
+    }
 }
 
 void Transaction::setProgress(int progress)
 {
-    m_progress = progress;
-    emit progressChanged(m_progress);
+    if(m_progress != progress) {
+        m_progress = progress;
+        emit progressChanged(m_progress);
+    }
 }
 
 void Transaction::cancel()

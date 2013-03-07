@@ -28,6 +28,7 @@
 #include <KProtocolManager>
 #include <KMessageBox>
 #include <KActionCollection>
+#include <KDebug>
 
 // Own includes
 #include <LibQApt/Transaction>
@@ -96,6 +97,7 @@ void ApplicationUpdates::start()
 {
     auto changes = m_aptBackend->stateChanges(m_updatesCache, QApt::PackageList());
     if(changes.isEmpty()) {
+        kWarning() << "couldn't find any apt updates";
         setProgressing(false);
         return;
     }
@@ -165,16 +167,12 @@ void ApplicationUpdates::installMessage(const QString& msg)
     setStatusMessage(msg);
 }
 
-void ApplicationUpdates::transactionStatusChanged(QApt::TransactionStatus status)
-{
-    if (status == QApt::FinishedStatus) {
-        m_lastRealProgress = 0;
-    }
-}
-
 void ApplicationUpdates::errorOccurred(QApt::ErrorCode error)
 {
-    QAptActions::self()->displayTransactionError(error, m_trans);
+    if(error!=QApt::Success) {
+        QAptActions::self()->displayTransactionError(error, m_trans);
+        setProgressing(false);
+    }
 }
 
 void ApplicationUpdates::setupTransaction(QApt::Transaction *trans)
@@ -187,15 +185,13 @@ void ApplicationUpdates::setupTransaction(QApt::Transaction *trans)
 
     trans->setLocale(QLatin1String(setlocale(LC_MESSAGES, 0)));
 
-    connect(trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
-            SLOT(transactionStatusChanged(QApt::TransactionStatus)));
     connect(trans, SIGNAL(errorOccurred(QApt::ErrorCode)),
             SLOT(errorOccurred(QApt::ErrorCode)));
     connect(trans, SIGNAL(progressChanged(int)), SLOT(setProgress(int)));
     connect(trans, SIGNAL(statusDetailsChanged(QString)), SLOT(installMessage(QString)));
     connect(trans, SIGNAL(cancellableChanged(bool)), SIGNAL(cancelableChanged(bool)));
-    connect(trans, SIGNAL(finished(QApt::ExitStatus)), SLOT(transactionFinished(QApt::ExitStatus)));
     connect(trans, SIGNAL(finished(QApt::ExitStatus)), trans, SLOT(deleteLater()));
+    connect(trans, SIGNAL(finished(QApt::ExitStatus)), SLOT(transactionFinished(QApt::ExitStatus)));
     connect(trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
             this, SLOT(statusChanged(QApt::TransactionStatus)));
     connect(trans, SIGNAL(mediumRequired(QString,QString)),
@@ -287,38 +283,38 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
         case QApt::SetupStatus:
             setProgressing(true);
             setStatusMessage(i18nc("@info Status info, widget title",
-                                        "<title>Starting</title>"));
+                                        "Starting"));
             setProgress(-1);
             break;
         case QApt::AuthenticationStatus:
             setStatusMessage(i18nc("@info Status info, widget title",
-                                        "<title>Waiting for Authentication</title>"));
+                                        "Waiting for Authentication"));
             setProgress(-1);
             break;
         case QApt::WaitingStatus:
             setStatusMessage(i18nc("@info Status information, widget title",
-                                        "<title>Waiting</title>"));
+                                        "Waiting"));
             setStatusDetail(i18nc("@info Status info",
                                         "Waiting for other transactions to finish"));
             setProgress(-1);
             break;
         case QApt::WaitingLockStatus:
             setStatusMessage(i18nc("@info Status information, widget title",
-                                        "<title>Waiting</title>"));
+                                        "Waiting"));
             setStatusDetail(i18nc("@info Status info",
                                         "Waiting for other software managers to quit"));
             setProgress(-1);
             break;
         case QApt::WaitingMediumStatus:
             setStatusMessage(i18nc("@info Status information, widget title",
-                                        "<title>Waiting</title>"));
+                                        "Waiting"));
             setStatusDetail(i18nc("@info Status info",
                                         "Waiting for required medium"));
             setProgress(-1);
             break;
         case QApt::WaitingConfigFilePromptStatus:
             setStatusMessage(i18nc("@info Status information, widget title",
-                                        "<title>Waiting</title>"));
+                                        "Waiting"));
             setStatusDetail(i18nc("@info Status info",
                                         "Waiting for configuration file"));
             setProgress(-1);
@@ -331,7 +327,7 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
         case QApt::LoadingCacheStatus:
             setStatusDetail(QString());
             setStatusMessage(i18nc("@info Status info",
-                                        "<title>Loading Software List</title>"));
+                                        "Loading Software List"));
             setProgress(-1);
             break;
         case QApt::DownloadingStatus:
@@ -339,12 +335,12 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
             switch (m_trans->role()) {
                 case QApt::UpdateCacheRole:
                     setStatusMessage(i18nc("@info Status information, widget title",
-                                                "<title>Updating software sources</title>"));
+                                                "Updating software sources"));
                     break;
                 case QApt::DownloadArchivesRole:
                 case QApt::CommitChangesRole:
                     setStatusMessage(i18nc("@info Status information, widget title",
-                                                "<title>Downloading Packages</title>"));
+                                                "Downloading Packages"));
                     break;
                 default:
                     break;
@@ -353,13 +349,13 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
         case QApt::CommittingStatus:
             setProgress(-1);
             setStatusMessage(i18nc("@info Status information, widget title",
-                                        "<title>Applying Changes</title>"));
+                                        "Applying Changes"));
             setStatusDetail(QString());
             break;
         case QApt::FinishedStatus:
             setProgress(100);
             setStatusMessage(i18nc("@info Status information, widget title",
-                                        "<title>Finished</title>"));
+                                        "Finished"));
             m_lastRealProgress = 0;
             break;
     }
@@ -426,6 +422,7 @@ QList<QAction*> ApplicationUpdates::messageActions() const
 
 void ApplicationUpdates::transactionFinished(QApt::ExitStatus status)
 {
+    m_lastRealProgress = 0;
     m_appBackend->reload();
     setProgressing(false);
 }

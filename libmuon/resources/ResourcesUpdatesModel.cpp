@@ -57,6 +57,7 @@ void ResourcesUpdatesModel::addNewBackends()
             connect(updater, SIGNAL(remainingTimeChanged()), SIGNAL(etaChanged()));
             connect(updater, SIGNAL(downloadSpeedChanged(quint64)), SIGNAL(downloadSpeedChanged()));
             connect(updater, SIGNAL(progressingChanged(bool)), SIGNAL(progressingChanged()));
+            connect(updater, SIGNAL(cancelableChanged(bool)), SIGNAL(cancelableChanged()));
             m_updaters += updater;
         }
     }
@@ -92,7 +93,7 @@ void ResourcesUpdatesModel::updateAll()
     if(m_updaters.isEmpty())
         emit progressingChanged();
     else foreach(AbstractBackendUpdater* upd, m_updaters) {
-        upd->start();
+        QMetaObject::invokeMethod(upd, "start", Qt::QueuedConnection);
     }
 }
 
