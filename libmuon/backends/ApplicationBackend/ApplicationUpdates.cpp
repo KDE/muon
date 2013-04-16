@@ -49,6 +49,8 @@ ApplicationUpdates::ApplicationUpdates(ApplicationBackend* parent)
     , m_eta(0)
     , m_progressing(false)
 {
+    connect(m_appBackend, SIGNAL(reloadFinished()),
+            this, SLOT(reloadFinished()));
 }
 
 bool ApplicationUpdates::hasUpdates() const
@@ -70,20 +72,15 @@ void ApplicationUpdates::setBackend(QApt::Backend* backend)
 {
     Q_ASSERT(!m_aptBackend || m_aptBackend==backend);
     m_aptBackend = backend;
+    // FIXME: Debconf support was lost during the port
+    QApt::FrontendCaps caps = (QApt::FrontendCaps)(QApt::MediumPromptCap |
+                               QApt::ConfigPromptCap | QApt::UntrustedPromptCap);
+    m_aptBackend->setFrontendCaps(caps);
 }
 
 QList<AbstractResource*> ApplicationUpdates::toUpdate() const
 {
-    QList<AbstractResource*> ret;
-    auto changes = m_aptBackend->stateChanges(m_updatesCache, QApt::PackageList());
-    for(auto pkgList : changes.values()) {
-        for(QApt::Package* it : pkgList) {
-            AbstractResource* res = m_appBackend->resourceByPackage(it);
-            Q_ASSERT(res);
-            ret += res;
-        }
-    }
-    return ret;
+    return m_toUpdate;
 }
 
 void ApplicationUpdates::prepare()
@@ -91,6 +88,7 @@ void ApplicationUpdates::prepare()
     m_aptBackend->markPackages(m_aptBackend->markedPackages(), QApt::Package::ToKeep);
     m_updatesCache = m_aptBackend->currentCacheState();
     m_aptBackend->markPackagesForDistUpgrade();
+    calculateUpdates();
 }
 
 void ApplicationUpdates::start()
@@ -118,7 +116,10 @@ void ApplicationUpdates::start()
     }
 
     // Create and run the transaction
-    setupTransaction(m_aptBackend->commitChanges());
+    m_trans = m_aptBackend->commitChanges();
+    setupTransaction(m_trans);
+    m_trans->run();
+    setProgressing(true);
 }
 
 void ApplicationUpdates::addResources(const QList<AbstractResource*>& apps)
@@ -191,7 +192,6 @@ void ApplicationUpdates::setupTransaction(QApt::Transaction *trans)
     connect(trans, SIGNAL(statusDetailsChanged(QString)), SLOT(installMessage(QString)));
     connect(trans, SIGNAL(cancellableChanged(bool)), SIGNAL(cancelableChanged(bool)));
     connect(trans, SIGNAL(finished(QApt::ExitStatus)), trans, SLOT(deleteLater()));
-    connect(trans, SIGNAL(finished(QApt::ExitStatus)), SLOT(transactionFinished(QApt::ExitStatus)));
     connect(trans, SIGNAL(statusChanged(QApt::TransactionStatus)),
             this, SLOT(statusChanged(QApt::TransactionStatus)));
     connect(trans, SIGNAL(mediumRequired(QString,QString)),
@@ -200,9 +200,6 @@ void ApplicationUpdates::setupTransaction(QApt::Transaction *trans)
             this, SLOT(untrustedPrompt(QStringList)));
     connect(trans, SIGNAL(downloadSpeedChanged(quint64)),
             this, SIGNAL(downloadSpeedChanged(quint64)));
-    trans->run();
-    m_trans = trans;
-    setProgressing(true);
 }
 
 bool ApplicationUpdates::isAllMarked() const
@@ -322,16 +319,13 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
         case QApt::RunningStatus:
             setStatusMessage(QString());
             setStatusDetail(QString());
-            setProgress(-1);
             break;
         case QApt::LoadingCacheStatus:
             setStatusDetail(QString());
             setStatusMessage(i18nc("@info Status info",
                                         "Loading Software List"));
-            setProgress(-1);
             break;
         case QApt::DownloadingStatus:
-            setProgress(-1);
             switch (m_trans->role()) {
                 case QApt::UpdateCacheRole:
                     setStatusMessage(i18nc("@info Status information, widget title",
@@ -347,7 +341,6 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
             }
             break;
         case QApt::CommittingStatus:
-            setProgress(-1);
             setStatusMessage(i18nc("@info Status information, widget title",
                                         "Applying Changes"));
             setStatusDetail(QString());
@@ -357,6 +350,7 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
             setStatusMessage(i18nc("@info Status information, widget title",
                                         "Finished"));
             m_lastRealProgress = 0;
+            m_appBackend->reload();
             break;
     }
 }
@@ -414,15 +408,39 @@ quint64 ApplicationUpdates::downloadSpeed() const
 QList<QAction*> ApplicationUpdates::messageActions() const
 {
     QList<QAction*> ret;
-    ret += QAptActions::self()->actionCollection()->action("update");
+    //high priority
     ret += QAptActions::self()->actionCollection()->action("dist-upgrade");
+
+    //normal priority
+    ret += QAptActions::self()->actionCollection()->action("update");
+
+    //low priority
+    ret += QAptActions::self()->actionCollection()->action("software_properties");
+    ret += QAptActions::self()->actionCollection()->action("load_archives");
+    ret += QAptActions::self()->actionCollection()->action("save_package_list");
+    ret += QAptActions::self()->actionCollection()->action("download_from_list");
+    ret += QAptActions::self()->actionCollection()->action("history");
     Q_ASSERT(!ret.contains(nullptr));
     return ret;
 }
 
-void ApplicationUpdates::transactionFinished(QApt::ExitStatus status)
+void ApplicationUpdates::reloadFinished()
 {
-    m_lastRealProgress = 0;
-    m_appBackend->reload();
+    calculateUpdates();
     setProgressing(false);
+}
+
+void ApplicationUpdates::calculateUpdates()
+{
+    m_toUpdate.clear();
+    auto changes = m_aptBackend->stateChanges(m_updatesCache, QApt::PackageList());
+    for(auto pkgList : changes.values()) {
+        for(QApt::Package* it : pkgList) {
+            AbstractResource* res = m_appBackend->resourceByPackageName(it->name());
+            if(!res) //If we couldn't find it by its name, try with
+                res = m_appBackend->resourceByPackageName(QString("%1:%2").arg(it->name()).arg(it->architecture()));
+            Q_ASSERT(res);
+            m_toUpdate += res;
+        }
+    }
 }

@@ -17,19 +17,16 @@ Item {
     property bool defaultStartup: true
     property bool navigationEnabled: true
     
-    //text search
-    property bool searchVisible: pageStack.currentPage!=null && pageStack.currentPage.searchFor!=null
-    
     Binding {
         target: app.searchWidget
-        property: "visible"
-        value: window.searchVisible
+        property: "enabled"
+        value: pageStack.currentPage!=null && pageStack.currentPage.searchFor!=null
     }
     function clearSearch() { app.searchWidget.text="" }
     Connections {
         target: app.searchWidget
         onTextChanged: {
-            if(app.searchWidget.text.length>3)
+            if(app.searchWidget.text.length>2)
                 pageStack.currentPage.searchFor(app.searchWidget.text)
         }
     }
@@ -77,29 +74,33 @@ Item {
         enabled: window.navigationEnabled && breadcrumbsItem.count>1
         mainWindow: app
         text: i18n("Back")
+        priority: "LowPriority"
+        shortcut: "Alt+Up"
         onTriggered: {
             breadcrumbsItem.popItem(false)
             window.clearSearch()
         }
-        priority: "LowPriority"
     }
     TopLevelPageData {
         iconName: "tools-wizard"
         text: i18n("Discover")
         component: topBrowsingComp
         objectName: "discover"
+        shortcut: "Alt+D"
     }
     TopLevelPageData {
         iconName: "applications-other"
         text: resourcesModel.updatesCount==0 ? i18n("Installed") : i18np("Installed (%1 update)", "Installed (%1 updates)", resourcesModel.updatesCount)
         component: topInstalledComp
         objectName: "installed"
+        shortcut: "Alt+I"
     }
     TopLevelPageData {
         iconName: "document-import"
         text: i18n("Sources")
         component: topSourcesComp
         objectName: "sources"
+        shortcut: "Alt+S"
     }
     
     Connections {

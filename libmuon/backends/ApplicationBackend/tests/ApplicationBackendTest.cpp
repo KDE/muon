@@ -28,15 +28,28 @@
 #include <resources/ResourcesModel.h>
 #include <resources/ResourcesProxyModel.h>
 #include <Category/Category.h>
+#include <Category/CategoryModel.h>
 #include <MuonBackendsFactory.h>
 
 QTEST_KDEMAIN_CORE( ApplicationBackendTest )
+
+AbstractResourcesBackend* backendByName(ResourcesModel* m, const QString& name)
+{
+    QVector<AbstractResourcesBackend*> backends = m->backends();
+    foreach(AbstractResourcesBackend* backend, backends) {
+        if(backend->metaObject()->className()==name) {
+            return backend;
+        }
+    }
+    return nullptr;
+}
 
 ApplicationBackendTest::ApplicationBackendTest()
 {
     ResourcesModel* m = new ResourcesModel("muon-appsbackend", this);
     new ModelTest(m,m);
 
+    m_appBackend = backendByName(m, "ApplicationBackend");
     QVERIFY(m_appBackend); //TODO: test all backends
     QTest::kWaitForSignal(m_appBackend, SIGNAL(backendReady()));
 }
@@ -76,6 +89,8 @@ void ApplicationBackendTest::testCategories()
     ResourcesModel* m = ResourcesModel::global();
     ResourcesProxyModel* proxy = new ResourcesProxyModel(m);
     proxy->setSourceModel(m);
+    CategoryModel* categoryModel = new CategoryModel(proxy);
+    categoryModel->setSubcategories(nullptr);
     QList<Category*> categories = Category::populateCategories();
     foreach(Category* cat, categories) {
         proxy->setFiltersFromCategory(cat);

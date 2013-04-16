@@ -62,15 +62,16 @@ QString QAptResource::installedVersion() const
 
     return QString();
 }
-
 AbstractResource::State QAptResource::state()
 {
+    if (!package())
+        return Broken;
+
     State ret = None;
-    if (package()) {
-        int s = package()->state();
-        if(s & QApt::Package::Upgradeable) ret = Upgradeable;
-        else if(s & QApt::Package::Installed) ret = Installed;
-    }
+
+    int s = package()->state();
+    if(s & QApt::Package::Upgradeable) ret = Upgradeable;
+    else if(s & QApt::Package::Installed) ret = Installed;
 
     return ret;
 }
