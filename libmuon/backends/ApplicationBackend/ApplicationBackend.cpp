@@ -521,7 +521,7 @@ QList<AbstractResource*> ApplicationBackend::searchPackageName(const QString& se
     QSet<QApt::Package*> packages = m_backend->search(searchText).toSet();
 
     QList<AbstractResource*> resources;
-    foreach(Application* a, m_appList) {
+    foreach(QAptResource* a, m_appList) {
         if(packages.contains(a->package())) {
             resources += a;
         }
