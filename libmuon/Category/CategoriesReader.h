@@ -18,38 +18,18 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef DUMMYBACKEND_H
-#define DUMMYBACKEND_H
+#ifndef CATEGORIESREADER_H
+#define CATEGORIESREADER_H
+#include <QList>
 
-#include <resources/AbstractResourcesBackend.h>
-#include <QVariantList>
-
-class DummyResource;
-class DummyBackend : public AbstractResourcesBackend
+class Category;
+class CategoriesReader
 {
-Q_OBJECT
-Q_INTERFACES(AbstractResourcesBackend)
-public:
-    explicit DummyBackend(QObject* parent, const QVariantList& args);
+    public:
+        QList<Category*> populateCategories();
 
-    virtual QList<AbstractResource*> upgradeablePackages() const;
-    virtual AbstractResource* resourceByPackageName(const QString& name) const;
-    virtual int updatesCount() const;
-    virtual AbstractBackendUpdater* backendUpdater() const;
-    virtual AbstractReviewsBackend* reviewsBackend() const;
-    virtual QList<AbstractResource*> searchPackageName(const QString& searchText);
-    virtual QVector<AbstractResource*> allResources() const;
-    virtual bool isValid() const { return true; } // No external file dependencies that could cause runtime errors
-
-    virtual void cancelTransaction(AbstractResource* app);
-    virtual void installApplication(AbstractResource* app);
-    virtual void installApplication(AbstractResource* app, AddonList addons);
-    virtual void removeApplication(AbstractResource* app);
-
-private:
-    QHash<QString, DummyResource*> m_resources;
-    AbstractBackendUpdater* m_updater;
-    AbstractReviewsBackend* m_reviews;
+    private:
+        QList<Category*> loadCategoriesFile(const QString& path);
 };
 
-#endif // DUMMYBACKEND_H
+#endif // CATEGORIESREADER_H

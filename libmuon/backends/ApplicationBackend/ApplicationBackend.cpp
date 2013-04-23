@@ -516,15 +516,17 @@ QAptResource* ApplicationBackend::resourceByPackage(QApt::Package *pkg) const
     return nullptr;
 }
 
-QStringList ApplicationBackend::searchPackageName(const QString& searchText)
+QList<AbstractResource*> ApplicationBackend::searchPackageName(const QString& searchText)
 {
-    QApt::PackageList packages = m_backend->search(searchText);
-    QStringList names;
+    QSet<QApt::Package*> packages = m_backend->search(searchText).toSet();
 
-    for (QApt::Package* package : packages)
-        names += package->name();
-
-    return names;
+    QList<AbstractResource*> resources;
+    foreach(Application* a, m_appList) {
+        if(packages.contains(a->package())) {
+            resources += a;
+        }
+    }
+    return resources;
 }
 
 AbstractBackendUpdater* ApplicationBackend::backendUpdater() const
