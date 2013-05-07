@@ -240,7 +240,7 @@ void ReviewsBackend::reviewsFetched(KJob *j)
         reviewsList << constructReview(data.toMap());
     }
 
-    m_reviewsCache[app->package()->name() + app->name()].append(reviewsList);
+    m_reviewsCache[app->packageName() + app->name()].append(reviewsList);
 
     emit reviewsReady(app, reviewsList);
 }
