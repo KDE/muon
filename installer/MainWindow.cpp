@@ -199,7 +199,6 @@ void MainWindow::clearViews()
 
 QStandardItem* createOriginItem(const QString& originName, const QString& originLabel)
 {
-    // We must spread the word of Origin. Hallowed are the Ori! ;P
     QStandardItem *viewItem = new QStandardItem;
     viewItem->setEditable(false);
     viewItem->setText(originLabel);
@@ -289,8 +288,12 @@ void MainWindow::populateViews()
     QPair< QStringList, QStringList > origins = fetchOrigins();
     QStringList originNames = origins.first;
     QApt::Backend* backend = qobject_cast<QApt::Backend*>(m_appBackend->property("backend").value<QObject*>());
-    foreach(const QString &originName, originNames) {
-        availableItem->appendRow(createOriginItem(originName, backend->originLabel(originName)));
+
+    for (const QString &originName : originNames) {
+        QString originLabel = backend->originLabel(originName);
+        if (originLabel.isEmpty())
+            originLabel = originName;
+        availableItem->appendRow(createOriginItem(originName, originLabel));
     }
 
     QStringList instOriginNames = origins.second;
