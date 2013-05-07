@@ -165,9 +165,13 @@ void ReviewsBackend::stopPendingJobs()
 void ReviewsBackend::fetchReviews(AbstractResource* res, int page)
 {
     QAptResource *app = qobject_cast<QAptResource *>(res);
-    // Check our cache before fetching from the 'net
-    QString hashName = app->packageName() + app->name();
+
+    QString packageName = app->packageName();
+    if (packageName.contains(':'))
+        packageName = packageName.left(packageName.indexOf(':'));
+    QString hashName = packageName + app->name();
     
+    // Check our cache before fetching from the 'net
     QList<Review*> revs = m_reviewsCache.value(hashName);
     if (revs.size()>(page*10)) { //there are 10 reviews per page
         emit reviewsReady(app, revs.mid(page*10, 10));
@@ -178,7 +182,6 @@ void ReviewsBackend::fetchReviews(AbstractResource* res, int page)
     QString origin = app->origin().toLower();
 
     QString version = QLatin1String("any");
-    QString packageName = app->packageName();
     QString appName = app->name();
     // Replace spaces with %2B for the url
     appName.replace(' ', QLatin1String("%2B"));
@@ -240,7 +243,10 @@ void ReviewsBackend::reviewsFetched(KJob *j)
         reviewsList << constructReview(data.toMap());
     }
 
-    m_reviewsCache[app->packageName() + app->name()].append(reviewsList);
+    QString packageName = app->packageName();
+    if (packageName.contains(':'))
+        packageName = packageName.left(packageName.indexOf(':'));
+    m_reviewsCache[packageName + app->name()].append(reviewsList);
 
     emit reviewsReady(app, reviewsList);
 }
