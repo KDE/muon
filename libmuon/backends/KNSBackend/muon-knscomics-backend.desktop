@@ -71,15 +71,6 @@ GenericName[tr]=Çizgi Romanlar
 GenericName[uk]=Комікси
 GenericName[x-test]=xxComicsxx
 GenericName[zh_TW]=漫畫
-<<<<<<< HEAD
-=======
->>>>>>> 2.0
-<<<<<<< HEAD
-=======
->>>>>>> 2.0
-<<<<<<< HEAD
-=======
->>>>>>> 2.0
 Comment=Install comic stripes to be used from the comics plasmoid
 Comment[ca]=Instal·la tires còmiques per utilitzar des del plasmoide de còmics
 Comment[da]=Installér tegneseriestriber til brug fra tegneserie-plasmoiden
@@ -113,18 +104,7 @@ Comment[tr]=Çizgi Romanları plasmoid'inde kullanılmak üzere çizgi roman şe
 Comment[uk]=Встановіть стрічки коміксів, які буде використано у плазмоїді коміксів
 Comment[x-test]=xxInstall comic stripes to be used from the comics plasmoidxx
 Comment[zh_TW]=安裝漫畫給漫畫小元件
-<<<<<<< HEAD
-=======
->>>>>>> 2.0
-<<<<<<< HEAD
-=======
->>>>>>> 2.0
-<<<<<<< HEAD
-=======
->>>>>>> 2.0
-<<<<<<< HEAD
-=======
->>>>>>> 2.0
+
 X-KDE-Library=muon-knsbackend
 X-KDE-PluginInfo-Name=muon-knsbackend-comics
 X-KDE-PluginInfo-License=GPL

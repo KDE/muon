@@ -116,8 +116,7 @@ void ApplicationUpdates::start()
     }
 
     // Create and run the transaction
-    m_trans = m_aptBackend->commitChanges();
-    setupTransaction(m_trans);
+    setupTransaction(m_aptBackend->commitChanges());
     m_trans->run();
     setProgressing(true);
 }
@@ -179,6 +178,8 @@ void ApplicationUpdates::errorOccurred(QApt::ErrorCode error)
 void ApplicationUpdates::setupTransaction(QApt::Transaction *trans)
 {
     Q_ASSERT(trans);
+    m_trans = trans;
+
     // Provide proxy/locale to the transaction
     if (KProtocolManager::proxyType() == KProtocolManager::ManualProxy) {
         trans->setProxy(KProtocolManager::proxyFor("http"));
@@ -341,6 +342,7 @@ void ApplicationUpdates::statusChanged(QApt::TransactionStatus status)
             }
             break;
         case QApt::CommittingStatus:
+            emit downloadSpeedChanged(-1);
             setStatusMessage(i18nc("@info Status information, widget title",
                                         "Applying Changes"));
             setStatusDetail(QString());

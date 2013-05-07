@@ -25,10 +25,17 @@ Item {
     function clearSearch() { app.searchWidget.text="" }
     Connections {
         target: app.searchWidget
-        onTextChanged: {
-            if(app.searchWidget.text.length>2)
-                pageStack.currentPage.searchFor(app.searchWidget.text)
+        onTextChanged: searchTimer.running = true
+        onEditingFinished: if(app.searchWidget.text == "" && backAction.enabled) {
+            backAction.trigger()
         }
+    }
+    Timer {
+        id: searchTimer
+        running: false
+        repeat: false
+        interval: 200
+        onTriggered: { pageStack.currentPage.searchFor(app.searchWidget.text) }
     }
     
     Component {
@@ -69,6 +76,7 @@ Item {
     }
     
     DiscoverAction {
+        id: backAction
         objectName: "back"
         iconName: "go-previous"
         enabled: window.navigationEnabled && breadcrumbsItem.count>1

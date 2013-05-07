@@ -35,6 +35,7 @@
 #include <KMessageBox>
 #include <KProcess>
 #include <KStandardAction>
+#include <KStandardDirs>
 #include <KXmlGuiWindow>
 #include <Solid/Networking>
 #include <KStandardDirs>
@@ -394,7 +395,8 @@ void QAptActions::runSourcesEditor()
     QStringList arguments;
     int winID = m_mainWindow->effectiveWinId();
 
-    QString editor = "software-properties-kde";
+    QString kdesudo = KStandardDirs::findExe("kdesudo");
+    QString editor = KStandardDirs::findExe("software-properties-kde");
 
     if (m_reloadWhenEditorFinished) {
         editor.append(QLatin1String(" --dont-update --attach ") % QString::number(winID)); //krazy:exclude=spelling;
@@ -402,7 +404,7 @@ void QAptActions::runSourcesEditor()
         editor.append(QLatin1String(" --attach ") % QString::number(winID));
     }
 
-    arguments << "/usr/bin/kdesudo" << editor;
+    arguments << kdesudo << editor;
 
     proc->setProgram(arguments);
     m_mainWindow->find(winID)->setEnabled(false);
@@ -511,8 +513,16 @@ void QAptActions::setActionsEnabled(bool enabled)
 
 void QAptActions::launchDistUpgrade()
 {
-    KProcess::startDetached(QStringList() << "python3"
-                            << "/usr/lib/python3/dist-packages/DistUpgrade/DistUpgradeFetcherKDE.py");
+    KProcess *proc = new KProcess(this);
+    QStringList arguments;
+    QString kdesudo = KStandardDirs::findExe("kdesudo");
+    QString upgrader = QString("do-release-upgrade -m desktop -f DistUpgradeViewKDE");
+
+    arguments << kdesudo << upgrader;
+    proc->setProgram(arguments);
+    proc->start();
+
+    connect(proc, SIGNAL(finished(int)), proc, SLOT(deleteLater()));
 }
 
 void QAptActions::checkDistUpgrade()
