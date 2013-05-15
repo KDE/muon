@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "UbuntuPurchasePage.h"
-#include <QDebug>
 
 UbuntuPurchasePage::UbuntuPurchasePage(QWidget *parent)
     : KWebPage(parent)
@@ -28,6 +27,8 @@ UbuntuPurchasePage::UbuntuPurchasePage(QWidget *parent)
 
 void UbuntuPurchasePage::javaScriptAlert(QWebFrame *originatingFrame, const QString &msg)
 {
+    // Ubuntu's webpage that we embed uses a JavaScript alert to communicate
+    // purchase response details in JSON.
     Q_UNUSED(originatingFrame);
 
     emit purchaseResponse(msg);

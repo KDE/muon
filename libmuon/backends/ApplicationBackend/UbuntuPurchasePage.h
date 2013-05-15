@@ -23,6 +23,12 @@
 
 #include <KWebPage>
 
+/**
+ * @brief The UbuntuPurchasePage class subclasses KWebPage so that it can
+ * reimplement javaScriptAlert in order to emit the scripting alert rather
+ * than showing it in a window. Ubuntu's app purchase webpage sends its
+ * purchase response details via a scripting alert.
+ */
 class UbuntuPurchasePage : public KWebPage
 {
     Q_OBJECT
