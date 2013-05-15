@@ -557,9 +557,8 @@ void ResourceDetailsWidget::updateActionButton()
         m_actionButton->setIcon(KIcon("download"));
         break;
     case AbstractResource::Broken:
-        m_actionButton->hide();
-        break;
     default:
+        m_actionButton->hide();
         break;
     }
 
