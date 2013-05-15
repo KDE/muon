@@ -61,6 +61,7 @@
 #include "ApplicationUpdates.h"
 #include "MuonMainWindow.h"
 #include <MuonDataSources.h>
+#include <UbuntuPurchaseDialog.h>
 
 static const KCatalogLoader loader("app-install-data");
 
@@ -86,6 +87,8 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     connect(m_reviewsBackend, SIGNAL(ratingsReady()), SIGNAL(allDataChanged()));
     
     QTimer::singleShot(10, this, SLOT(initBackend()));
+    UbuntuPurchaseDialog *d = new UbuntuPurchaseDialog();
+    d->show();
 }
 
 ApplicationBackend::~ApplicationBackend()
@@ -685,7 +688,6 @@ void ApplicationBackend::initUSCResources(KJob *j)
     // TODO: Thread?
     for (const QVariant &resourceData : resources.toList()) {
         USCResource *res = new USCResource(this, m_backend, resourceData.toMap());
-        qDebug() << "USCResource:" << res->name();
         if (res->isValid())
             m_appList.append(res);
     }

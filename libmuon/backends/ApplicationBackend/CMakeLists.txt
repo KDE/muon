@@ -35,13 +35,15 @@ set(appsbackend_SRCS
     ReviewsBackend.cpp #TODO: rename to AptReviewsBackend
     UbuntuLoginBackend.cpp
     USCResource.cpp
+    UbuntuPurchaseDialog.cpp
+    UbuntuPurchasePage.cpp
 )
 
 qt4_add_dbus_interface(appsbackend_SRCS ubuntu_sso_dbus_interface.xml ubuntu_sso -i "LoginMetaTypes.h")
 
 kde4_add_plugin(muon-appsbackend SHARED ${appsbackend_SRCS})
 target_link_libraries(muon-appsbackend ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDBUS_LIBRARY}
-    ${KDE4_KDECORE_LIBS} ${KDE4_KDEUI_LIBS} ${KDE4_KIO_LIBS} ${DEBCONF_KDE_LIB}
+    ${KDE4_KDECORE_LIBS} ${KDE4_KDEUI_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KDEWEBKIT_LIBS} ${DEBCONF_KDE_LIB}
     ${qjson_LIBRARIES} ${QTOAUTH_LIBRARY} ${QAPT_LIBRARY} muonprivate muonapt
 )
 install(TARGETS muon-appsbackend DESTINATION ${PLUGIN_INSTALL_DIR})
