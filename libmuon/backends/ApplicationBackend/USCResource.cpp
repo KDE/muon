@@ -52,6 +52,8 @@ USCResource::USCResource(ApplicationBackend *parent,
     QList<QVariant> variantList = data.value("screenshot_urls").toList();
     for (const QVariant &variant : variantList)
         m_screenshotUrls += variant.toUrl();
+
+    m_price = data.value("price").toString();
 }
 
 QApt::Package *USCResource::package()
@@ -87,6 +89,15 @@ QString USCResource::longDescription() const
 QString USCResource::packageName() const
 {
     return m_packageName;
+}
+
+AbstractResource::State USCResource::state()
+{
+    if (m_package)
+        return QAptResource::state();
+
+    // FIXME: could be purchased, but we don't have deb_line, etc
+    return AbstractResource::NeedsPurchase;
 }
 
 QString USCResource::categories()
@@ -131,6 +142,11 @@ int USCResource::downloadSize()
         return m_package->downloadSize();
 
     return 0;
+}
+
+QString USCResource::price() const
+{
+    return m_price;
 }
 
 void USCResource::fetchScreenshots()

@@ -536,13 +536,31 @@ void ResourceDetailsWidget::updateActionButton()
         return;
 
     m_statusLabel->setText(m_resource->status());
-    if (!m_resource->isInstalled()) {
+    m_actionButton->show();
+
+    AbstractResource::State state = m_resource->state();
+    switch (state) {
+    case AbstractResource::None:
         m_actionButton->setText(i18nc("@action", "Install"));
         m_actionButton->setIcon(KIcon("download"));
-        m_actionButton->show();
-    } else {
+        break;
+    case AbstractResource::NeedsPurchase:
+        m_actionButton->setText(i18nc("@action", "Buy"));
+        m_actionButton->setIcon(KIcon("download"));
+        break;
+    case AbstractResource::Installed:
         m_actionButton->setText(i18nc("@action", "Remove"));
         m_actionButton->setIcon(KIcon("edit-delete"));
+        break;
+    case AbstractResource::Upgradeable:
+        m_actionButton->setText(i18nc("@action", "Upgrade"));
+        m_actionButton->setIcon(KIcon("download"));
+        break;
+    case AbstractResource::Broken:
+        m_actionButton->hide();
+        break;
+    default:
+        break;
     }
 
     m_addonsWidget->setResource(m_resource);

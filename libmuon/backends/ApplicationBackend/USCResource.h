@@ -38,6 +38,7 @@ public:
     QString icon() const;
     QString comment();
     QString packageName() const;
+    AbstractResource::State state();
     QString categories();
     QUrl homepage() const;
     QUrl thumbnailUrl();
@@ -49,6 +50,7 @@ public:
     QString origin() const;
     int downloadSize();
     QString section() { return QString(); }
+    QString price() const;
     void fetchScreenshots();
 
 private:
@@ -63,6 +65,7 @@ private:
     QString m_license;
     QString m_version;
     QString m_origin;
+    QString m_price;
 };
 
 #endif // USCRESOURCE_H

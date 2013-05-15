@@ -62,6 +62,7 @@ QString QAptResource::installedVersion() const
 
     return QString();
 }
+
 AbstractResource::State QAptResource::state()
 {
     if (!package())

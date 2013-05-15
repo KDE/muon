@@ -53,13 +53,15 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
     Q_PROPERTY(QString availableVersion READ availableVersion CONSTANT)
     Q_PROPERTY(QString section READ section CONSTANT)
     Q_PROPERTY(QString mimetypes READ mimetypes CONSTANT)
+    Q_PROPERTY(QString price READ price CONSTANT)
     Q_PROPERTY(AbstractResourcesBackend* backend READ backend CONSTANT)
     public:
         enum State {
             Broken,
             None,
             Installed,
-            Upgradeable
+            Upgradeable,
+            NeedsPurchase
         };
         Q_ENUMS(State)
         
@@ -121,6 +123,10 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
         ///@returns a user-readable explaination of the resource status
         ///by default, it will specify what state() is returning
         virtual QString status();
+
+        /// @returns a raw price
+        virtual QString price() const;
+        virtual QString prettyPrice() const;
 
         AbstractResourcesBackend* backend() const;
 

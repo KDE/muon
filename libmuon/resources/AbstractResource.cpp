@@ -84,6 +84,7 @@ QString AbstractResource::status()
         case None: return i18n("Available");
         case Installed: return i18n("Installed");
         case Upgradeable: return i18n("Upgradeable");
+        case NeedsPurchase: return prettyPrice();
     }
     return QString();
 }
@@ -96,4 +97,19 @@ bool AbstractResource::isFromSecureOrigin() const
 QString AbstractResource::sizeDescription()
 {
     return KGlobal::locale()->formatByteSize(downloadSize());
+}
+
+QString AbstractResource::price() const
+{
+    return QString("0.00");
+}
+
+QString AbstractResource::prettyPrice() const
+{
+    QString raw = price();
+    if (raw == QLatin1String("0.00"))
+        return i18nc("Cost of a good", "Free");
+
+    // FIXME: currency support
+    return '$' + raw;
 }
