@@ -80,7 +80,7 @@ UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
 
     UbuntuPurchasePage *page = new UbuntuPurchasePage(m_webView);
     m_webView->setPage(page);
-    m_webView->setHtml(DUMMY_HTML);
+
 
     // Ubuntu's webpage we embed will send us a json response
     connect(page, SIGNAL(purchaseResponse(QString)),
@@ -88,6 +88,18 @@ UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
     // We use the webpage title changing to test w/o a server
     connect(m_webView, SIGNAL(titleChanged(QString)),
             this, SLOT(parseJson(QString)));
+}
+
+void UbuntuPurchaseDialog::startPurchase(USCResource *res, const QUrl &url)
+{
+//    if (!res)
+//        return;
+    m_resource = res;
+
+    if (url.isEmpty())
+        m_webView->setHtml(DUMMY_HTML);
+    else
+        m_webView->load(url);
 }
 
 void UbuntuPurchaseDialog::parseJson(const QString &json)

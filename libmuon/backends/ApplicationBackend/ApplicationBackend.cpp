@@ -89,6 +89,7 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     QTimer::singleShot(10, this, SLOT(initBackend()));
     UbuntuPurchaseDialog *d = new UbuntuPurchaseDialog();
     d->show();
+    d->startPurchase(nullptr, QUrl()); // Testing only
 }
 
 ApplicationBackend::~ApplicationBackend()

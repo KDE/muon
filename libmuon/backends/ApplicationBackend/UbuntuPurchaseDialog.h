@@ -24,6 +24,8 @@
 #include <QWidget>
 
 class KWebView;
+class QUrl;
+class USCResource;
 
 class UbuntuPurchaseDialog : public QWidget
 {
@@ -33,11 +35,15 @@ public:
 
 private:
     KWebView *m_webView;
+    USCResource *m_resource;
     
 signals:
     void purchaseCancelledByUser();
     void purchaseFailed();
     void purchaseSucceeded();
+
+public slots:
+    void startPurchase(USCResource *res, const QUrl &url);
     
 private slots:
     void parseJson(const QString &json);
