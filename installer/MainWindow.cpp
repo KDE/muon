@@ -298,7 +298,10 @@ void MainWindow::populateViews()
 
     QStringList instOriginNames = origins.second;
     foreach(const QString & originName, instOriginNames) {
-        QStandardItem* viewItem = createOriginItem(originName, backend->originLabel(originName));
+        QString originLabel = backend->originLabel(originName);
+        if (originLabel.isEmpty())
+            originLabel = originName;
+        QStandardItem* viewItem = createOriginItem(originName, originLabel);
 
         viewItem->setData(AbstractResource::State::Installed, StateFilterRole);
         installedItem->appendRow(viewItem);
