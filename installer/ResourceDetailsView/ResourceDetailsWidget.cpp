@@ -312,7 +312,6 @@ void ResourceDetailsWidget::setResource(AbstractResource *resource)
 {
     m_resource = resource;
     m_listener->setResource(m_resource);
-    qDebug() << resource->origin();
 
     AbstractResource *app = qobject_cast<AbstractResource*>(resource);
 
