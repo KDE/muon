@@ -59,9 +59,9 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
         enum State {
             Broken,
             None,
+            NeedsPurchase,
             Installed,
-            Upgradeable,
-            NeedsPurchase
+            Upgradeable
         };
         Q_ENUMS(State)
         

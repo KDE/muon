@@ -93,7 +93,7 @@ QString USCResource::packageName() const
 
 AbstractResource::State USCResource::state()
 {
-    if (m_package)
+    if (package())
         return QAptResource::state();
 
     // FIXME: could be purchased, but we don't have deb_line, etc
