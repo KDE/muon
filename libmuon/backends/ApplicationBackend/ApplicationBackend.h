@@ -121,7 +121,6 @@ private Q_SLOTS:
     void checkForUpdates();
     void fetchUSCResourceList();
     void initUSCResources(KJob *j);
-    void onPurchaseFailed();
 
 Q_SIGNALS:
 	void startingFirstTransaction();

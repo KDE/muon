@@ -109,6 +109,7 @@ const QString LOADING_HTML = QString("<html>\n"
 UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
     : QWidget(parent)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setMargin(0);
     setLayout(layout);
@@ -130,6 +131,9 @@ UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
     // We use the webpage title changing to test w/o a server
     connect(m_webView, SIGNAL(titleChanged(QString)),
             this, SLOT(parseJson(QString)));
+    // Auto-connect the cancel signal to close the dialog
+    connect(this, SIGNAL(purchaseCancelledByUser()),
+            this, SLOT(close()));
 }
 
 void UbuntuPurchaseDialog::startPurchase(USCResource *res, const QUrl &url)
@@ -175,11 +179,13 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
 
         // Check for intentional cancellation
         if (cancelled) {
+            qDebug() << "Cancelled!";
             emit purchaseCancelledByUser();
             return;
         }
 
         // Not cancelled, so it failed
+        qDebug() << "Purchase Failed!";
         emit purchaseFailed();
         return;
     }

@@ -347,6 +347,10 @@ void ResourceDetailsWidget::setResource(AbstractResource *resource)
 
     connect(resource->backend(), SIGNAL(reloadFinished()),
             this, SLOT(updateActionButton()));
+    connect(resource->backend(), SIGNAL(purchaseCancelledByUser()),
+            this, SLOT(updateActionButton()));
+    connect(resource->backend(), SIGNAL(purchaseFailed()),
+            this, SLOT(updateActionButton()));
     updateActionButton();
 
     m_longDescLabel->setText(resource->longDescription());
@@ -574,4 +578,5 @@ void ResourceDetailsWidget::updateActionButton()
     }
 
     m_addonsWidget->setResource(m_resource);
+    applicationRunningChanged();
 }
