@@ -134,8 +134,9 @@ UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
 
 void UbuntuPurchaseDialog::startPurchase(USCResource *res, const QUrl &url)
 {
-//    if (!res)
-//        return;
+    if (!res)
+        return;
+
     m_resource = res;
 
     m_webView->setHtml(LOADING_HTML.arg(i18nc("@info title","Connecting to Payment Service")));
@@ -164,7 +165,6 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
 
     auto res = responseData.toMap();
     bool successful = res.value("successful").toBool();
-    qDebug() << "Successful?" << successful;
 
     // Handle cancel or error
     if (!successful) {
