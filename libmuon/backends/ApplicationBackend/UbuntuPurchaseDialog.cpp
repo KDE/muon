@@ -162,20 +162,31 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
         return;
     }
 
-    auto response = responseData.toMap();
-    bool successful = response.value("successful").toBool();
+    auto res = responseData.toMap();
+    bool successful = res.value("successful").toBool();
     qDebug() << "Successful?" << successful;
 
     // Handle cancel or error
     if (!successful) {
+        bool cancelled = res.value("user_canceled").toBool() ||
+                         res.value("user_cancelled").toBool();
+
+        // Check for intentional cancellation
+        if (cancelled) {
+            emit purchaseCancelledByUser();
+            return;
+        }
+
+        // Not cancelled, so it failed
+        emit purchaseFailed();
         return;
     }
 
     // Purchase successful
     emit purchaseSucceeded();
 
-    QString debLine = response.value("deb_line").toString();
-    QString signingKeyId = response.value("signing_key_id").toString();
-    QString licenseKey = response.value("license_key").toString();
-    QString licenseKeyPath = response.value("license_key_path").toString();
+    QString debLine = res.value("deb_line").toString();
+    QString signingKeyId = res.value("signing_key_id").toString();
+    QString licenseKey = res.value("license_key").toString();
+    QString licenseKeyPath = res.value("license_key_path").toString();
 }

@@ -494,6 +494,15 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
     UbuntuPurchaseDialog *d = new UbuntuPurchaseDialog();
     d->startPurchase(app, QUrl());
     d->show();
+    connect(d, SIGNAL(purchaseFailed()), this, SLOT(onPurchaseFailed()));
+}
+
+void ApplicationBackend::onPurchaseFailed()
+{
+    QString title = i18nc("@title:window", "Purchase Failed");
+    QString text = i18nc("@label", "Sorry, something went wrong. Your purchase "
+                                   "has been cancelled.");
+    KMessageBox::sorry(m_aptify, text, title);
 }
 
 int ApplicationBackend::updatesCount() const
