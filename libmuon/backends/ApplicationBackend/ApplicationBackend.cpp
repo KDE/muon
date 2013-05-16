@@ -384,7 +384,7 @@ void ApplicationBackend::addTransaction(Transaction *transaction)
 
     // Find changes due to markings
     QApt::PackageList excluded;
-    excluded.append(qobject_cast<Application*>(transaction->resource())->package());
+    excluded.append(qobject_cast<QAptResource*>(transaction->resource())->package());
 
     // Exclude addons being marked
     for (const QString &pkgStr : transaction->addons().addonsToInstall()) {
