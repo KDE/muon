@@ -159,7 +159,8 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
     QVariant responseData = parser.parse(json.toLocal8Bit(), &ok);
 
     if (!ok) {
-        qWarning() << "Failure to parse purchase server reponse json!";
+        // Could be harmless as the webpage has normal titles
+        qDebug() << "Failure to parse purchase server reponse json!";
         return;
     }
 

@@ -48,6 +48,7 @@ public:
     QString sizeDescription() { return QString(); }
     QString availableVersion() const;
     QString origin() const;
+    QString archiveId() const;
     int downloadSize();
     QString section() { return QString(); }
     QString price() const;
@@ -66,6 +67,7 @@ private:
     QString m_version;
     QString m_origin;
     QString m_price;
+    QString m_archiveId;
 };
 
 #endif // USCRESOURCE_H

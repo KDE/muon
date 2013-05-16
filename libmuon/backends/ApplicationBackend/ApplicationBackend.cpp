@@ -491,8 +491,20 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
         return;
     }
 
+    // Compose purchase URL
+    KUrl urlBase = KUrl("https://software-center.ubuntu.com"); // FIXME: de-hardcode
+    QString lang = getLanguage();
+    QString cName = codeName("DISTRIB_CODENAME");
+    QString archiveId = app->archiveId();
+    QString arch = m_backend->nativeArchitecture();
+    QString args = QLatin1String("archive_id=") % archiveId % "&arch=" % arch;
+
+    KUrl url(urlBase, QString("/subscriptions/%1/ubuntu/%2/"
+                              "+new/?%3").arg(lang).arg(cName).arg(args));
+    qDebug() << url;
+
     UbuntuPurchaseDialog *d = new UbuntuPurchaseDialog();
-    d->startPurchase(app, QUrl());
+    d->startPurchase(app, url);
     d->show();
     connect(d, SIGNAL(purchaseFailed()), this, SLOT(onPurchaseFailed()));
 }
@@ -712,4 +724,36 @@ void ApplicationBackend::initUSCResources(KJob *j)
     }
 
     emit backendReady();
+}
+
+QString ApplicationBackend::codeName(const QString& value)
+{
+    QString ret;
+    QFile f("/etc/lsb-release");
+    if(f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QRegExp rx(QString("%1=(.+)\n").arg(value));
+        while(!f.atEnd()) {
+            QByteArray line = f.readLine();
+            if(rx.exactMatch(line)) {
+                ret = rx.cap(1);
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+QString ApplicationBackend::getLanguage()
+{
+    QStringList fullLangs;
+    // The reviews API abbreviates all langs past the _ char except these
+    fullLangs << "pt_BR" << "zh_CN" << "zh_TW";
+
+    QString language = KGlobal::locale()->language();
+
+    if (fullLangs.contains(language)) {
+        return language;
+    }
+
+    return language.split('_').first();
 }

@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "UbuntuPurchasePage.h"
+#include <QDebug>
 
 UbuntuPurchasePage::UbuntuPurchasePage(QWidget *parent)
     : KWebPage(parent)
@@ -40,5 +41,6 @@ void UbuntuPurchasePage::javaScriptConsoleMessage(const QString &message, int li
     Q_UNUSED(lineNumber);
     Q_UNUSED(sourceID);
 
+    qDebug() << message;
     emit receivedOAuthToken(message);
 }

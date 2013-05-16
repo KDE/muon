@@ -54,6 +54,7 @@ USCResource::USCResource(ApplicationBackend *parent,
         m_screenshotUrls += variant.toUrl();
 
     m_price = data.value("price").toString();
+    m_archiveId = data.value("archive_id").toString();
 }
 
 QApt::Package *USCResource::package()
@@ -134,6 +135,11 @@ QString USCResource::availableVersion() const
 QString USCResource::origin() const
 {
     return m_origin;
+}
+
+QString USCResource::archiveId() const
+{
+    return m_archiveId;
 }
 
 int USCResource::downloadSize()

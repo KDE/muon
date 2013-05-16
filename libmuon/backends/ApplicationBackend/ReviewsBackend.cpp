@@ -23,9 +23,7 @@
 #include <QtCore/QStringBuilder>
 #include <QDebug>
 
-#include <KGlobal>
 #include <KIO/Job>
-#include <KLocale>
 #include <KStandardDirs>
 #include <KTemporaryFile>
 #include <KFilterDev>
@@ -37,29 +35,13 @@
 
 #include <QtOAuth/interface.h>
 
+#include "ApplicationBackend.h"
 #include "QAptResource.h"
 #include <ReviewsBackend/Rating.h>
 #include <ReviewsBackend/Review.h>
 #include <ReviewsBackend/AbstractLoginBackend.h>
 #include "UbuntuLoginBackend.h"
 #include <MuonDataSources.h>
-
-static QString getCodename(const QString& value)
-{
-    QString ret;
-    QFile f("/etc/lsb-release");
-    if(f.open(QIODevice::ReadOnly|QIODevice::Text)) {
-        QRegExp rx(QString("%1=(.+)\n").arg(value));
-        while(!f.atEnd()) {
-            QByteArray line = f.readLine();
-            if(rx.exactMatch(line)) {
-                ret = rx.cap(1);
-                break;
-            }
-        }
-    }
-    return ret;
-}
 
 ReviewsBackend::ReviewsBackend(QObject *parent)
         : AbstractReviewsBackend(parent)
@@ -178,7 +160,7 @@ void ReviewsBackend::fetchReviews(AbstractResource* res, int page)
         return;
     }
 
-    QString lang = getLanguage();
+    QString lang = ApplicationBackend::getLanguage();
     QString origin = app->origin().toLower();
 
     QString version = QLatin1String("any");
@@ -251,21 +233,6 @@ void ReviewsBackend::reviewsFetched(KJob *j)
     emit reviewsReady(app, reviewsList);
 }
 
-QString ReviewsBackend::getLanguage()
-{
-    QStringList fullLangs;
-    // The reviews API abbreviates all langs past the _ char except these
-    fullLangs << "pt_BR" << "zh_CN" << "zh_TW";
-
-    QString language = KGlobal::locale()->language();
-
-    if (fullLangs.contains(language)) {
-        return language;
-    }
-
-    return language.split('_').first();
-}
-
 void ReviewsBackend::submitUsefulness(Review* r, bool useful)
 {
     QVariantMap data;
@@ -286,9 +253,9 @@ void ReviewsBackend::submitReview(AbstractResource* application, const QString& 
     data["version"] = app->package()->version();
     data["review_text"] = review_text;
     data["rating"] = rating;
-    data["language"] = getLanguage();
+    data["language"] = ApplicationBackend::getLanguage();
     data["origin"] = app->package()->origin();
-    data["distroseries"] = getCodename("DISTRIB_CODENAME");
+    data["distroseries"] = ApplicationBackend::codeName("DISTRIB_CODENAME");
     data["arch_tag"] = app->package()->architecture();
     
     postInformation("reviews/", data);

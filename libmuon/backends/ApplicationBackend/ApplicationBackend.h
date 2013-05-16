@@ -77,6 +77,8 @@ public:
     void integrateMainWindow(MuonMainWindow* w);
     QWidget* mainWindow() const;
     virtual QList<AbstractResource*> upgradeablePackages() const;
+    static QString codeName(const QString &value);
+    static QString getLanguage();
 
 private:
     QApt::Backend *m_backend;
