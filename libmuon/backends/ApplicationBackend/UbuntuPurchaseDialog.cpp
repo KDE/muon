@@ -168,6 +168,7 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
 
     // Handle cancel or error
     if (!successful) {
+        // We have to handle both spellings for some reason, lol
         bool cancelled = res.value("user_canceled").toBool() ||
                          res.value("user_cancelled").toBool();
 
@@ -189,4 +190,20 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
     QString signingKeyId = res.value("signing_key_id").toString();
     QString licenseKey = res.value("license_key").toString();
     QString licenseKeyPath = res.value("license_key_path").toString();
+}
+
+void UbuntuPurchaseDialog::onReceivedOAuthToken(const QString &json)
+{
+    QJson::Parser parser;
+    bool ok = false;
+    QVariant tokenData = parser.parse(json.toLocal8Bit(), &ok);
+
+    if (!ok) {
+        qWarning() << "Failed to parse OAuth token";
+        return;
+    }
+
+    m_oauthToken = tokenData.toMap();
+    // Compatibility with OAuth naming
+    m_oauthToken["token"] = m_oauthToken.value("token_key");
 }

@@ -27,7 +27,8 @@
  * @brief The UbuntuPurchasePage class subclasses KWebPage so that it can
  * reimplement javaScriptAlert in order to emit the scripting alert rather
  * than showing it in a window. Ubuntu's app purchase webpage sends its
- * purchase response details via a scripting alert.
+ * purchase response details via a scripting alert. Additionally, it sends
+ * OAuth tokens that we need via the JavaScript console
  */
 class UbuntuPurchasePage : public KWebPage
 {
@@ -36,10 +37,12 @@ public:
     explicit UbuntuPurchasePage(QWidget *parent = nullptr);
 
 protected:
-    void javaScriptAlert(QWebFrame *originatingFrame, const QString &msg);
+    void javaScriptAlert(QWebFrame *originatingFrame, const QString &msg) override;
+    void javaScriptConsoleMessage(const QString &message, int lineNumber, const QString &sourceID) override;
 
 signals:
     void purchaseResponse(const QString &json);
+    void receivedOAuthToken(const QString &json);
 };
 
 #endif // UBUNTUPURCHASEPAGE_H

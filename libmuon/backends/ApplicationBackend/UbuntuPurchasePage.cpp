@@ -33,3 +33,12 @@ void UbuntuPurchasePage::javaScriptAlert(QWebFrame *originatingFrame, const QStr
 
     emit purchaseResponse(msg);
 }
+
+void UbuntuPurchasePage::javaScriptConsoleMessage(const QString &message, int lineNumber, const QString &sourceID)
+{
+    // Ubuntu's webpage sends us the OAuth token via a JavaScript console message
+    Q_UNUSED(lineNumber);
+    Q_UNUSED(sourceID);
+
+    emit receivedOAuthToken(message);
+}

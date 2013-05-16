@@ -23,9 +23,15 @@
 
 #include <QWidget>
 
+// Qt includes
+#include <QMap>
+
+class QUrl;
+
 class KPixmapSequenceOverlayPainter;
 class KWebView;
-class QUrl;
+
+class ApplicationBackend;
 class USCResource;
 
 class UbuntuPurchaseDialog : public QWidget
@@ -35,8 +41,11 @@ public:
     explicit UbuntuPurchaseDialog(QWidget *parent = nullptr);
 
 private:
+    // Data
     USCResource *m_resource;
+    QMap<QString, QVariant> m_oauthToken;
 
+    // Widgets
     KWebView *m_webView;
     KPixmapSequenceOverlayPainter *m_spinner;
     
@@ -51,6 +60,7 @@ public slots:
     
 private slots:
     void parseJson(const QString &json);
+    void onReceivedOAuthToken(const QString &json);
 };
 
 #endif // UBUNTUPURCHASEDIALOG_H
