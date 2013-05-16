@@ -66,10 +66,8 @@ GridItem {
             }
             source: model.application.thumbnailUrl
             height: delegateRoot.height*0.7
-            sourceSize {
-                width: parent.width
-                height: screen.height
-            }
+            fillMode: Image.PreserveAspectFit
+            smooth: true
             cache: false
             asynchronous: true
             onStatusChanged:  {
@@ -89,8 +87,7 @@ GridItem {
                 State { name: "fallback"
                     PropertyChanges { target: screen; smooth: true }
                     PropertyChanges { target: screen; source: "image://icon/"+model.application.icon}
-                    PropertyChanges { target: screen; sourceSize.width: screen.height }
-                    PropertyChanges { target: smallIcon; visible: false }
+                    PropertyChanges { target: smallIcon; width: 0 }
                 }
             ]
         }
@@ -123,6 +120,7 @@ GridItem {
                 right: parent.right
                 bottom: parent.bottom
                 top: parent.verticalCenter
+                bottomMargin: 10
             }
         }
     }
@@ -164,36 +162,16 @@ GridItem {
             }
             InstallApplicationButton {
                 id: installButton
-                width: parent.width/3
                 height: 30
                 anchors {
                     bottom: parent.bottom
                     left: parent.left
-                    bottomMargin: 20
-                    margins: 10
-                }
-                
-                application: model.application
-                preferUpgrade: page.preferUpgrade
-            }
-            Item {
-                anchors {
                     right: parent.right
-                    left: installButton.right
-                    verticalCenter: installButton.verticalCenter
                 }
-                height: installButton.height
-                Rating {
-                    anchors.centerIn: parent
-                    height: parent.height*0.7
+                application: model.application
+                additionalItem: Rating {
                     rating: model.rating
                     visible: !model.application.canUpgrade && model.rating>=0
-                }
-                Button {
-                    anchors.fill: parent
-                    text: i18n("Update")
-                    visible: model.application.canUpgrade
-                    onClicked: resourcesModel.installApplication(model.application)
                 }
             }
         }

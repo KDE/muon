@@ -68,7 +68,7 @@ ToolBar {
             Row {
                 id: launcherRow
                 spacing: 2
-                IconItem { source: model.app.icon; height: parent.height; width: height }
+                IconItem { source: model.app.icon; height: parent.height*0.95; width: height }
                 Label { text: model.app.name }
                 Label { text: listener.statusText; visible: listener.isActive }
                 ToolButton {
@@ -85,6 +85,17 @@ ToolBar {
                     }
                 }
             }
+            Rectangle {
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.left
+                    bottomMargin: -3
+                }
+                width: parent.width*(listener.progress/100)
+                color: theme.textColor
+                height: 1
+                visible: listener.isActive
+            }
         }
     }
     ToolButton {
@@ -94,7 +105,7 @@ ToolBar {
             rightMargin: 5
         }
         height: Math.min(implicitHeight, parent.height)
-        iconSource: "dialog-close"
+        iconSource: "window-close"
         onClicked: progressModel.clear()
     }
 }

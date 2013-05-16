@@ -68,8 +68,11 @@ Page
         
         InstallApplicationButton {
             id: installButton
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
+            anchors {
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+            }
+            width: maximumWidth
             application: page.application
         }
     }
@@ -105,7 +108,8 @@ Page
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            margins: 10
+            topMargin: 10
+            leftMargin: 10
         }
         
         ApplicationOverview {
