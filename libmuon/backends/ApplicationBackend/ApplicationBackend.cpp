@@ -381,10 +381,11 @@ void ApplicationBackend::addTransaction(Transaction *transaction)
     m_backend->saveCacheState();
 
     markTransaction(transaction);
+    QAptResource *app = qobject_cast<QAptResource*>(transaction->resource());
 
     // Find changes due to markings
     QApt::PackageList excluded;
-    excluded.append(qobject_cast<QAptResource*>(transaction->resource())->package());
+    excluded.append(app->package());
 
     // Exclude addons being marked
     for (const QString &pkgStr : transaction->addons().addonsToInstall()) {
@@ -409,8 +410,6 @@ void ApplicationBackend::addTransaction(Transaction *transaction)
         transaction->deleteLater();
         return;
     }
-
-    QAptResource *app = qobject_cast<QAptResource*>(transaction->resource());
 
     if (app->package()->wouldBreak()) {
         m_backend->restoreCacheState(oldCacheState);
