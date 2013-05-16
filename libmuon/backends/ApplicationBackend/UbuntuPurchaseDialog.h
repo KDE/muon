@@ -23,6 +23,7 @@
 
 #include <QWidget>
 
+class KPixmapSequenceOverlayPainter;
 class KWebView;
 class QUrl;
 class USCResource;
@@ -34,13 +35,16 @@ public:
     explicit UbuntuPurchaseDialog(QWidget *parent = nullptr);
 
 private:
-    KWebView *m_webView;
     USCResource *m_resource;
+
+    KWebView *m_webView;
+    KPixmapSequenceOverlayPainter *m_spinner;
     
 signals:
     void purchaseCancelledByUser();
     void purchaseFailed();
     void purchaseSucceeded();
+    void termsOfServiceDeclined();
 
 public slots:
     void startPurchase(USCResource *res, const QUrl &url);

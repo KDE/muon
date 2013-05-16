@@ -25,6 +25,10 @@
 #include <QDebug>
 
 // KDE includes
+#include <KIconLoader>
+#include <KLocale>
+#include <KPixmapSequence>
+#include <KPixmapSequenceOverlayPainter>
 #include <KWebView>
 
 // QJson includes
@@ -68,6 +72,40 @@ const QString DUMMY_HTML = QString("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0
  "</body>"
  "</html>");
 
+const QString LOADING_HTML = QString("<html>\n"
+                                     "<head>\n"
+                                      "<title></title>\n"
+                                     "</head>\n"
+                                     "<style type=\"text/css\">\n"
+                                     "html {\n"
+                                       "background: #fff;\n"
+                                       "color: #000;\n"
+                                       "font: sans-serif;\n"
+                                       "font: caption;\n"
+                                       "text-align: center;\n"
+                                       "position: absolute;\n"
+                                       "top: 0;\n"
+                                       "bottom: 0;\n"
+                                       "width: 100\%;\n"
+                                       "height: 100\%;\n"
+                                       "display: table;\n"
+                                     "}\n"
+                                     "body {\n"
+                                       "display: table-cell;\n"
+                                       "vertical-align: middle;\n"
+                                     "}\n"
+                                     "h1 {\n"
+                                       "center no-repeat;\n"
+                                       "padding-top: 48px;\n" /* leaves room for the spinner above */
+                                       "font-size: 100\%;\n"
+                                       "font-weight: normal;\n"
+                                     "}\n"
+                                     "</style>\n"
+                                     "<body>\n"
+                                      "<h1>%1</h1>\n"
+                                     "</body>\n"
+                                     "</html>\n");
+
 UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
     : QWidget(parent)
 {
@@ -81,6 +119,10 @@ UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
     UbuntuPurchasePage *page = new UbuntuPurchasePage(m_webView);
     m_webView->setPage(page);
 
+    m_spinner = new KPixmapSequenceOverlayPainter(m_webView);
+    m_spinner->setSequence(KPixmapSequence("process-working", KIconLoader::SizeSmallMedium));
+    m_spinner->setWidget(m_webView);
+    m_spinner->start();
 
     // Ubuntu's webpage we embed will send us a json response
     connect(page, SIGNAL(purchaseResponse(QString)),
@@ -96,6 +138,10 @@ void UbuntuPurchaseDialog::startPurchase(USCResource *res, const QUrl &url)
 //        return;
     m_resource = res;
 
+    m_webView->setHtml(LOADING_HTML.arg(i18nc("@info title","Connecting to Payment Service")));
+    connect(m_webView, SIGNAL(loadFinished(bool)),
+            m_spinner, SLOT(stop()));
+
     if (url.isEmpty())
         m_webView->setHtml(DUMMY_HTML);
     else
@@ -104,6 +150,9 @@ void UbuntuPurchaseDialog::startPurchase(USCResource *res, const QUrl &url)
 
 void UbuntuPurchaseDialog::parseJson(const QString &json)
 {
+    if (json.isEmpty())
+        return;
+
     QJson::Parser parser;
     bool ok = false;
     QVariant responseData = parser.parse(json.toLocal8Bit(), &ok);
