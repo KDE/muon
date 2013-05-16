@@ -38,6 +38,7 @@ class KJob;
 class KPixmapSequenceOverlayPainter;
 class KRatingWidget;
 class KTemporaryFile;
+class KWebView;
 
 class AddonsWidget;
 class AbstractResource;
@@ -75,6 +76,7 @@ private:
     QPushButton *m_cancelButton;
     QLabel *m_longDescLabel;
     QDeclarativeView *m_screenshotView;
+    KWebView *m_videoView;
     QLabel *m_websiteLabel;
     AddonsWidget *m_addonsWidget;
     QLabel *m_size;

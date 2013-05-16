@@ -97,6 +97,7 @@ class MUONPRIVATE_EXPORT AbstractResource : public QObject
 
         virtual QUrl thumbnailUrl() = 0;
         virtual QUrl screenshotUrl() = 0;
+        virtual QList<QUrl> videoUrls();
         
         virtual int downloadSize() = 0;
         virtual QString sizeDescription();

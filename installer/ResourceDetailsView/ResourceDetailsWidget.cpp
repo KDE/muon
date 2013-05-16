@@ -53,6 +53,7 @@
 #include <KStandardGuiItem>
 #include <KTemporaryFile>
 #include <KToolInvocation>
+#include <KWebView>
 #include <KDebug>
 #include <Nepomuk/KRatingWidget>
 
@@ -204,7 +205,10 @@ ResourceDetailsWidget::ResourceDetailsWidget(QWidget *parent)
     m_websiteLabel->setAlignment(Qt::AlignLeft);
     m_websiteLabel->setOpenExternalLinks(true);
 
-    m_screenshotView = new QDeclarativeView(this);
+    KVBox *bodyRight = new KVBox(body);
+    bodyRight->setSpacing(2*KDialog::spacingHint());
+
+    m_screenshotView = new QDeclarativeView(bodyRight);
     m_screenshotView->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_screenshotView->setMinimumSize(170, 130);
     m_screenshotView->rootContext()->setContextProperty("view", m_screenshotView);
@@ -219,8 +223,13 @@ ResourceDetailsWidget::ResourceDetailsWidget(QWidget *parent)
     m_throbberWidget->start();
     connect(item, SIGNAL(thumbnailLoaded()), m_throbberWidget, SLOT(stop()));
 
+    m_videoView = new KWebView(bodyRight);
+    m_videoView->setMinimumSize(170, 130);
+    m_videoView->page()->setPreferredContentsSize(QSize(400, 225));
+    m_videoView->setFixedSize(QSize(400, 225));
+
     bodyLayout->addWidget(bodyLeft);
-    bodyLayout->addWidget(m_screenshotView);
+    bodyLayout->addWidget(bodyRight);
     m_screenshotView->show();
 
     m_addonsWidget = new AddonsWidget(widget);
@@ -379,6 +388,13 @@ void ResourceDetailsWidget::setResource(AbstractResource *resource)
     }
 
     m_license->setText(resource->license());
+
+    QList<QUrl> videos = m_resource->videoUrls();
+    if (videos.isEmpty())
+        m_videoView->hide();
+    else {
+        m_videoView->setUrl(videos.first());
+    }
 
     // FIXME: Port to Resources
 //    if (resource->isSupported()) {

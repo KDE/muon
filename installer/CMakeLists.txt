@@ -37,6 +37,7 @@ kde4_add_executable(muon-installer ${muon_installer_SRCS})
 
 target_link_libraries(muon-installer muonprivate muonapt
                                      ${KDE4_KIO_LIBS}
+                                     ${KDE4_KDEWEBKIT_LIBS}
                                      ${QAPT_LIBRARY}
                                      ${qjson_LIBRARIES}
                                      ${QT_QTDECLARATIVE_LIBRARY})

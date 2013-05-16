@@ -165,6 +165,7 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
     if (!ok) {
         // Could be harmless as the webpage has normal titles
         qDebug() << "Failure to parse purchase server reponse json!";
+        qDebug() << json;
         return;
     }
 

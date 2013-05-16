@@ -53,6 +53,7 @@ public:
     QString section();
     QString price() const;
     void fetchScreenshots();
+    QList<QUrl> videoUrls();
 
 private:
     QString m_name;
@@ -63,6 +64,7 @@ private:
     QString m_homepage;
     QUrl m_screenshotUrl;
     QList<QUrl> m_screenshotUrls;
+    QList<QUrl> m_videoUrls;
     QString m_license;
     QString m_version;
     QString m_origin;

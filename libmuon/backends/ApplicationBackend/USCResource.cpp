@@ -56,6 +56,10 @@ USCResource::USCResource(ApplicationBackend *parent,
     for (const QVariant &variant : variantList)
         m_screenshotUrls += variant.toUrl();
 
+    variantList = data.value("video_embedded_html_urls").toList();
+    for (const QVariant &variant : variantList)
+        m_videoUrls += variant.toUrl();
+
     m_price = data.value("price").toString();
     m_archiveId = data.value("archive_id").toString();
     m_size = data.value("binary_filesize").toUInt();
@@ -176,4 +180,9 @@ QString USCResource::price() const
 void USCResource::fetchScreenshots()
 {
     emit screenshotsFetched(m_screenshotUrls, m_screenshotUrls);
+}
+
+QList<QUrl> USCResource::videoUrls()
+{
+    return m_videoUrls;
 }
