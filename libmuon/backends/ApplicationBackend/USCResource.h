@@ -45,12 +45,12 @@ public:
     QUrl screenshotUrl();
     QString license();
     QString longDescription() const;
-    QString sizeDescription() { return QString(); }
+    QString sizeDescription();
     QString availableVersion() const;
     QString origin() const;
     QString archiveId() const;
     int downloadSize();
-    QString section() { return QString(); }
+    QString section();
     QString price() const;
     void fetchScreenshots();
 
@@ -68,6 +68,7 @@ private:
     QString m_origin;
     QString m_price;
     QString m_archiveId;
+    quint64 m_size;
 };
 
 #endif // USCRESOURCE_H

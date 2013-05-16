@@ -22,7 +22,10 @@
 
 // Qt includes
 #include <QtCore/QStringList>
-#include <QDebug>
+
+// KDE includes
+#include <KGlobal>
+#include <KLocale>
 
 // LibQApt includes
 #include <LibQApt/Backend>
@@ -55,6 +58,7 @@ USCResource::USCResource(ApplicationBackend *parent,
 
     m_price = data.value("price").toString();
     m_archiveId = data.value("archive_id").toString();
+    m_size = data.value("binary_filesize").toUInt();
 }
 
 QApt::Package *USCResource::package()
@@ -85,6 +89,12 @@ QString USCResource::comment()
 QString USCResource::longDescription() const
 {
     return m_longDesc;
+}
+
+QString USCResource::sizeDescription()
+{
+    return i18nc("@info app size", "%1 on disk",
+                 KGlobal::locale()->formatByteSize(m_size));
 }
 
 QString USCResource::packageName() const
@@ -148,6 +158,14 @@ int USCResource::downloadSize()
         return m_package->downloadSize();
 
     return 0;
+}
+
+QString USCResource::section()
+{
+    if (m_package)
+        return m_package->section();
+
+    return QString();
 }
 
 QString USCResource::price() const
