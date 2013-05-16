@@ -57,6 +57,7 @@ class MUONPRIVATE_EXPORT AbstractResourcesBackend : public QObject
         virtual void installApplication(AbstractResource *app);
         virtual void removeApplication(AbstractResource *app) = 0;
         virtual void cancelTransaction(AbstractResource *app) = 0;
+        virtual void purchaseApplication(AbstractResource *app);
 
     signals:
         void backendReady();

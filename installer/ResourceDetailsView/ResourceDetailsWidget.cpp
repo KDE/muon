@@ -466,11 +466,22 @@ void ResourceDetailsWidget::actionButtonClicked()
     m_progressBar->setFormat(i18nc("@info:status Progress text when waiting", "Waiting"));
 
     AbstractResourcesBackend *backend = m_resource->backend();
-    // TODO: update packages
-    if (m_resource->isInstalled()) {
-        backend->removeApplication(m_resource);
-    } else {
+    AbstractResource::State state = m_resource->state();
+
+    switch (state) {
+    case AbstractResource::None:
+    case AbstractResource::Upgradeable:
         backend->installApplication(m_resource);
+        break;
+    case AbstractResource::Installed:
+        backend->removeApplication(m_resource);
+        break;
+    case AbstractResource::NeedsPurchase:
+        backend->purchaseApplication(m_resource);
+        break;
+    case AbstractResource::Broken:
+    default:
+        break;
     }
 }
 

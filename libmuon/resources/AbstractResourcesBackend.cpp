@@ -32,3 +32,9 @@ void AbstractResourcesBackend::installApplication(AbstractResource* app)
 
 void AbstractResourcesBackend::integrateMainWindow(MuonMainWindow*)
 {}
+
+void AbstractResourcesBackend::purchaseApplication(AbstractResource *app)
+{
+    Q_UNUSED(app);
+    // Not implemented
+}

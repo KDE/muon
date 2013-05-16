@@ -87,9 +87,6 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     connect(m_reviewsBackend, SIGNAL(ratingsReady()), SIGNAL(allDataChanged()));
     
     QTimer::singleShot(10, this, SLOT(initBackend()));
-    UbuntuPurchaseDialog *d = new UbuntuPurchaseDialog();
-    d->show();
-    d->startPurchase(nullptr, QUrl()); // Testing only
 }
 
 ApplicationBackend::~ApplicationBackend()
@@ -485,6 +482,19 @@ void ApplicationBackend::installApplication(AbstractResource* app)
 void ApplicationBackend::removeApplication(AbstractResource* app)
 {
     addTransaction(new Transaction(this, app, Transaction::RemoveRole));
+}
+
+void ApplicationBackend::purchaseApplication(AbstractResource *res)
+{
+    USCResource *app = qobject_cast<USCResource*>(res);
+    if (!app) {
+        qWarning() << "Tried to purchase a not-for-purchase app";
+        return;
+    }
+
+    UbuntuPurchaseDialog *d = new UbuntuPurchaseDialog();
+    d->startPurchase(app, QUrl());
+    d->show();
 }
 
 int ApplicationBackend::updatesCount() const

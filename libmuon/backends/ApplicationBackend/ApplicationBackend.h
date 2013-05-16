@@ -73,11 +73,6 @@ public:
     QVector< AbstractResource* > allResources() const;
     QList<AbstractResource*> searchPackageName(const QString& searchText);
     
-    void installApplication(AbstractResource *app, AddonList addons);
-    void installApplication(AbstractResource *app);
-    void removeApplication(AbstractResource *app);
-    void cancelTransaction(AbstractResource *app);
-    
     AbstractBackendUpdater* backendUpdater() const;
     void integrateMainWindow(MuonMainWindow* w);
     QWidget* mainWindow() const;
@@ -102,6 +97,12 @@ private:
 
 public Q_SLOTS:
     void reload();
+
+    void installApplication(AbstractResource *app, AddonList addons);
+    void installApplication(AbstractResource *app);
+    void removeApplication(AbstractResource *app);
+    void cancelTransaction(AbstractResource *app);
+    void purchaseApplication(AbstractResource *res);
     
     //helper functions
     void initAvailablePackages(KJob*);

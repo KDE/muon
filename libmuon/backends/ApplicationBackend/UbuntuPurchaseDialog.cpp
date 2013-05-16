@@ -168,6 +168,14 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
 
     // Handle cancel or error
     if (!successful) {
-
+        return;
     }
+
+    // Purchase successful
+    emit purchaseSucceeded();
+
+    QString debLine = response.value("deb_line").toString();
+    QString signingKeyId = response.value("signing_key_id").toString();
+    QString licenseKey = response.value("license_key").toString();
+    QString licenseKeyPath = response.value("license_key_path").toString();
 }
