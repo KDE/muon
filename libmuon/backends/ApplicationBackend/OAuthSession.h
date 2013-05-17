@@ -59,6 +59,9 @@ private:
 
     static OAuthSession* s_self;
 
+signals:
+    void loginStateChanged();
+
 public slots:
     void postInformation(const OAuthPost &info);
     void refreshConsumerKeys();

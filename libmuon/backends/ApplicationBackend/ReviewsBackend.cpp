@@ -50,6 +50,9 @@ ReviewsBackend::ReviewsBackend(QObject *parent)
         , m_serverBase(MuonDataSources::rnRSource())
 {
     QMetaObject::invokeMethod(this, "fetchRatings", Qt::QueuedConnection);
+
+    connect(OAuthSession::global(), SIGNAL(loginStateChanged()),
+            this, SIGNAL(loginStateChanged()));
 }
 
 void ReviewsBackend::setAptBackend(QApt::Backend *aptBackend)
