@@ -42,34 +42,14 @@
 #include <ReviewsBackend/AbstractLoginBackend.h>
 #include "UbuntuLoginBackend.h"
 #include <MuonDataSources.h>
+#include "OAuthSession.h"
 
 ReviewsBackend::ReviewsBackend(QObject *parent)
         : AbstractReviewsBackend(parent)
-        , m_aptBackend(0)
+        , m_aptBackend(nullptr)
         , m_serverBase(MuonDataSources::rnRSource())
 {
-    m_loginBackend = new UbuntuLoginBackend(this);
-    connect(m_loginBackend, SIGNAL(connectionStateChanged()), SIGNAL(loginStateChanged()));
-    connect(m_loginBackend, SIGNAL(connectionStateChanged()), SLOT(refreshConsumerKeys()));
-    m_oauthInterface = new QOAuth::Interface(this);
-    
     QMetaObject::invokeMethod(this, "fetchRatings", Qt::QueuedConnection);
-}
-
-ReviewsBackend::~ReviewsBackend()
-{}
-
-void ReviewsBackend::refreshConsumerKeys()
-{
-    if(m_loginBackend->hasCredentials()) {
-        m_oauthInterface->setConsumerKey(m_loginBackend->consumerKey());
-        m_oauthInterface->setConsumerSecret(m_loginBackend->consumerSecret());
-
-        for (const QPair<QString, QVariantMap> &request : m_pendingRequests)
-            postInformation(request.first, request.second);
-
-        m_pendingRequests.clear();
-    }
 }
 
 void ReviewsBackend::setAptBackend(QApt::Backend *aptBackend)
@@ -80,7 +60,7 @@ void ReviewsBackend::setAptBackend(QApt::Backend *aptBackend)
 void ReviewsBackend::fetchRatings()
 {
     QString ratingsCache = KStandardDirs::locateLocal("data", "libmuon/ratings.txt");
-    refreshConsumerKeys();
+    OAuthSession::global()->refreshConsumerKeys();
 
     // First, load our old ratings cache in case we don't have net connectivity
     loadRatingsFromFile();
@@ -236,8 +216,9 @@ void ReviewsBackend::submitUsefulness(Review* r, bool useful)
 {
     QVariantMap data;
     data["useful"] = useful;
-    
-    postInformation(QString("reviews/%1/recommendations/").arg(r->id()), data);
+
+    OAuthPost info(m_serverBase, QString("reviews/%1/recommendations/").arg(r->id()), data);
+    OAuthSession::global()->postInformation(info);
 }
 
 void ReviewsBackend::submitReview(AbstractResource* application, const QString& summary,
@@ -257,12 +238,15 @@ void ReviewsBackend::submitReview(AbstractResource* application, const QString& 
     data["distroseries"] = ApplicationBackend::codeName("DISTRIB_CODENAME");
     data["arch_tag"] = app->package()->architecture();
     
-    postInformation("reviews/", data);
+    OAuthPost info(m_serverBase, QLatin1String("reviews/"), data);
+    OAuthSession::global()->postInformation(info);
 }
 
 void ReviewsBackend::deleteReview(Review* r)
 {
-    postInformation(QString("reviews/delete/%1/").arg(r->id()), QVariantMap());
+    OAuthPost info(m_serverBase, QString("reviews/delete/%1/").arg(r->id()),
+                   QVariantMap());
+    OAuthSession::global()->postInformation(info);
 }
 
 void ReviewsBackend::flagReview(Review* r, const QString& reason, const QString& text)
@@ -271,41 +255,8 @@ void ReviewsBackend::flagReview(Review* r, const QString& reason, const QString&
     data["reason"] = reason;
     data["text"] = text;
 
-    postInformation(QString("reviews/%1/flags/").arg(r->id()), data);
-}
-
-QByteArray authorization(QOAuth::Interface* oauth, const KUrl& url, AbstractLoginBackend* login)
-{
-    return oauth->createParametersString(url.url(), QOAuth::POST, login->token(), login->tokenSecret(),
-                                           QOAuth::HMAC_SHA1, QOAuth::ParamMap(), QOAuth::ParseForHeaderArguments);
-}
-
-void ReviewsBackend::postInformation(const QString& path, const QVariantMap& data)
-{
-    if(!hasCredentials()) {
-        m_pendingRequests += qMakePair(path, data);
-        login();
-        return;
-    }
-    
-    KUrl url(m_serverBase, path);
-    url.setScheme("https");
-    
-    KIO::StoredTransferJob* job = KIO::storedHttpPost(QJson::Serializer().serialize(data), url, KIO::Overwrite | KIO::HideProgressInfo);
-    job->addMetaData("content-type", "Content-Type: application/json" );
-    job->addMetaData("customHTTPHeader", "Authorization: " + authorization(m_oauthInterface, url, m_loginBackend));
-    connect(job, SIGNAL(result(KJob*)), this, SLOT(informationPosted(KJob*)));
-    job->start();
-}
-
-void ReviewsBackend::informationPosted(KJob* j)
-{
-    KIO::StoredTransferJob* job = qobject_cast<KIO::StoredTransferJob*>(j);
-    if(job->error()==0) {
-        qDebug() << "success" << job->data();
-    } else {
-        qDebug() << "error..." << job->error() << job->errorString() << job->errorText();
-    }
+    OAuthPost info(m_serverBase, QString("reviews/%1/flags/").arg(r->id()), data);
+    OAuthSession::global()->postInformation(info);
 }
 
 bool ReviewsBackend::isFetching() const
@@ -315,29 +266,29 @@ bool ReviewsBackend::isFetching() const
 
 bool ReviewsBackend::hasCredentials() const
 {
-    return m_loginBackend->hasCredentials();
+    return OAuthSession::global()->loginBackend()->hasCredentials();
 }
 
 QString ReviewsBackend::userName() const
 {
-    Q_ASSERT(m_loginBackend->hasCredentials());
-    return m_loginBackend->displayName();
+    Q_ASSERT(hasCredentials());
+    return OAuthSession::global()->loginBackend()->displayName();
 }
 
 void ReviewsBackend::login()
 {
-    Q_ASSERT(!m_loginBackend->hasCredentials());
-    m_loginBackend->login();
+    Q_ASSERT(!hasCredentials());
+    OAuthSession::global()->loginBackend()->login();
 }
 
 void ReviewsBackend::registerAndLogin()
 {
-    Q_ASSERT(!m_loginBackend->hasCredentials());
-    m_loginBackend->registerAndLogin();
+    Q_ASSERT(!hasCredentials());
+    OAuthSession::global()->loginBackend()->registerAndLogin();
 }
 
 void ReviewsBackend::logout()
 {
-    Q_ASSERT(m_loginBackend->hasCredentials());
-    m_loginBackend->logout();
+    Q_ASSERT(hasCredentials());
+    OAuthSession::global()->loginBackend()->logout();
 }

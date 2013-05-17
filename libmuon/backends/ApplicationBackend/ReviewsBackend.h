@@ -48,7 +48,6 @@ class ReviewsBackend : public AbstractReviewsBackend
     Q_OBJECT
 public:
     ReviewsBackend(QObject *parent);
-    ~ReviewsBackend();
 
     Rating *ratingForApplication(AbstractResource *app) const;
 
@@ -72,15 +71,10 @@ private:
 
     void loadRatingsFromFile();
     QString getLanguage();
-    AbstractLoginBackend* m_loginBackend;
-    QOAuth::Interface* m_oauthInterface;
-    QList<QPair<QString, QVariantMap> > m_pendingRequests;
 
 private Q_SLOTS:
     void ratingsFetched(KJob *job);
     void reviewsFetched(KJob *job);
-    void informationPosted(KJob* job);
-    void postInformation(const QString& path, const QVariantMap& data);
     void fetchRatings();
 
 public slots:
@@ -92,7 +86,6 @@ public slots:
                       const QString& review_text, const QString& rating);
     void deleteReview(Review* r);
     void flagReview(Review* r, const QString& reason, const QString &text);
-    void refreshConsumerKeys();
 };
 
 #endif

@@ -37,6 +37,8 @@ set(appsbackend_SRCS
     USCResource.cpp
     UbuntuPurchaseDialog.cpp
     UbuntuPurchasePage.cpp
+    OAuthSession.cpp
+    OAuthPost.cpp
 )
 
 qt4_add_dbus_interface(appsbackend_SRCS ubuntu_sso_dbus_interface.xml ubuntu_sso -i "LoginMetaTypes.h")
