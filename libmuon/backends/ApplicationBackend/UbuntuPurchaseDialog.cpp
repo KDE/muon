@@ -131,6 +131,9 @@ UbuntuPurchaseDialog::UbuntuPurchaseDialog(QWidget *parent)
     // We use the webpage title changing to test w/o a server
     connect(m_webView, SIGNAL(titleChanged(QString)),
             this, SLOT(parseJson(QString)));
+    // The webpage will send us an OAuth token
+    connect(page, SIGNAL(receivedOAuthToken(QString)),
+            this, SLOT(onReceivedOAuthToken(QString)));
     // Auto-connect the cancel signal to close the dialog
     connect(this, SIGNAL(purchaseCancelledByUser()),
             this, SLOT(close()));
