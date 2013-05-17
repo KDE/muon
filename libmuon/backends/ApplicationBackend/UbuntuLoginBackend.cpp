@@ -89,6 +89,12 @@ void UbuntuLoginBackend::successfulLogin(const QString& app, const QMap<QString,
     }
 }
 
+void UbuntuLoginBackend::updateCredentials(const MapString &credentials)
+{
+    m_credentials = credentials;
+    emit connectionStateChanged();
+}
+
 QString UbuntuLoginBackend::appname() const
 {
     return QCoreApplication::instance()->applicationName();

@@ -35,7 +35,7 @@ namespace QOAuth {
     class Interface;
 }
 
-class AbstractLoginBackend;
+class UbuntuLoginBackend;
 class OAuthPost;
 class KJob;
 
@@ -50,10 +50,10 @@ public:
     explicit OAuthSession(QObject *parent = nullptr);
     static OAuthSession* global();
 
-    AbstractLoginBackend *loginBackend() const;
+    UbuntuLoginBackend *loginBackend() const;
 
 private:
-    AbstractLoginBackend* m_loginBackend;
+    UbuntuLoginBackend* m_loginBackend;
     QOAuth::Interface* m_oauthInterface;
     QList<OAuthPost> m_pendingRequests;
 
@@ -65,6 +65,7 @@ signals:
 public slots:
     void postInformation(const OAuthPost &info);
     void refreshConsumerKeys();
+    void updateCredentials(const QMap<QString, QVariant> &creds);
 
 private slots:
     void informationPosted(KJob* job);

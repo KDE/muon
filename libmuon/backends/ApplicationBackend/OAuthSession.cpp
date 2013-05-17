@@ -58,7 +58,7 @@ OAuthSession::OAuthSession(QObject *parent)
     m_oauthInterface = new QOAuth::Interface(this);
 }
 
-AbstractLoginBackend *OAuthSession::loginBackend() const
+UbuntuLoginBackend *OAuthSession::loginBackend() const
 {
     return m_loginBackend;
 }
@@ -74,6 +74,16 @@ void OAuthSession::refreshConsumerKeys()
 
         m_pendingRequests.clear();
     }
+}
+
+void OAuthSession::updateCredentials(const QMap<QString, QVariant> &creds)
+{
+    MapString credentials;
+    for (auto it = creds.constBegin(); it != creds.constEnd(); ++it) {
+        credentials[it.key()] = it.value().toString();
+    }
+
+    m_loginBackend->updateCredentials(credentials);
 }
 
 static QByteArray authorization(QOAuth::Interface* oauth, const KUrl& url, AbstractLoginBackend* login)

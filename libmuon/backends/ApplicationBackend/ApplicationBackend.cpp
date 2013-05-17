@@ -61,7 +61,8 @@
 #include "ApplicationUpdates.h"
 #include "MuonMainWindow.h"
 #include <MuonDataSources.h>
-#include <UbuntuPurchaseDialog.h>
+#include "UbuntuPurchaseDialog.h"
+#include "OAuthSession.h"
 
 static const KCatalogLoader loader("app-install-data");
 
@@ -505,7 +506,6 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
 
     UbuntuPurchaseDialog *d = new UbuntuPurchaseDialog();
     d->startPurchase(app, url);
-    d->show();
 
     // Forward signals to the frontend
     connect(d, SIGNAL(purchaseCancelledByUser()),
@@ -514,6 +514,11 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
             this, SIGNAL(purchaseFailed()));
     connect(d, SIGNAL(purchaseSucceeded()),
             this, SIGNAL(purchaseSucceeded()));
+    // We can use the SSO session from the purchase dialog in the app
+    connect(d, SIGNAL(receivedOAuthToken(QMap<QString,QVariant>)),
+            OAuthSession::global(), SLOT(updateCredentials(QMap<QString,QVariant>)));
+
+    d->show();
 }
 
 int ApplicationBackend::updatesCount() const

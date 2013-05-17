@@ -43,6 +43,9 @@ class UbuntuLoginBackend : public AbstractLoginBackend
         QByteArray consumerKey() const;
         QByteArray consumerSecret() const;
 
+    public slots:
+        void updateCredentials(const MapString &credentials);
+
     private slots:
         void credentialsError(const QString& app, const MapString& a);
         void authorizationDenied(const QString& app);

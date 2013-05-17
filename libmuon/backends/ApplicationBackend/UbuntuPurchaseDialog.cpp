@@ -214,4 +214,6 @@ void UbuntuPurchaseDialog::onReceivedOAuthToken(const QString &json)
     m_oauthToken = tokenData.toMap();
     // Compatibility with OAuth naming
     m_oauthToken["token"] = m_oauthToken.value("token_key");
+
+    emit receivedOAuthToken(m_oauthToken);
 }

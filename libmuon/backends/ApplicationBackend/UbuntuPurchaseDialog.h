@@ -54,6 +54,7 @@ signals:
     void purchaseFailed();
     void purchaseSucceeded();
     void termsOfServiceDeclined();
+    void receivedOAuthToken(const QMap<QString, QVariant> &token);
 
 public slots:
     void startPurchase(USCResource *res, const QUrl &url);
