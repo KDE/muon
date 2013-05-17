@@ -64,11 +64,10 @@ void ReviewsBackend::refreshConsumerKeys()
     if(m_loginBackend->hasCredentials()) {
         m_oauthInterface->setConsumerKey(m_loginBackend->consumerKey());
         m_oauthInterface->setConsumerSecret(m_loginBackend->consumerSecret());
-        
-        QList<QPair<QString, QVariantMap> >::const_iterator it, itEnd;
-        for(it=m_pendingRequests.constBegin(), itEnd=m_pendingRequests.constEnd(); it!=itEnd; ++it) {
-            postInformation(it->first, it->second);
-        }
+
+        for (const QPair<QString, QVariantMap> &request : m_pendingRequests)
+            postInformation(request.first, request.second);
+
         m_pendingRequests.clear();
     }
 }
