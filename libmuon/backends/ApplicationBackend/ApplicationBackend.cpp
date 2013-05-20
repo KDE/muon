@@ -703,10 +703,14 @@ void ApplicationBackend::checkForUpdates()
 
 void ApplicationBackend::fetchUSCResourceList()
 {
-    // FIXME: de-hardcode stuff
     QString urlBase = QLatin1String("https://software-center.ubuntu.com");
-    KIO::StoredTransferJob* job = KIO::storedGet(KUrl(urlBase, "/api/2.0/applications/en/ubuntu/quantal/amd64/"),
-                                                 KIO::NoReload, KIO::DefaultFlags|KIO::HideProgressInfo);
+    QString lang = getLanguage();
+    QString distro = codeName("DISTRIB_CODENAME");
+    QString arch = m_backend->nativeArchitecture();
+
+    KUrl url(urlBase, QString("/api/2.0/applications/%1/ubuntu/%2/%3").arg(lang).arg(distro).arg(arch));
+    KIO::StoredTransferJob* job = KIO::storedGet(url, KIO::NoReload,
+                                                 KIO::DefaultFlags|KIO::HideProgressInfo);
     connect(job, SIGNAL(finished(KJob*)), SLOT(initUSCResources(KJob*)));
 }
 
