@@ -21,6 +21,7 @@
 #include "USCResource.h"
 
 // Qt includes
+#include <QFile>
 #include <QtCore/QStringList>
 
 // KDE includes
@@ -88,10 +89,13 @@ QString USCResource::icon() const
 {
     if (m_icon.isEmpty()) {
         // Check cache for icon
-        if (!m_fetchingIcon) {
+        QString iconsCache = KStandardDirs::locateLocal("data", "libmuon/icons/", true);
+        QString dest = iconsCache + m_iconUrl.split('/').last();
+
+        if (QFile::exists(dest)) {
+            return dest;
+        } else if (!m_fetchingIcon) {
             // Fetch icon
-            QString iconsCache = KStandardDirs::locateLocal("data", "libmuon/icons/", true);
-            KUrl dest(iconsCache, m_iconUrl.split('/').last());
             KIO::FileCopyJob *getJob = KIO::file_copy(KUrl(m_iconUrl), dest, -1,
                                        KIO::Overwrite | KIO::HideProgressInfo);
             connect(getJob, SIGNAL(result(KJob*)), SLOT(iconFetched(KJob*)));
