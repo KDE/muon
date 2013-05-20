@@ -493,7 +493,7 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
     }
 
     // Compose purchase URL
-    KUrl urlBase = KUrl("https://software-center.ubuntu.com"); // FIXME: de-hardcode
+    KUrl urlBase = KUrl("https://software-center.ubuntu.com");
     QString lang = getLanguage();
     QString cName = codeName("DISTRIB_CODENAME");
     QString archiveId = app->archiveId();
@@ -512,13 +512,23 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
             this, SIGNAL(purchaseCancelledByUser()));
     connect(d, SIGNAL(purchaseFailed()),
             this, SIGNAL(purchaseFailed()));
-    connect(d, SIGNAL(purchaseSucceeded()),
+    connect(d, SIGNAL(purchaseSucceeded(QMap<QString, QVariant>)),
             this, SIGNAL(purchaseSucceeded()));
+    connect(d, SIGNAL(purchaseSucceeded(QMap<QString,QVariant>)),
+            this, SLOT(onPurchaseSucceeded(QMap<QString,QVariant>)));
     // We can use the SSO session from the purchase dialog in the app
     connect(d, SIGNAL(receivedOAuthToken(QMap<QString,QVariant>)),
             OAuthSession::global(), SLOT(updateCredentials(QMap<QString,QVariant>)));
 
     d->show();
+}
+
+void ApplicationBackend::onPurchaseSucceeded(const QMap<QString, QVariant> &details)
+{
+    QString debLine = details.value("deb_line").toString();
+    QString signingKeyId = details.value("signing_key_id").toString();
+    QString licenseKey = details.value("license_key").toString();
+    QString licenseKeyPath = details.value("license_key_path").toString();
 }
 
 int ApplicationBackend::updatesCount() const

@@ -195,12 +195,7 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
     }
 
     // Purchase successful
-    emit purchaseSucceeded();
-
-    QString debLine = res.value("deb_line").toString();
-    QString signingKeyId = res.value("signing_key_id").toString();
-    QString licenseKey = res.value("license_key").toString();
-    QString licenseKeyPath = res.value("license_key_path").toString();
+    emit purchaseSucceeded(res);
 }
 
 void UbuntuPurchaseDialog::onReceivedOAuthToken(const QString &json)

@@ -121,6 +121,7 @@ private Q_SLOTS:
     void checkForUpdates();
     void fetchUSCResourceList();
     void initUSCResources(KJob *j);
+    void onPurchaseSucceeded(const QMap<QString, QVariant> &details);
 
 Q_SIGNALS:
 	void startingFirstTransaction();

@@ -52,7 +52,7 @@ private:
 signals:
     void purchaseCancelledByUser();
     void purchaseFailed();
-    void purchaseSucceeded();
+    void purchaseSucceeded(const QMap<QString, QVariant> &details);
     void termsOfServiceDeclined();
     void receivedOAuthToken(const QMap<QString, QVariant> &token);
 
