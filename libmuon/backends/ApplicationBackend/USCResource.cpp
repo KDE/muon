@@ -25,7 +25,9 @@
 
 // KDE includes
 #include <KGlobal>
+#include <KIO/Job>
 #include <KLocale>
+#include <KStandardDirs>
 
 // LibQApt includes
 #include <LibQApt/Backend>
@@ -33,8 +35,10 @@
 USCResource::USCResource(ApplicationBackend *parent,
                          QApt::Backend *backend, const QVariantMap &data)
     : QAptResource(parent, backend)
+    , m_fetchingIcon(false)
 {
     m_name = data.value("name").toString();
+    m_iconUrl = data.value("icon_url").toString();
     QString desc = data.value("description").toString();
     desc.replace(QLatin1String("\r\n"), QLatin1String("<br>"));
     QStringList descSplit = desc.split('\n');
@@ -82,7 +86,31 @@ QString USCResource::name()
 
 QString USCResource::icon() const
 {
-    return QLatin1String("applications-other");
+    if (m_icon.isEmpty()) {
+        // Check cache for icon
+        if (!m_fetchingIcon) {
+            // Fetch icon
+            QString iconsCache = KStandardDirs::locateLocal("data", "libmuon/icons/", true);
+            KUrl dest(iconsCache, m_iconUrl.split('/').last());
+            KIO::FileCopyJob *getJob = KIO::file_copy(KUrl(m_iconUrl), dest, -1,
+                                       KIO::Overwrite | KIO::HideProgressInfo);
+            connect(getJob, SIGNAL(result(KJob*)), SLOT(iconFetched(KJob*)));
+        }
+
+        return QLatin1String("applications-other");
+    }
+
+    return m_icon;
+}
+
+void USCResource::iconFetched(KJob *job)
+{
+    m_fetchingIcon = false;
+    if (job->error()) {
+        m_icon = QLatin1String("applications-other");
+    }
+
+    m_icon = qobject_cast<KIO::FileCopyJob*>(job)->destUrl().fileName();
 }
 
 QString USCResource::comment()

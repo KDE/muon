@@ -80,6 +80,8 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     , m_aptBackendInitialized(false)
 {
     KGlobal::dirs()->addResourceDir("appicon", "/usr/share/app-install/icons/");
+    QString iconsCache = KStandardDirs::locateLocal("data", "libmuon/icons/", true);
+    KGlobal::dirs()->addResourceDir("appicon", iconsCache);
     
     m_watcher = new QFutureWatcher<QVector<QAptResource *>>(this);
     connect(m_watcher, SIGNAL(finished()), this, SLOT(setApplications()));

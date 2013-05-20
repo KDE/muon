@@ -57,6 +57,9 @@ public:
 
 private:
     QString m_name;
+    QString m_iconUrl;
+    QString m_icon;
+    bool m_fetchingIcon;
     QString m_comment;
     QString m_longDesc;
     QString m_packageName;
@@ -71,6 +74,9 @@ private:
     QString m_price;
     QString m_archiveId;
     quint64 m_size;
+
+private slots:
+    void iconFetched(KJob *job);
 };
 
 #endif // USCRESOURCE_H
