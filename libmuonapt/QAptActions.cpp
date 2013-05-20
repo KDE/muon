@@ -85,7 +85,11 @@ MuonMainWindow* QAptActions::mainWindow() const
 void QAptActions::setBackend(QApt::Backend* backend)
 {
     m_backend = backend;
-    connect(m_backend, SIGNAL(packageChanged()), SLOT(setActionsEnabled()));
+    if (!m_backend->init())
+        initError();
+
+    connect(m_backend, SIGNAL(packageChanged()), this, SLOT(setActionsEnabled()));
+
     setOriginalState(m_backend->currentCacheState());
 
     setReloadWhenEditorFinished(true);
@@ -202,6 +206,11 @@ void QAptActions::setActionsEnabledInternal(bool enabled)
     actionCollection()->action("save_markings")->setEnabled(changesPending);
     actionCollection()->action("save_download_list")->setEnabled(changesPending);
     actionCollection()->action("dist-upgrade")->setEnabled(false);
+}
+
+bool QAptActions::reloadWhenSourcesEditorFinished() const
+{
+    return m_reloadWhenEditorFinished;
 }
 
 bool QAptActions::isConnected() const {
@@ -415,7 +424,7 @@ void QAptActions::runSourcesEditor()
 
 void QAptActions::sourcesEditorFinished(int exitStatus)
 {
-    bool reload = (exitStatus == 0);
+    bool reload = (exitStatus != 0);
     m_mainWindow->find(m_mainWindow->effectiveWinId())->setEnabled(true);
     if (m_reloadWhenEditorFinished && reload) {
         actionCollection()->action("update")->trigger();
