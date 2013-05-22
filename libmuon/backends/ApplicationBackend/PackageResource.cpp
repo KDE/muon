@@ -82,18 +82,6 @@ QString PackageResource::categories()
     return QString();
 }
 
-QString PackageResource::license()
-{
-    QString component = package()->component();
-    if (component == "main" || component == "universe") {
-        return i18nc("@info license", "Open Source");
-    } else if (component == "restricted") {
-        return i18nc("@info license", "Proprietary");
-    } else {
-        return i18nc("@info license", "Unknown");
-    }
-}
-
 QUrl PackageResource::screenshotUrl()
 {
     // FIXME, MuonDataSources integration

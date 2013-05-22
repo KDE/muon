@@ -40,7 +40,6 @@ public:
     QString icon() const;
     QString mimetypes() const;
     QString categories();
-    QString license();
     QUrl screenshotUrl();
     QUrl thumbnailUrl();
     bool isTechnical() const;

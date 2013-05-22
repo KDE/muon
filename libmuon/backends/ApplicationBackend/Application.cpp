@@ -237,18 +237,6 @@ QUrl Application::screenshotUrl()
     return url;
 }
 
-QString Application::license()
-{
-    QString component = package()->component();
-    if (component == "main" || component == "universe") {
-        return i18nc("@info license", "Open Source");
-    } else if (component == "restricted") {
-        return i18nc("@info license", "Proprietary");
-    } else {
-        return i18nc("@info license", "Unknown");
-    }
-}
-
 bool Application::isValid() const
 {
     return m_isValid;

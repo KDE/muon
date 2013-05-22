@@ -55,6 +55,18 @@ void QAptResource::clearPackage()
     m_package = nullptr;
 }
 
+QString QAptResource::license()
+{
+    QString component = package()->component();
+    if (component == "main" || component == "universe") {
+        return i18nc("@info license", "Open Source");
+    } else if (component == "restricted") {
+        return i18nc("@info license", "Proprietary");
+    } else {
+        return i18nc("@info license", "Unknown");
+    }
+}
+
 QString QAptResource::installedVersion() const
 {
     if (m_package)

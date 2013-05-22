@@ -44,6 +44,7 @@ public:
     virtual QApt::Package *package() = 0;
     bool isValid() const;
     void clearPackage();
+    QString license();
     QString installedVersion() const;
     State state();
     QList<PackageState> addonsInformation();

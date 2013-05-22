@@ -55,7 +55,6 @@ public:
     QString mimetypes() const;
     QString menuPath();
     QString categories();
-    QString license();
     QUrl screenshotUrl();
     QUrl thumbnailUrl();
     bool isValid() const;
