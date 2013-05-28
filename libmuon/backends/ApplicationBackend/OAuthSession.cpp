@@ -84,6 +84,7 @@ void OAuthSession::updateCredentials(const QMap<QString, QVariant> &creds)
     }
 
     m_loginBackend->updateCredentials(credentials);
+    qDebug() << "credentials updated!";
 }
 
 static QByteArray authorization(QOAuth::Interface* oauth, const KUrl& url, AbstractLoginBackend* login)
@@ -92,12 +93,12 @@ static QByteArray authorization(QOAuth::Interface* oauth, const KUrl& url, Abstr
                                          QOAuth::HMAC_SHA1, QOAuth::ParamMap(), QOAuth::ParseForHeaderArguments);
 }
 
-void OAuthSession::postInformation(const OAuthPost &info)
+KIO::StoredTransferJob *OAuthSession::postInformation(const OAuthPost &info)
 {
     if(!m_loginBackend->hasCredentials()) {
         m_pendingRequests.append(info);
         m_loginBackend->login();
-        return;
+        return nullptr;
     }
 
     KUrl url(info.baseUrl(), info.path());
@@ -105,10 +106,33 @@ void OAuthSession::postInformation(const OAuthPost &info)
 
     KIO::StoredTransferJob* job = KIO::storedHttpPost(QJson::Serializer().serialize(info.data()),
                                                       url, KIO::Overwrite | KIO::HideProgressInfo);
-    job->addMetaData("content-type", "Content-Type: application/json" );
+    job->addMetaData("content-type", "Content-Type: application/json");
     job->addMetaData("customHTTPHeader", "Authorization: " + authorization(m_oauthInterface, url, m_loginBackend));
+    qDebug() << "job metadata:" << job->outgoingMetaData()["customHTTPHeader"];
     connect(job, SIGNAL(result(KJob*)), this, SLOT(informationPosted(KJob*)));
     job->start();
+
+    return job;
+}
+
+KIO::StoredTransferJob *OAuthSession::getInformation(const OAuthPost &info)
+{
+    if(!m_loginBackend->hasCredentials()) {
+        m_pendingRequests.append(info);
+        m_loginBackend->login();
+        return nullptr;
+    }
+
+    KUrl url(info.baseUrl(), info.path());
+    url.setScheme("https");
+
+    KIO::StoredTransferJob* job = KIO::storedGet(url, KIO::NoReload, KIO::Overwrite | KIO::HideProgressInfo);
+    job->addMetaData("customHTTPHeader", "Authorization: " + authorization(m_oauthInterface, url, m_loginBackend));
+    qDebug() << "job metadata:" << job->outgoingMetaData()["customHTTPHeader"];
+    connect(job, SIGNAL(result(KJob*)), this, SLOT(informationPosted(KJob*)));
+    job->start();
+
+    return job;
 }
 
 void OAuthSession::informationPosted(KJob* j)

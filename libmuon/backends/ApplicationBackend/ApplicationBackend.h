@@ -122,11 +122,14 @@ private Q_SLOTS:
     void fetchUSCResourceList();
     void initUSCResources(KJob *j);
     void onPurchaseSucceeded(const QMap<QString, QVariant> &details);
+    void fetchMySubscriptions(bool completeOnly = true);
+    void onMySubsriptionsFetched(KJob *j);
 
 Q_SIGNALS:
 	void startingFirstTransaction();
     void sourcesEditorFinished();
     void aptBackendInitialized(QApt::Backend* backend);
+    void mySubscriptionsFetched(const QString &json);
 };
 
 #endif

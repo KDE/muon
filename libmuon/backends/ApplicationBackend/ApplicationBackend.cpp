@@ -522,6 +522,9 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
     connect(d, SIGNAL(receivedOAuthToken(QMap<QString,QVariant>)),
             OAuthSession::global(), SLOT(updateCredentials(QMap<QString,QVariant>)));
 
+    connect(d, SIGNAL(purchaseCancelledByUser()),
+            this, SLOT(fetchMySubscriptions()));
+
     d->show();
 }
 
@@ -741,6 +744,24 @@ void ApplicationBackend::initUSCResources(KJob *j)
     }
 
     emit backendReady();
+}
+
+void ApplicationBackend::fetchMySubscriptions(bool completeOnly)
+{
+    KUrl urlBase = KUrl("https://software-center.ubuntu.com");
+    QString args = QString("/api/2.0/subscriptions/?complete_only=%1").arg("true");
+
+    OAuthPost post(urlBase, args, QVariantMap());
+    KIO::StoredTransferJob *job = OAuthSession::global()->getInformation(post);
+
+    connect(job, SIGNAL(result(KJob*)), this, SLOT(onMySubsriptionsFetched(KJob*)));
+}
+
+void ApplicationBackend::onMySubsriptionsFetched(KJob *j)
+{
+    KIO::StoredTransferJob* job = qobject_cast<KIO::StoredTransferJob*>(j);
+
+    qDebug() << "subscriptions fetched" << job->data();
 }
 
 QString ApplicationBackend::codeName(const QString& value)

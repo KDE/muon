@@ -31,6 +31,10 @@
 #include "ReviewsBackend/AbstractReviewsBackend.h"
 #include "OAuthPost.h"
 
+namespace KIO {
+    class StoredTransferJob;
+}
+
 namespace QOAuth {
     class Interface;
 }
@@ -63,7 +67,8 @@ signals:
     void loginStateChanged();
 
 public slots:
-    void postInformation(const OAuthPost &info);
+    KIO::StoredTransferJob *postInformation(const OAuthPost &info);
+    KIO::StoredTransferJob *getInformation(const OAuthPost &info);
     void refreshConsumerKeys();
     void updateCredentials(const QMap<QString, QVariant> &creds);
 
