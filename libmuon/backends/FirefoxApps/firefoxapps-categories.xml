@@ -1,0 +1,9 @@
+<Menu>
+  <Menu>
+    <Name>Firefox Apps</Name>
+    <Icon>kalgebra</Icon>
+    <Include>
+        <Category>ffxwebapps</Category>
+    </Include>
+  </Menu>
+</Menu>

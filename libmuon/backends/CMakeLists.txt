@@ -1,3 +1,5 @@
+add_subdirectory(FirefoxApps)
+
 if(LIBATTICA_FOUND)
     add_subdirectory(KNSBackend)
 endif(LIBATTICA_FOUND)

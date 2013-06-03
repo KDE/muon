@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Muon/Backend
+Exec=blubb
+Icon=kalarm
+Name=Web Apps
+GenericName=Web Apps
+Comment=Installed Firefox Apps
+X-KDE-Library=muon-firefoxappsbackend
+X-KDE-PluginInfo-Name=muon-firefoxappsbackend
+X-KDE-PluginInfo-License=GPL
