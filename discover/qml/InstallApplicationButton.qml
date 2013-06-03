@@ -20,7 +20,7 @@ Item {
             right: parent.right
         }
         visible: parent.state=="idle"
-        text: application.isInstalled ? i18n("Install") : i18n("Remove")
+        text: !application.isInstalled ? i18n("Install") : i18n("Remove")
         width: Math.min(parent.width/2, implicitWidth)
         
         onClicked: {
@@ -42,11 +42,10 @@ Item {
         visible: parent.state=="idle"
         anchors {
             verticalCenter: button.verticalCenter
-            right: button.left
             left: parent.left
             rightMargin: 5
         }
-        width: Math.min(parent.width/2, implicitWidth)
+        width: Math.min(parent.width/2-5, button.implicitWidth)
         sourceComponent: application.canUpgrade ? updateButton : additionalItem
     }
     

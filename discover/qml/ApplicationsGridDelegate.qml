@@ -25,8 +25,6 @@ import QtQuick 1.1
 GridItem {
     id: delegateRoot
     clip: true
-    width: parentItem.cellWidth
-    height: parentItem.cellHeight
     property bool requireClick: false
     property bool displayDescription: false
     enabled: true
@@ -49,12 +47,17 @@ GridItem {
             displayDescription=false
         }
     }
+    onDisplayDescriptionChanged: {
+        if(delegateRoot.displayDescription)
+            descriptionLoader.sourceComponent=extraInfoComponent
+    }
 
     Flickable {
         id: delegateFlickable
         anchors.fill: parent
         contentHeight: delegateRoot.height*2
         interactive: false
+        contentY: delegateRoot.displayDescription ? delegateRoot.height : 0
         Behavior on contentY { NumberAnimation { duration: 200; easing.type: Easing.InQuad } }
         
         Image {
@@ -64,42 +67,32 @@ GridItem {
                 top: parent.top
                 topMargin: 5
             }
-            source: model.application.thumbnailUrl
+            property bool hasThumbnail: model.application.thumbnailUrl!=""
+            source: hasThumbnail ? model.application.thumbnailUrl : "image://icon/"+model.application.icon
             height: delegateRoot.height*0.7
             fillMode: Image.PreserveAspectFit
-            smooth: true
+            smooth: false
             cache: false
             asynchronous: true
             onStatusChanged:  {
                 if(status==Image.Error) {
-                    fallbackToIcon()
+                    hasThumbnail=false
                 }
             }
-            Component.onCompleted: {
-                if(model.application.thumbnailUrl=="")
-                    fallbackToIcon();
-            }
-            
-            function fallbackToIcon() { state = "fallback" }
-            state: "normal"
-            states: [
-                State { name: "normal" },
-                State { name: "fallback"
-                    PropertyChanges { target: screen; smooth: true }
-                    PropertyChanges { target: screen; source: "image://icon/"+model.application.icon}
-                    PropertyChanges { target: smallIcon; width: 0 }
-                }
-            ]
         }
-        IconItem {
+        Image {
             id: smallIcon
             anchors {
                 right: parent.right
                 rightMargin: 5
             }
+            y: 5+(delegateRoot.displayDescription ? delegateRoot.height : screen.height-height )
             width: 48
             height: width
-            source: model.application.icon
+            smooth: true
+            asynchronous: true
+            source: "image://icon/"+model.application.icon
+            visible: screen.hasThumbnail
             Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.InQuad } }
         }
         Label {
@@ -122,26 +115,9 @@ GridItem {
                 top: parent.verticalCenter
                 bottomMargin: 10
             }
+            clip: true
         }
     }
-    onStateChanged: {
-        if(state=="description")
-            descriptionLoader.sourceComponent=extraInfoComponent
-    }
-    
-    state: "screenshot"
-    states: [
-        State { name: "screenshot"
-            when: !delegateRoot.displayDescription
-            PropertyChanges { target: smallIcon; y: 5+screen.height-height }
-            PropertyChanges { target: delegateFlickable; contentY: 0 }
-        },
-        State { name: "description"
-            when: delegateRoot.displayDescription
-            PropertyChanges { target: smallIcon; y: 5+delegateRoot.height }
-            PropertyChanges { target: delegateFlickable; contentY: delegateRoot.height }
-        }
-    ]
     
     Component {
         id: extraInfoComponent
@@ -167,6 +143,7 @@ GridItem {
                     bottom: parent.bottom
                     left: parent.left
                     right: parent.right
+                    bottomMargin: 5
                 }
                 application: model.application
                 additionalItem: Rating {
