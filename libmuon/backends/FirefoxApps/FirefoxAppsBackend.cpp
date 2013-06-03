@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QTimer>
+#include <QFile>
 
 K_PLUGIN_FACTORY(MuonFirefoxAppsBackendFactory, registerPlugin<FirefoxAppsBackend>(); )
 K_EXPORT_PLUGIN(MuonFirefoxAppsBackendFactory(KAboutData("muon-dummybackend","muon-dummybackend",ki18n("FirefoxApps Backend"),"0.1",ki18n("FirefoxApps backend to test muon frontends"), KAboutData::License_GPL)))
@@ -103,16 +104,22 @@ void FirefoxAppsBackend::installApplication(AbstractResource* app, AddonList )
     installApplication(app);
 }
 
-void FirefoxAppsBackend::installApplication(AbstractResource* app)
+void FirefoxAppsBackend::installApplication(AbstractResource* /*app*/)
 {
+    Q_ASSERT(false && "not possible");
 // 	TransactionModel *transModel = TransactionModel::global();
 // 	transModel->addTransaction(new FirefoxAppsTransaction(qobject_cast<FirefoxAppsResource*>(app), Transaction::InstallRole));
 }
 
 void FirefoxAppsBackend::removeApplication(AbstractResource* app)
 {
-// 	TransactionModel *transModel = TransactionModel::global();
-// 	transModel->addTransaction(new FirefoxAppsTransaction(qobject_cast<FirefoxAppsResource*>(app), Transaction::RemoveRole));
+    Transaction* t = new Transaction(this, app, Transaction::RemoveRole);
+    TransactionModel *transModel = TransactionModel::global();
+    transModel->addTransaction(t);
+    FirefoxAppsResource* r = qobject_cast<FirefoxAppsResource*>(app);
+    Q_ASSERT(r);
+    r->remove();
+    transModel->removeTransaction(t);
 }
 
 void FirefoxAppsBackend::cancelTransaction(AbstractResource*)

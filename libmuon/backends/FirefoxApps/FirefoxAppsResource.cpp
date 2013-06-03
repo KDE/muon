@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include "FirefoxAppsResource.h"
+#include <KConfigGroup>
+#include <KProcess>
+#include <QDebug>
 
 FirefoxAppsResource::FirefoxAppsResource(const QString& path, AbstractResourcesBackend* parent)
     : AbstractResource(parent)
@@ -43,4 +46,17 @@ QString FirefoxAppsResource::comment() { return m_desktop.readComment(); }
 QString FirefoxAppsResource::name() { return m_desktop.readName(); }
 QString FirefoxAppsResource::packageName() const { return m_desktop.fileName(); }
 void FirefoxAppsResource::fetchChangelog() { emit changelogFetched(QString()); }
+QString FirefoxAppsResource::path() const { return m_desktop.fileName(); }
 
+void FirefoxAppsResource::remove()
+{
+    KConfigGroup uninstallGroup = m_desktop.actionGroup("Uninstall");
+    QString exec = uninstallGroup.readEntry("Exec");
+    if(exec.isEmpty()) {
+        qWarning() << "error: no Exec entry for" << path();
+    } else {
+        KProcess p;
+        p.setShellCommand(exec);
+        p.startDetached();
+    }
+}

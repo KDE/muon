@@ -49,6 +49,9 @@ public:
     virtual QString packageName() const;
     virtual void fetchChangelog();
 
+    QString path() const;
+    void remove();
+
 private:
     KDesktopFile m_desktop;
 };
