@@ -124,6 +124,7 @@ private Q_SLOTS:
     void onPurchaseSucceeded(const QMap<QString, QVariant> &details);
     void fetchMySubscriptions(bool completeOnly = true);
     void onMySubsriptionsFetched(KJob *j);
+    void addLicenseKey(const QString &license, const QString &licensePath);
 
 Q_SIGNALS:
 	void startingFirstTransaction();

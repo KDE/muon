@@ -42,6 +42,7 @@
 
 // LibQApt/DebconfKDE includes
 #include <LibQApt/Backend>
+#include <LibQApt/SourcesList>
 #include <LibQApt/Transaction>
 #include <DebconfGui.h>
 #include <qjson/parser.h>
@@ -534,6 +535,41 @@ void ApplicationBackend::onPurchaseSucceeded(const QMap<QString, QVariant> &deta
     QString signingKeyId = details.value("signing_key_id").toString();
     QString licenseKey = details.value("license_key").toString();
     QString licenseKeyPath = details.value("license_key_path").toString();
+
+    // Add license key
+    addLicenseKey(licenseKey, licenseKeyPath);
+
+    // Add sources list entry
+    QApt::SourcesList list;
+    QApt::SourceEntry entry(debLine);
+    if (entry.isValid()) {
+        list.addEntry(entry);
+        list.save();
+    } else
+        qWarning() << "Tried to add invalid source entry from purchase";
+}
+
+void ApplicationBackend::addLicenseKey(const QString &license, const QString &licensePath)
+{
+    if (!licensePath.startsWith('~')) {
+        // FIXME: system-wide keys not yet supported
+    } else {
+        // Add license locally
+        QDir dir;
+        QString dest = dir.absoluteFilePath(licensePath);
+        dir = QFileInfo(dest).absoluteDir();
+
+        if (!dir.exists())
+            dir.mkdir(dir.absolutePath());
+
+        // Write license key to file
+        QFile destFile(dest);
+        if (!destFile.exists()) {
+            destFile.open(QFile::WriteOnly);
+            destFile.write(license.toLocal8Bit());
+            destFile.close();
+        }
+    }
 }
 
 int ApplicationBackend::updatesCount() const
