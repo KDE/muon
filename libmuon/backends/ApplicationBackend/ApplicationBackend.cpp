@@ -547,6 +547,24 @@ void ApplicationBackend::onPurchaseSucceeded(const QMap<QString, QVariant> &deta
         list.save();
     } else
         qWarning() << "Tried to add invalid source entry from purchase";
+
+    // Add vendor signing key
+
+    // Reload sources list
+
+    // Connect reload finish to onReloadForCommercialRepo
+}
+
+void ApplicationBackend::reloadForCommercialRepoFinished(USCResource *resource)
+{
+    QApt::Package *package = resource->package();
+
+    if (!package) {
+        qWarning() << "Tried to install unavailable USCResource " << resource->name();
+        return;
+    }
+
+    installApplication(resource);
 }
 
 void ApplicationBackend::addLicenseKey(const QString &license, const QString &licensePath)

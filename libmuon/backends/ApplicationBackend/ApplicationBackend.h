@@ -46,6 +46,7 @@ class Transaction;
 class QAptActions;
 class QAptResource;
 class KJob;
+class USCResource;
 
 class ApplicationBackend : public AbstractResourcesBackend
 {
@@ -125,6 +126,7 @@ private Q_SLOTS:
     void fetchMySubscriptions(bool completeOnly = true);
     void onMySubsriptionsFetched(KJob *j);
     void addLicenseKey(const QString &license, const QString &licensePath);
+    void reloadForCommercialRepoFinished(USCResource *resource);
 
 Q_SIGNALS:
 	void startingFirstTransaction();
