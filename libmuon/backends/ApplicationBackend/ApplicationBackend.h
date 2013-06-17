@@ -88,6 +88,7 @@ private:
 
     QFutureWatcher<QVector<QAptResource *>> *m_watcher;
     QVector<QAptResource *> m_appList;
+    USCResource *m_purchasedResource;
 
     // Transactions
     QHash<Transaction *, QApt::Transaction *> m_transQueue;
@@ -122,17 +123,19 @@ private Q_SLOTS:
     void checkForUpdates();
     void fetchUSCResourceList();
     void initUSCResources(KJob *j);
-    void onPurchaseSucceeded(const QMap<QString, QVariant> &details);
+    void onPurchaseSucceeded(USCResource *resource, const QMap<QString, QVariant> &details);
     void fetchMySubscriptions(bool completeOnly = true);
     void onMySubsriptionsFetched(KJob *j);
     void addLicenseKey(const QString &license, const QString &licensePath);
-    void reloadForCommercialRepoFinished(USCResource *resource);
+    void reloadForCommercialRepo(USCResource *resource);
+    void onReloadForCommercialRepoFinished();
 
 Q_SIGNALS:
 	void startingFirstTransaction();
     void sourcesEditorFinished();
     void aptBackendInitialized(QApt::Backend* backend);
     void mySubscriptionsFetched(const QString &json);
+    void reloadForCommercialRepoFinished(USCResource *resource);
 };
 
 #endif

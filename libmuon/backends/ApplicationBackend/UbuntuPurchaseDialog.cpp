@@ -194,7 +194,7 @@ void UbuntuPurchaseDialog::parseJson(const QString &json)
     }
 
     // Purchase successful
-    emit purchaseSucceeded(res);
+    emit purchaseSucceeded(m_resource, res);
 }
 
 void UbuntuPurchaseDialog::onReceivedOAuthToken(const QString &json)

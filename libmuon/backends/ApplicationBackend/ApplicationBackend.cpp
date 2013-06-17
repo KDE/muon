@@ -517,8 +517,8 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
             this, SIGNAL(purchaseFailed()));
     connect(d, SIGNAL(purchaseSucceeded(QMap<QString, QVariant>)),
             this, SIGNAL(purchaseSucceeded()));
-    connect(d, SIGNAL(purchaseSucceeded(QMap<QString,QVariant>)),
-            this, SLOT(onPurchaseSucceeded(QMap<QString,QVariant>)));
+    connect(d, SIGNAL(purchaseSucceeded(USCResource*,QMap<QString,QVariant>)),
+            this, SLOT(onPurchaseSucceeded(USCResource*,QMap<QString,QVariant>)));
     // We can use the SSO session from the purchase dialog in the app
     connect(d, SIGNAL(receivedOAuthToken(QMap<QString,QVariant>)),
             OAuthSession::global(), SLOT(updateCredentials(QMap<QString,QVariant>)));
@@ -529,7 +529,7 @@ void ApplicationBackend::purchaseApplication(AbstractResource *res)
     d->show();
 }
 
-void ApplicationBackend::onPurchaseSucceeded(const QMap<QString, QVariant> &details)
+void ApplicationBackend::onPurchaseSucceeded(USCResource *resource, const QMap<QString, QVariant> &details)
 {
     QString debLine = details.value("deb_line").toString();
     QString signingKeyId = details.value("signing_key_id").toString();
@@ -551,20 +551,33 @@ void ApplicationBackend::onPurchaseSucceeded(const QMap<QString, QVariant> &deta
     // Add vendor signing key
 
     // Reload sources list
-
-    // Connect reload finish to onReloadForCommercialRepo
+    connect(this, SIGNAL(reloadForCommercialRepoFinished(USCResource*)),
+            this, SLOT(onReloadForCommercialRepoFinished(USCResource*)));
+    reloadForCommercialRepo(resource);
 }
 
-void ApplicationBackend::reloadForCommercialRepoFinished(USCResource *resource)
+void ApplicationBackend::reloadForCommercialRepo(USCResource *resource)
 {
-    QApt::Package *package = resource->package();
+    m_purchasedResource = resource;
+    // FIXME: support single-source updating in worker.
+    QApt::Transaction* transaction = backend()->updateCache();
+    m_backendUpdater->setupTransaction(transaction);
+    transaction->run();
+
+    connect(transaction, SIGNAL(finished(QApt::ExitStatus)),
+            this, SLOT(onReloadForCommercialRepoFinished()));
+}
+
+void ApplicationBackend::onReloadForCommercialRepoFinished()
+{
+    QApt::Package *package = m_purchasedResource->package();
 
     if (!package) {
-        qWarning() << "Tried to install unavailable USCResource " << resource->name();
+        qWarning() << "Tried to install unavailable USCResource " << m_purchasedResource->name();
         return;
     }
 
-    installApplication(resource);
+    installApplication(m_purchasedResource);
 }
 
 void ApplicationBackend::addLicenseKey(const QString &license, const QString &licensePath)
@@ -758,7 +771,6 @@ void ApplicationBackend::checkForUpdates()
     QApt::Transaction* transaction = backend()->updateCache();
     m_backendUpdater->setupTransaction(transaction);
     transaction->run();
-
 }
 
 void ApplicationBackend::fetchUSCResourceList()
