@@ -1,7 +1,7 @@
 <Menu>
   <Menu>
     <Name>Firefox Apps</Name>
-    <Icon>kalgebra</Icon>
+    <Icon>firefox</Icon>
     <Include>
         <Category>ffxwebapps</Category>
     </Include>
