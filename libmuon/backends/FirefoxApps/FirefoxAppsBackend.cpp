@@ -121,16 +121,14 @@ AbstractReviewsBackend* FirefoxAppsBackend::reviewsBackend() const
     return nullptr;
 }
 
-void FirefoxAppsBackend::installApplication(AbstractResource* app, AddonList )
+void FirefoxAppsBackend::installApplication(AbstractResource* app, AddonList)
 {
     installApplication(app);
 }
 
-void FirefoxAppsBackend::installApplication(AbstractResource* /*app*/)
+void FirefoxAppsBackend::installApplication(AbstractResource* app)
 {
-    Q_ASSERT(false && "not possible");
-// 	TransactionModel *transModel = TransactionModel::global();
-// 	transModel->addTransaction(new FirefoxAppsTransaction(qobject_cast<FirefoxAppsResource*>(app), Transaction::InstallRole));
+    QDesktopServices::openUrl(app->homepage());
 }
 
 void FirefoxAppsBackend::removeApplication(AbstractResource* app)

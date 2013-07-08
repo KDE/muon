@@ -44,7 +44,7 @@ public:
 
     virtual void cancelTransaction(AbstractResource* app);
     virtual void installApplication(AbstractResource* app);
-    virtual void installApplication(AbstractResource* app, AddonList addons);
+    virtual void installApplication(AbstractResource* app, AddonList);
     virtual void removeApplication(AbstractResource* app);
 
 private slots:
