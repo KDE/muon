@@ -32,6 +32,10 @@
 #include <QThread>
 #include <QTimer>
 #include <QFile>
+#include <QFileSystemWatcher>
+#include <QFileInfo>
+#include <QDir>
+#include <QDesktopServices>
 
 K_PLUGIN_FACTORY(MuonFirefoxAppsBackendFactory, registerPlugin<FirefoxAppsBackend>(); )
 K_EXPORT_PLUGIN(MuonFirefoxAppsBackendFactory(KAboutData("muon-dummybackend","muon-dummybackend",ki18n("FirefoxApps Backend"),"0.1",ki18n("FirefoxApps backend to test muon frontends"), KAboutData::License_GPL)))
@@ -39,13 +43,31 @@ K_EXPORT_PLUGIN(MuonFirefoxAppsBackendFactory(KAboutData("muon-dummybackend","mu
 FirefoxAppsBackend::FirefoxAppsBackend(QObject* parent, const QVariantList&)
     : AbstractResourcesBackend(parent)
     , m_updater(new StandardBackendUpdater(this))
+    , m_watcher(new QFileSystemWatcher(this))
 {
     QStringList resources = KGlobal::dirs()->findAllResources("xdgdata-apps", "*.desktop");
-    qDebug() << "woooo" << resources;
     foreach(const QString& resource, resources) {
         if(resource.contains("/owa-http")) {
             m_resources.insert(resource, new FirefoxAppsResource(resource, this));
+            m_watcher->addPath(QFileInfo(resource).dir().path());
         }
+    }
+    connect(m_watcher, SIGNAL(fileChanged(QString)), SLOT(fileChanged(QString)));
+    connect(m_watcher, SIGNAL(directoryChanged(QString)), SLOT(directoryChanged(QString)));
+}
+
+void FirefoxAppsBackend::fileChanged(const QString& path)
+{
+    if(FirefoxAppsResource* res = m_resources.value(path)) {
+        res->notifyStateChange();
+    }
+}
+
+void FirefoxAppsBackend::directoryChanged(const QString& path)
+{
+    for(QHash<QString, FirefoxAppsResource*>::const_iterator it=m_resources.constBegin(), itEnd=m_resources.constEnd(); it!=itEnd; ++it) {
+        if(it.key().startsWith(path))
+            it.value()->notifyStateChange();
     }
 }
 

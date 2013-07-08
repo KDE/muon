@@ -51,6 +51,7 @@ public:
 
     QString path() const;
     void remove();
+    void notifyStateChange();
 
 private:
     KDesktopFile m_desktop;

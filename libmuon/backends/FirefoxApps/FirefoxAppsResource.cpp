@@ -21,12 +21,24 @@
 #include "FirefoxAppsResource.h"
 #include <KConfigGroup>
 #include <KProcess>
+#include <kshell.h>
 #include <QDebug>
+#include <QFile>
 
 FirefoxAppsResource::FirefoxAppsResource(const QString& path, AbstractResourcesBackend* parent)
     : AbstractResource(parent)
     , m_desktop(path)
 {}
+
+AbstractResource::State FirefoxAppsResource::state()
+{
+    return QFile::exists(m_desktop.fileName()) ? AbstractResource::Installed : AbstractResource::None;
+}
+
+QUrl FirefoxAppsResource::homepage() const
+{
+    return QUrl("https://marketplace.firefox.com/search?q=\""+m_desktop.readName()+'"');
+}
 
 QList<PackageState> FirefoxAppsResource::addonsInformation() { return QList<PackageState>(); }
 QString FirefoxAppsResource::section() { return "webapps"; }
@@ -38,9 +50,7 @@ QString FirefoxAppsResource::license() { return "unknown"; }
 int FirefoxAppsResource::downloadSize() { return 0; }
 QUrl FirefoxAppsResource::screenshotUrl() { return QUrl(); }
 QUrl FirefoxAppsResource::thumbnailUrl() { return QUrl(); }
-QUrl FirefoxAppsResource::homepage() const { return QUrl(); }
 QString FirefoxAppsResource::categories() { return "ffxwebapps"; }
-AbstractResource::State FirefoxAppsResource::state() { return AbstractResource::Installed; }
 QString FirefoxAppsResource::icon() const { return m_desktop.readIcon(); }
 QString FirefoxAppsResource::comment() { return m_desktop.readComment(); }
 QString FirefoxAppsResource::name() { return m_desktop.readName(); }
@@ -55,8 +65,15 @@ void FirefoxAppsResource::remove()
     if(exec.isEmpty()) {
         qWarning() << "error: no Exec entry for" << path();
     } else {
-        KProcess p;
-        p.setShellCommand(exec);
-        p.startDetached();
+        QStringList args = KShell::splitArgs(exec);
+        QProcess* p = new QProcess;
+        p->start(args.takeFirst(), args);
+        connect(p, SIGNAL(finished(int)), this, SIGNAL(stateChanged()));
+        connect(p, SIGNAL(finished(int)), p, SLOT(deleteLater()));
     }
+}
+
+void FirefoxAppsResource::notifyStateChange()
+{
+    emit stateChanged();
 }
