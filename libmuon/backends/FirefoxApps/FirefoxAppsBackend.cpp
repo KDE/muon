@@ -35,6 +35,7 @@
 #include <QFileSystemWatcher>
 #include <QFileInfo>
 #include <QDir>
+#include <QProcess>
 #include <QDesktopServices>
 
 K_PLUGIN_FACTORY(MuonFirefoxAppsBackendFactory, registerPlugin<FirefoxAppsBackend>(); )
@@ -128,7 +129,7 @@ void FirefoxAppsBackend::installApplication(AbstractResource* app, AddonList)
 
 void FirefoxAppsBackend::installApplication(AbstractResource* app)
 {
-    QDesktopServices::openUrl(app->homepage());
+    QProcess::startDetached("firefox", QStringList() << app->homepage().toString());
 }
 
 void FirefoxAppsBackend::removeApplication(AbstractResource* app)
