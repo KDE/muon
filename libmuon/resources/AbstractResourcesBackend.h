@@ -81,35 +81,35 @@ class MUONPRIVATE_EXPORT AbstractResourcesBackend : public QObject
          * to the searchText and return those AbstractResources.
          * @returns the list of resources whose name contains searchText
          */
-        virtual QList<AbstractResource*> searchPackageName(const QString &searchText) = 0;//FIXME: Probably provide a standard implementation?!
+        virtual QList<AbstractResource*> searchPackageName(const QString &searchText);
         
         /**
          * @returns the reviews backend of this AbstractResourcesBackend (which handles all ratings and reviews of resources)
          */
-        virtual AbstractReviewsBackend* reviewsBackend() const = 0;//FIXME: Have a standard impl which returns 0?
+        virtual AbstractReviewsBackend* reviewsBackend() const;
         
         /**
          * @returns the class which is used by muon to update the users system, if you are unsure what to do
          * just return the StandardBackendUpdater
          */
-        virtual AbstractBackendUpdater* backendUpdater() const = 0;//FIXME: Standard impl returning the standard updater?
+        virtual AbstractBackendUpdater* backendUpdater() const = 0;
         
         /**
          * @returns the number of resources for which an update is available, it should only count technical packages
          */
-        virtual int updatesCount() const = 0;//FIXME: Probably provide a standard implementation?!
+        virtual int updatesCount() const;
         
         /**
          * Gets a resource identified by the name
          * @param name the name to search for
          * @returns the resource with the provided name
          */
-        virtual AbstractResource* resourceByPackageName(const QString& name) const = 0;//FIXME: Even this could get a standard impl
+        virtual AbstractResource* resourceByPackageName(const QString& name) const;
         
         /**
          * @returns all resources for which an update is available
          */
-        virtual QList<AbstractResource*> upgradeablePackages() const = 0;//FIXME: Do a standard impl as well
+        virtual QList<AbstractResource*> upgradeablePackages() const;
         
         /**
          * This method gets called while initializing the GUI, in case the backend needs to

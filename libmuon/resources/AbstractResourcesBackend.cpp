@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "AbstractResourcesBackend.h"
+#include "AbstractResource.h"
 #include <QHash>
 
 AbstractResourcesBackend::AbstractResourcesBackend(QObject* parent)
@@ -32,3 +33,48 @@ void AbstractResourcesBackend::installApplication(AbstractResource* app)
 
 void AbstractResourcesBackend::integrateMainWindow(MuonMainWindow*)
 {}
+
+QList<AbstractResource*> AbstractResourcesBackend::searchPackageName(const QString &searchText)
+{
+    QList<AbstractResource*> search;
+    foreach (AbstractResource * res, allResources()) {
+        if (res->name().contains(searchText))
+            search << res;
+    }
+    return search;
+}
+
+int AbstractResourcesBackend::updatesCount() const
+{
+    int count = 0;
+    foreach (AbstractResource * res, allResources()) {
+        if (res->state() == AbstractResource::Upgradeable && !res->isTechnical())
+            count++;
+    }
+    return count;
+}
+
+AbstractReviewsBackend* AbstractResourcesBackend::reviewsBackend() const
+{
+    return 0;
+}
+
+AbstractResource* AbstractResourcesBackend::resourceByPackageName(const QString& name) const
+{
+    foreach (AbstractResource * res, allResources()) {
+        if (res->name() == name)
+            return res;
+    }
+    return 0;
+}
+
+QList<AbstractResource*> AbstractResourcesBackend::upgradeablePackages() const
+{
+    QList<AbstractResource*> list;
+    foreach (AbstractResource * res, allResources()) {
+        if (res->state() == AbstractResource::Upgradeable) {
+            list << res;
+        }
+    }
+    return list;
+}
