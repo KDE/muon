@@ -29,14 +29,10 @@
 #include <KPluginFactory>
 #include <KStandardDirs>
 #include <QDebug>
-#include <QThread>
-#include <QTimer>
-#include <QFile>
 #include <QFileSystemWatcher>
 #include <QFileInfo>
-#include <QDir>
 #include <QProcess>
-#include <QDesktopServices>
+#include <QDir>
 
 K_PLUGIN_FACTORY(MuonFirefoxAppsBackendFactory, registerPlugin<FirefoxAppsBackend>(); )
 K_EXPORT_PLUGIN(MuonFirefoxAppsBackendFactory(KAboutData("muon-dummybackend","muon-dummybackend",ki18n("FirefoxApps Backend"),"0.1",ki18n("FirefoxApps backend to test muon frontends"), KAboutData::License_GPL)))
