@@ -1,5 +1,3 @@
-add_subdirectory(FirefoxApps)
-
 if(LIBATTICA_FOUND)
     add_subdirectory(KNSBackend)
 endif(LIBATTICA_FOUND)
@@ -16,3 +14,8 @@ OPTION(BUILD_DummyBackend "Build the DummyBackend" "OFF")
 if(BUILD_DummyBackend)
     add_subdirectory(DummyBackend)
 endif(BUILD_DummyBackend)
+
+OPTION(BUILD_FirefoxAppsBackend "Build the FirefoxApps backend" "OFF")
+if(BUILD_FirefoxAppsBackend)
+    add_subdirectory(FirefoxApps)
+endif(BUILD_FirefoxAppsBackend)
