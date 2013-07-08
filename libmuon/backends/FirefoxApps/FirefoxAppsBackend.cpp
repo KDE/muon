@@ -29,7 +29,7 @@
 #include <KPluginFactory>
 #include <KStandardDirs>
 #include <QDebug>
-#include <QFileSystemWatcher>
+#include <KDirWatch>
 #include <QFileInfo>
 #include <QProcess>
 #include <QDir>
@@ -40,31 +40,36 @@ K_EXPORT_PLUGIN(MuonFirefoxAppsBackendFactory(KAboutData("muon-dummybackend","mu
 FirefoxAppsBackend::FirefoxAppsBackend(QObject* parent, const QVariantList&)
     : AbstractResourcesBackend(parent)
     , m_updater(new StandardBackendUpdater(this))
-    , m_watcher(new QFileSystemWatcher(this))
+    , m_watcher(new KDirWatch(this))
 {
+    QSet<QString> dirs;
     QStringList resources = KGlobal::dirs()->findAllResources("xdgdata-apps", "*.desktop");
     foreach(const QString& resource, resources) {
         if(resource.contains("/owa-http")) {
             m_resources.insert(resource, new FirefoxAppsResource(resource, this));
-            m_watcher->addPath(QFileInfo(resource).dir().path());
+            m_watcher->addDir(QFileInfo(resource).dir().path(), KDirWatch::WatchFiles);
         }
     }
-    connect(m_watcher, SIGNAL(fileChanged(QString)), SLOT(fileChanged(QString)));
-    connect(m_watcher, SIGNAL(directoryChanged(QString)), SLOT(directoryChanged(QString)));
+
+    connect(m_watcher, SIGNAL(created(QString)), SLOT(webappCreated(QString)));
+    connect(m_watcher, SIGNAL(deleted(QString)), SLOT(webappDeleted(QString)));
 }
 
-void FirefoxAppsBackend::fileChanged(const QString& path)
+void FirefoxAppsBackend::webappDeleted(const QString& path)
 {
+//     qDebug() << "webapp deleted: " << path;
     if(FirefoxAppsResource* res = m_resources.value(path)) {
         res->notifyStateChange();
     }
 }
 
-void FirefoxAppsBackend::directoryChanged(const QString& path)
+void FirefoxAppsBackend::webappCreated(const QString& path)
 {
-    for(QHash<QString, FirefoxAppsResource*>::const_iterator it=m_resources.constBegin(), itEnd=m_resources.constEnd(); it!=itEnd; ++it) {
-        if(it.key().startsWith(path))
-            it.value()->notifyStateChange();
+//     qDebug() << "webapp created: " << path;
+    if(path.contains("/owa-http")) {
+        reloadStarted();
+        m_resources.insert(path, new FirefoxAppsResource(path, this));
+        reloadFinished();
     }
 }
 

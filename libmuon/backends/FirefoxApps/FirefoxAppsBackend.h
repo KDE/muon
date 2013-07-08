@@ -24,7 +24,7 @@
 #include <resources/AbstractResourcesBackend.h>
 #include <QVariantList>
 
-class QFileSystemWatcher;
+class KDirWatch;
 class FirefoxAppsResource;
 class FirefoxAppsBackend : public AbstractResourcesBackend
 {
@@ -48,13 +48,13 @@ public:
     virtual void removeApplication(AbstractResource* app);
 
 private slots:
-    void fileChanged(const QString& path);
-    void directoryChanged(const QString& path);
+    void webappCreated(const QString& path);
+    void webappDeleted(const QString& path);
 
 private:
     QHash<QString, FirefoxAppsResource*> m_resources;
     AbstractBackendUpdater* m_updater;
-    QFileSystemWatcher* m_watcher;
+    KDirWatch* m_watcher;
 };
 
 #endif // FirefoxAppsBackendBACKEND_H
