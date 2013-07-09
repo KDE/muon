@@ -69,7 +69,7 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     : AbstractResourcesBackend(parent)
     , m_backend(new QApt::Backend(this))
     , m_reviewsBackend(new ReviewsBackend(this))
-    , m_isReloading(false)
+    , m_isFetching(false)
     , m_currentTransaction(nullptr)
     , m_backendUpdater(new ApplicationUpdates(this))
     , m_aptify(nullptr)
@@ -79,8 +79,6 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     
     m_watcher = new QFutureWatcher<QVector<Application*> >(this);
     connect(m_watcher, SIGNAL(finished()), this, SLOT(setApplications()));
-    connect(this, SIGNAL(reloadFinished()), SIGNAL(updatesCountChanged()));
-    connect(this, SIGNAL(backendReady()), SIGNAL(updatesCountChanged()));
     connect(m_reviewsBackend, SIGNAL(ratingsReady()), SIGNAL(allDataChanged()));
     
     QTimer::singleShot(10, this, SLOT(initBackend()));
@@ -142,8 +140,6 @@ void ApplicationBackend::setApplications()
     m_appList = m_watcher->future().result();
     for (Application* app : m_appList)
         app->setParent(this);
-
-    emit backendReady();
     
     KIO::StoredTransferJob* job = KIO::storedGet(KUrl(MuonDataSources::screenshotsSource(), "/json/packages"),KIO::NoReload, KIO::DefaultFlags|KIO::HideProgressInfo);
     connect(job, SIGNAL(finished(KJob*)), SLOT(initAvailablePackages(KJob*)));
@@ -156,8 +152,7 @@ void ApplicationBackend::reload()
 {
     if (m_aptify)
         m_aptify->setCanExit(false);
-    emit reloadStarted();
-    m_isReloading = true;
+    setFetching(true);
     foreach(Application* app, m_appList)
         app->clearPackage();
     qDeleteAll(m_transQueue);
@@ -170,16 +165,16 @@ void ApplicationBackend::reload()
     foreach(Application* app, m_appList)
         app->package();
 
-    m_isReloading = false;
+    m_isFetching = false;
     if (m_aptify)
         m_aptify->setCanExit(true);
-    emit reloadFinished();
+    setFetching(false);
     emit searchInvalidated();
 }
 
 bool ApplicationBackend::isReloading() const
 {
-    return m_isReloading;
+    return m_isFetching;
 }
 
 bool ApplicationBackend::isValid() const
@@ -472,7 +467,7 @@ void ApplicationBackend::removeApplication(AbstractResource* app)
 
 int ApplicationBackend::updatesCount() const
 {
-    if(m_isReloading)
+    if(m_isFetching)
         return 0;
 
     int count = 0;
@@ -621,4 +616,16 @@ void ApplicationBackend::checkForUpdates()
     m_backendUpdater->setupTransaction(transaction);
     transaction->run();
 
+}
+
+bool ApplicationBackend::setFetching(bool f)
+{
+    if(m_isFetching == f) {
+        m_isFetching = f;
+        emit fetchingChanged();
+        if(m_isFetching) {
+            emit searchInvalidated();
+            emit updatesCountChanged();
+        }
+    }
 }

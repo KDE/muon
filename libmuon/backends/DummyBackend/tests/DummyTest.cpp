@@ -41,11 +41,11 @@ AbstractResourcesBackend* backendByName(ResourcesModel* m, const QString& name)
 DummyTest::DummyTest(QObject* parent): QObject(parent)
 {
     m_model = new ResourcesModel("muon-dummybackend", this);
-//     new ModelTest(m_model, m_model);
+    new ModelTest(m_model, m_model);
 
     m_appBackend = backendByName(m_model, "DummyBackend");
     QVERIFY(m_appBackend); //TODO: test all backends
-    QTest::kWaitForSignal(m_appBackend, SIGNAL(backendReady()));
+    !m_model->isFetching() || QTest::kWaitForSignal(m_model, SIGNAL(allInitialized()));
 }
 
 void DummyTest::testReadData()
