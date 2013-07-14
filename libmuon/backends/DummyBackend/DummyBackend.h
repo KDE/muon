@@ -32,12 +32,9 @@ Q_INTERFACES(AbstractResourcesBackend)
 public:
     explicit DummyBackend(QObject* parent, const QVariantList& args);
 
-    virtual QList<AbstractResource*> upgradeablePackages() const;
     virtual AbstractResource* resourceByPackageName(const QString& name) const;
-    virtual int updatesCount() const;
     virtual AbstractBackendUpdater* backendUpdater() const;
     virtual AbstractReviewsBackend* reviewsBackend() const;
-    virtual QList<AbstractResource*> searchPackageName(const QString& searchText);
     virtual QVector<AbstractResource*> allResources() const;
     virtual bool isValid() const { return true; } // No external file dependencies that could cause runtime errors
 

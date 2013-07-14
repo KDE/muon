@@ -66,12 +66,12 @@ QVector<AbstractResource*> DummyBackend::allResources() const
     return ret;
 }
 
-int DummyBackend::updatesCount() const
+/*int DummyBackend::updatesCount() const
 {
     return upgradeablePackages().count();
-}
+}*/
 
-QList<AbstractResource*> DummyBackend::upgradeablePackages() const
+/*QList<AbstractResource*> DummyBackend::upgradeablePackages() const
 {
     QList<AbstractResource*> updates;
     foreach(AbstractResource* res, m_resources) {
@@ -79,14 +79,14 @@ QList<AbstractResource*> DummyBackend::upgradeablePackages() const
             updates += res;
     }
     return updates;
-}
+}*/
 
 AbstractResource* DummyBackend::resourceByPackageName(const QString& name) const
 {
     return m_resources.value(name);
 }
 
-QList<AbstractResource*> DummyBackend::searchPackageName(const QString& searchText)
+/*QList<AbstractResource*> DummyBackend::searchPackageName(const QString& searchText)
 {
     QList<AbstractResource*> ret;
     foreach(AbstractResource* r, m_resources) {
@@ -94,7 +94,7 @@ QList<AbstractResource*> DummyBackend::searchPackageName(const QString& searchTe
             ret += r;
     }
     return ret;
-}
+}*/
 
 AbstractBackendUpdater* DummyBackend::backendUpdater() const
 {
