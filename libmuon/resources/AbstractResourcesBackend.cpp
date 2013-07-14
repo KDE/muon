@@ -38,7 +38,7 @@ QList<AbstractResource*> AbstractResourcesBackend::searchPackageName(const QStri
 {
     QList<AbstractResource*> search;
     foreach (AbstractResource * res, allResources()) {
-        if (res->name().contains(searchText))
+        if (res->name().contains(searchText, Qt::CaseInsensitive) || res->comment().contains(searchText, Qt::CaseInsensitive))
             search << res;
     }
     return search;
