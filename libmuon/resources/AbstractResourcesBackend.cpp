@@ -56,7 +56,7 @@ int AbstractResourcesBackend::updatesCount() const
 
 AbstractReviewsBackend* AbstractResourcesBackend::reviewsBackend() const
 {
-    return 0;
+    return nullptr;
 }
 
 AbstractResource* AbstractResourcesBackend::resourceByPackageName(const QString& name) const
@@ -65,7 +65,7 @@ AbstractResource* AbstractResourcesBackend::resourceByPackageName(const QString&
         if (res->name() == name)
             return res;
     }
-    return 0;
+    return nullptr;
 }
 
 QList<AbstractResource*> AbstractResourcesBackend::upgradeablePackages() const
