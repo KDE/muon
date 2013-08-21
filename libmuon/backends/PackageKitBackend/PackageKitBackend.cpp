@@ -209,7 +209,7 @@ bool PackageKitBackend::isLoading() const
 void PackageKitBackend::populateInstalledCache()
 {
     kDebug() << "Starting to populate the installed packages cache";
-    m_appdata = AppstreamUtils::fetchAppData("/home/lukas/appdata.xml");//FIXME: Change path
+    m_appdata = AppstreamUtils::fetchAppData("/usr/share/app-info/appdata.xml");
     
     m_isLoading = true;
     
