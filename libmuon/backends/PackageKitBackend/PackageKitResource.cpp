@@ -22,8 +22,11 @@
 #include "PackageKitResource.h"
 #include "PackageKitBackend.h"
 #include <MuonDataSources.h>
+#include <QFile>
 #include <KGlobal>
 #include <KLocale>
+#include <KIO/Job>
+#include <qjson/parser.h>
 #include <PackageKit/packagekit-qt2/Daemon>
 
 PackageKitResource::PackageKitResource(const QString &packageId, PackageKit::Transaction::Info info, const QString &summary, PackageKitBackend* parent)
@@ -139,6 +142,57 @@ QUrl PackageKitResource::screenshotUrl()
 QUrl PackageKitResource::thumbnailUrl()
 {
     return KUrl(MuonDataSources::screenshotsSource(), "thumbnail/"+packageName());
+}
+
+void PackageKitResource::fetchScreenshots()
+{
+    QString dest = "/tmp/screenshot." + packageName(); //KStandardDirs::locate("tmp", "screenshots." + packageName());
+    
+    QFile f(dest);
+    if (f.exists())
+        f.remove();
+    KUrl packageUrl(MuonDataSources::screenshotsSource(), "/json/package/" + packageName());
+    
+    KIO::Job* getJob = KIO::file_copy(packageUrl, KUrl(dest), -1, KIO::Overwrite | KIO::HideProgressInfo);
+    connect(getJob, SIGNAL(finished(KJob*)), SLOT(slotScreenshotsFetched(KJob*)));
+    getJob->start();
+}
+
+void PackageKitResource::slotScreenshotsFetched(KJob * job)
+{
+    bool done = false;
+    QString dest = "/tmp/screenshot." + packageName(); //KStandardDirs::locate("tmp", "screenshots." + packageName());
+
+    QFile f(dest);
+    if (f.exists()) {
+        bool b = f.open(QIODevice::ReadOnly);
+        Q_ASSERT(b);
+        
+        QJson::Parser p;
+        bool ok;
+        QVariantMap values = p.parse(&f, &ok).toMap();
+        if(ok) {
+            QVariantList screenshots = values["screenshots"].toList();
+            
+            QList<QUrl> thumbnailUrls, screenshotUrls;
+            foreach(const QVariant& screenshot, screenshots) {
+                kDebug() << screenshot;
+                QVariantMap s = screenshot.toMap();
+                thumbnailUrls += s["small_image_url"].toUrl();
+                screenshotUrls += s["large_image_url"].toUrl();
+            }
+            emit screenshotsFetched(thumbnailUrls, screenshotUrls);
+            done = true;
+        }
+    }
+    if(!done) {
+        QList<QUrl> thumbnails, screenshots;
+        if(!thumbnailUrl().isEmpty()) {
+            thumbnails += thumbnailUrl();
+            screenshots += screenshotUrl();
+        }
+        emit screenshotsFetched(thumbnails, screenshots);
+    }
 }
 
 AbstractResource::State PackageKitResource::state()

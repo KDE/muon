@@ -24,6 +24,7 @@
 #include <resources/AbstractResource.h>
 #include <PackageKit/packagekit-qt2/Transaction>
 
+class KJob;
 class PackageKitBackend;
 
 class PackageKitResource : public AbstractResource
@@ -58,6 +59,7 @@ class PackageKitResource : public AbstractResource
         QString availablePackageId() const;
 
     public slots:
+        void fetchScreenshots();
         void addPackageId(PackageKit::Transaction::Info info, const QString &packageId, const QString &summary);
         void details(const QString &packageId, const QString &license, PackageKit::Transaction::Group group, const QString &detail, const QString &url, qulonglong size);
         void resetPackageIds();
@@ -67,6 +69,7 @@ class PackageKitResource : public AbstractResource
 
     private slots:
         void fetchDetails();
+        void slotScreenshotsFetched(KJob * job);
         
     protected:
         PackageKitBackend * m_backend;
