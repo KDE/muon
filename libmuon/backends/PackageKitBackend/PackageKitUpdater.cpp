@@ -50,6 +50,8 @@ void PackageKitUpdater::reloadFinished()
 void PackageKitUpdater::prepare()
 {
     kDebug();
+    m_toUpgrade = m_backend->upgradeablePackages();
+    
     if (m_transaction)
         m_transaction->deleteLater();
     
@@ -272,9 +274,6 @@ void PackageKitUpdater::cancel()
 void PackageKitUpdater::start()
 {
     kDebug() << m_toUpgrade.count();
-    if (m_toUpgrade.isEmpty()) {//FIXME: Is this correct?
-        m_toUpgrade = m_backend->upgradeablePackages();
-    }
     QSet<QString> m_packageIds;
     for (AbstractResource * res : m_toUpgrade) {
         PackageKitResource * app = qobject_cast<PackageKitResource*>(res);
