@@ -25,6 +25,7 @@
 
 #include "AbstractResource.h"
 #include "resources/AbstractResourcesBackend.h"
+#include "ResourcesOriginsModel.h"
 #include <ReviewsBackend/Rating.h>
 #include <ReviewsBackend/AbstractReviewsBackend.h>
 #include <Transaction/Transaction.h>
@@ -83,8 +84,9 @@ void ResourcesModel::init(bool load)
 
     connect(TransactionModel::global(), SIGNAL(transactionAdded(Transaction*)), SLOT(resourceChangedByTransaction(Transaction*)));
     connect(TransactionModel::global(), SIGNAL(transactionRemoved(Transaction*)), SLOT(resourceChangedByTransaction(Transaction*)));
-    if(load)
+    if (load) {
         QMetaObject::invokeMethod(this, "registerAllBackends", Qt::QueuedConnection);
+    }
 }
 
 ResourcesModel::ResourcesModel(const QString& backendName, QObject* parent)
@@ -338,6 +340,11 @@ QMap<int, QVariant> ResourcesModel::itemData(const QModelIndex& index) const
     return ret;
 }
 
+ResourcesOriginsModel* ResourcesModel::origins() const
+{
+    return m_origins;
+}
+
 void ResourcesModel::registerAllBackends()
 {
     MuonBackendsFactory f;
@@ -351,6 +358,7 @@ void ResourcesModel::registerAllBackends()
             addResourcesBackend(b);
         }
     }
+    m_origins = new ResourcesOriginsModel(this);
 }
 
 void ResourcesModel::registerBackendByName(const QString& name)

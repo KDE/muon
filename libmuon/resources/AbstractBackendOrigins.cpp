@@ -1,5 +1,6 @@
 /***************************************************************************
  *   Copyright © 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>       *
+ *   Copyright © 2013 Lukas Appelhans <l.appelhans@gmx.de>                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -17,23 +18,34 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
-
+#include "AbstractBackendOrigins.h"
 #include "AbstractResourcesBackend.h"
-#include <QHash>
 
-AbstractResourcesBackend::AbstractResourcesBackend(QObject* parent)
-    : QObject(parent)
-{}
-
-void AbstractResourcesBackend::installApplication(AbstractResource* app)
+Entry::Entry(const QString& suite, bool enabled, Source* p)
+  : QObject(p)
+  , m_suite(suite)
+  , m_enabled(enabled)
+  , m_source(p)
 {
-    installApplication(app, AddonList());
+
 }
 
-void AbstractResourcesBackend::integrateMainWindow(MuonMainWindow*)
-{}
-
-AbstractBackendOrigins* AbstractResourcesBackend::origins() const
+Source::Source(const QString& uri, const QString& name, QList< Entry* > entries, AbstractBackendOrigins* parent)
+  : QObject(parent)
+  , m_uri(uri)
+  , m_name(name)
+  , m_entries(entries)
 {
-    return nullptr;
+
+}
+
+AbstractBackendOrigins::AbstractBackendOrigins(AbstractResourcesBackend* parent)
+  : QObject(parent)
+{
+    connect(parent, SIGNAL(backendReady()), SLOT(load()));
+}
+
+AbstractBackendOrigins::~AbstractBackendOrigins()
+{
+
 }

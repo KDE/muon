@@ -30,6 +30,7 @@
 #include <akabeicore/akabeibackend.h>
 
 class AkabeiTransaction;
+class AkabeiOrigins;
 
 struct ApplicationData
 {
@@ -72,6 +73,8 @@ public:
     void removeFromQueue(AkabeiTransaction * trans);
     
     bool isTransactionRunning() const;
+    
+    virtual AbstractBackendOrigins* origins() const;
 
 public slots:
     void statusChanged(Akabei::Backend::Status);
@@ -83,6 +86,7 @@ private:
     QQueue<AkabeiTransaction*> m_transactionQueue;
     AkabeiUpdater * m_updater;
     QHash<QString, ApplicationData> m_appdata;
+    AkabeiOrigins * m_origins;
 };
 
 #endif

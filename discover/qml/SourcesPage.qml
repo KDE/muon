@@ -1,7 +1,6 @@
 import QtQuick 1.0
 import org.kde.plasma.components 0.1
 import org.kde.muon 1.0
-import org.kde.muonapt 1.0
 import "navigation.js" as Navigation
 
 Page {
@@ -90,9 +89,8 @@ Page {
             }
         }
         
-        onAccepted: origins.addRepository(repository.text)
+        onAccepted: resourcesModel.origins().addRepository(repository.text)
     }
-    OriginsBackend { id: origins }
     
     NativeScrollBar {
         id: scroll
@@ -113,7 +111,7 @@ Page {
         }
         width: parent.actualWidth
         
-        model: origins.sources
+        model: resourcesModel.origins
         
         delegate: ListItem {
             function joinEntriesSuites(source) {
@@ -139,9 +137,9 @@ Page {
                 return ret.join(", ")
             }
             enabled: browseOrigin.enabled
-            onClicked: Navigation.openApplicationListSource(modelData.name)
+            onClicked: Navigation.openApplicationListSource(name)
             
-            CheckBox {
+            /*CheckBox {
                 id: enabledBox
                 enabled: false //TODO: implement the application of this change
                 anchors {
@@ -149,17 +147,17 @@ Page {
                     top: parent.top
                 }
                 checked: modelData.enabled
-            }
+            }*/
             Label {
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
-                    left: enabledBox.right
+                    left: parent.left
                     right: suitesLabel.left
                     leftMargin: 5
                 }
                 elide: Text.ElideRight
-                text: modelData.name=="" ? modelData.uri : i18n("%1. %2", modelData.name, modelData.uri)
+                text: name=="" ? uri : i18n("%1. %2", name, uri)
             }
             Label {
                 id: suitesLabel
@@ -167,7 +165,7 @@ Page {
                     bottom: parent.bottom
                     right: browseOrigin.left
                 }
-                text: joinEntriesSuites(modelData)
+                text: suites
             }
             ToolButton {
                 id: browseOrigin
@@ -184,7 +182,7 @@ Page {
                 id: removeButton
                 anchors.right: parent.right
                 iconSource: "edit-delete"
-                onClicked: origins.removeRepository(modelData.uri)
+                onClicked: resourcesModel.origins.removeRepository(modelData.uri)
             }
         }
     }

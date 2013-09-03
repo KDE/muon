@@ -4,6 +4,7 @@ ${AKABEICLIENT_INCLUDE_DIR}
 )
 
 set(akabeibackend_SRCS
+    AkabeiOrigins.cpp
     AppstreamUtils.cpp
     AppAkabeiResource.cpp
     AkabeiUpdater.cpp 

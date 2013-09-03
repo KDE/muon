@@ -26,7 +26,10 @@
 
 #include "libmuonprivate_export.h"
 #include "AbstractResourcesBackend.h"
+#include "AbstractBackendOrigins.h"
+#include "ResourcesOriginsModel.h"
 
+class ResourcesOriginsModel;
 class AbstractResource;
 class AbstractResourcesBackend;
 
@@ -34,6 +37,7 @@ class MUONPRIVATE_EXPORT ResourcesModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int updatesCount READ updatesCount NOTIFY updatesCountChanged)
+    Q_PROPERTY(QObject* origins READ origins);
     public:
         enum Roles {
             NameRole = Qt::UserRole,
@@ -79,6 +83,7 @@ class MUONPRIVATE_EXPORT ResourcesModel : public QAbstractListModel
         void installApplication(AbstractResource* app);
         void removeApplication(AbstractResource* app);
         void cancelTransaction(AbstractResource* app);
+        Q_SCRIPTABLE ResourcesOriginsModel * origins() const;
 
     signals:
         void allInitialized();
@@ -104,6 +109,7 @@ class MUONPRIVATE_EXPORT ResourcesModel : public QAbstractListModel
         QVector< QVector<AbstractResource*> > m_resources;
         int m_initializingBackends;
         MuonMainWindow* m_mainwindow;
+        ResourcesOriginsModel * m_origins;
 
         static ResourcesModel* s_self;
 };

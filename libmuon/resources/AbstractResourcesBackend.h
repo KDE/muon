@@ -29,6 +29,7 @@
 
 #include "libmuonprivate_export.h"
 
+class AbstractBackendOrigins;
 class Transaction;
 class AbstractReviewsBackend;
 class AbstractResource;
@@ -117,6 +118,13 @@ class MUONPRIVATE_EXPORT AbstractResourcesBackend : public QObject
          * @param w the MuonMainWindow the backend should integrate to
          */
         virtual void integrateMainWindow(MuonMainWindow* w);
+        
+        /**
+         * The class returned in this method can be reimplemented, if you want to
+         * manage your origins (also called package repositories) with Muon.
+         * Otherwise just don't implement this or return nullptr;
+         */
+        virtual AbstractBackendOrigins * origins() const;
 
     public slots:
         /**

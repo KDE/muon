@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright © 2012 Aleix Pol Gonzalez <aleixpol@blue-systems.com>       *
+ *   Copyright © 2013 Lukas Appelhans <l.appelhans@gmx.de>                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or         *
  *   modify it under the terms of the GNU General Public License as        *
@@ -18,22 +18,37 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "AbstractResourcesBackend.h"
-#include <QHash>
+#ifndef RESOURCESORIGINSMODEL_H
+#define RESOURCESORIGINSMODEL_H
 
-AbstractResourcesBackend::AbstractResourcesBackend(QObject* parent)
-    : QObject(parent)
-{}
+#include <QAbstractListModel>
+#include <libmuonprivate_export.h>
 
-void AbstractResourcesBackend::installApplication(AbstractResource* app)
+class Source;
+class AbstractBackendOrigins;
+class ResourcesModel;
+class MUONPRIVATE_EXPORT ResourcesOriginsModel : public QAbstractListModel
 {
-    installApplication(app, AddonList());
-}
+    Q_OBJECT
+public:
+    enum Roles {
+        NameRole = Qt::UserRole,
+        UriRole,
+        SuitesRole
+    };
+    ResourcesOriginsModel(ResourcesModel * model);
+    ~ResourcesOriginsModel();
+    
+    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    
+private slots:
+    void reload();
+    
+private:
+    QList<AbstractBackendOrigins*> m_origins;
+    QList<Source*> m_sources;
 
-void AbstractResourcesBackend::integrateMainWindow(MuonMainWindow*)
-{}
+};
 
-AbstractBackendOrigins* AbstractResourcesBackend::origins() const
-{
-    return nullptr;
-}
+#endif // RESOURCESORIGINSMODEL_H
