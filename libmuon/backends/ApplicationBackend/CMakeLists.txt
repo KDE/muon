@@ -32,6 +32,7 @@ set(appsbackend_SRCS
     ApplicationUpdates.cpp
     ReviewsBackend.cpp #TODO: rename to AptReviewsBackend
     UbuntuLoginBackend.cpp
+    ApplicationOrigins.cpp
 )
 
 set(notifier_SRCS
