@@ -24,6 +24,7 @@
 
 #include <resources/AbstractBackendOrigins.h>
 #include "ApplicationBackend.h"
+#include <LibQApt/SourcesList>
 
 class ApplicationOrigins : public AbstractBackendOrigins
 {
@@ -39,7 +40,11 @@ public slots:
     virtual void addRepository(const QString& repository);
     virtual void removeRepository(const QString& repository);
     virtual void load();
-
+    
+private:
+    ApplicationBackend * m_backend;
+    QApt::SourcesList m_sourcesList;
+    QList<Source*> m_sources;
 };
 
 #endif // APPLICATIONORIGINS_H

@@ -19,11 +19,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #include "ApplicationOrigins.h"
+#include <resources/ResourcesModel.h>
+#include <QProcess>
+#include <QDebug>
+#include <QDir>
+#include <QMainWindow>
+#include <qdeclarative.h>
+#include <LibQApt/Backend>
+#include <LibQApt/Config>
+#include <KMessageBox>
+#include <KLocalizedString>
 
 ApplicationOrigins::ApplicationOrigins(ApplicationBackend* backend)
-  : AbstractBackendOrigins(backend)
+  : AbstractBackendOrigins(backend),
+    m_backend(backend)
 {
 
 }
@@ -45,15 +55,38 @@ void ApplicationOrigins::removeRepository(const QString& repository)
 
 void ApplicationOrigins::load()
 {
+    QApt::Backend* backend = qobject_cast<QApt::Backend*>(m_backend->property("backend").value<QObject*>());
+    if (!backend) {
+        connect(m_backend, SIGNAL(backendReady()), SLOT(load()));
+        return;
+    }
+    
+    m_sourcesList.reload();
 
+    for (const QApt::SourceEntry &sEntry : m_sourcesList.entries()) {
+        if (!sEntry.isValid())
+            continue;
+
+        Source* newSource = sourceForUri(sEntry.uri());
+        Entry* entry = new Entry(sEntry.dist(), sEntry.isEnabled(), newSource);
+        newSource->addEntry(entry);
+    }
+
+    emit originsChanged();
 }
 
 Source* ApplicationOrigins::sourceForUri(const QString& uri)
 {
-
+    foreach(Source* s, m_sources) {
+        if (s->uri()==uri)
+            return s;
+    }
+    Source* s = new Source(QString(), uri, QList<Entry*>(), this);//FIXME Resolve name here
+    m_sources += s;
+    return s;
 }
 
 QList< Source* > ApplicationOrigins::sources() const
 {
-
+    return m_sources;
 }
