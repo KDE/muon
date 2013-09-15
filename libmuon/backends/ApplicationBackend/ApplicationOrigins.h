@@ -33,6 +33,7 @@ public:
     ApplicationOrigins(ApplicationBackend * backend);
     ~ApplicationOrigins();
     
+    virtual QString addMessage() const;
     virtual QList<Source*> sources() const;
     virtual Source* sourceForUri(const QString& uri);
 
@@ -40,6 +41,10 @@ public slots:
     virtual void addRepository(const QString& repository);
     virtual void removeRepository(const QString& repository);
     virtual void load();
+    
+private slots:
+    void additionDone(int);
+    void removalDone(int);
     
 private:
     ApplicationBackend * m_backend;

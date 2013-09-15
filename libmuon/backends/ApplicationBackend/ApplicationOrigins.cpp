@@ -45,12 +45,62 @@ ApplicationOrigins::~ApplicationOrigins()
 
 void ApplicationOrigins::addRepository(const QString& repository)
 {
-
+    QProcess* p = new QProcess(this);
+    p->setProcessChannelMode(QProcess::MergedChannels);
+    connect(p, SIGNAL(finished(int)), SLOT(additionDone(int)));
+    connect(p, SIGNAL(finished(int)), p, SLOT(deleteLater()));
+    p->start("kdesudo", QStringList("--") << "apt-add-repository" << "-y" << repository);
 }
 
 void ApplicationOrigins::removeRepository(const QString& repository)
 {
+    QProcess* p = new QProcess(this);
+    p->setProcessChannelMode(QProcess::MergedChannels);
+    connect(p, SIGNAL(finished(int)), SLOT(removalDone(int)));
+    connect(p, SIGNAL(finished(int)), p, SLOT(deleteLater()));
+    p->start("kdesudo", QStringList("--") << "apt-add-repository" << "--remove" << "-y" << repository);
+}
 
+void ApplicationOrigins::additionDone(int processErrorCode)
+{
+    if(processErrorCode==0) {
+        load();
+        QMetaObject::invokeMethod(m_backend, "reload");
+    } else {
+        QProcess* p = qobject_cast<QProcess*>(sender());
+        Q_ASSERT(p);
+        QByteArray errorMessage = p->readAllStandardOutput();
+        if(errorMessage.isEmpty())
+            KMessageBox::error(0, errorMessage, i18n("Adding Origins..."));
+    }
+}
+
+void ApplicationOrigins::removalDone(int processErrorCode)
+{
+    if(processErrorCode==0) {
+        load();
+        QMetaObject::invokeMethod(m_backend, "reload");
+    } else {
+        QProcess* p = qobject_cast<QProcess*>(sender());
+        Q_ASSERT(p);
+        QByteArray errorMessage = p->readAllStandardOutput();
+        if(errorMessage.isEmpty())
+            KMessageBox::error(0, errorMessage, i18n("Removing Origins..."));
+    }
+}
+
+QString ApplicationOrigins::addMessage() const
+{
+    return i18n("<sourceline> - The apt repository source line to add. This is one of:\n"
+                                "  a complete apt line, \n"
+                                "  a repo url and areas (areas defaults to 'main')\n"
+                                "  a PPA shortcut.\n\n"
+                                "  Examples:\n"
+                                "    deb http://myserver/path/to/repo stable myrepo\n"
+                                "    http://myserver/path/to/repo myrepo\n"
+                                "    https://packages.medibuntu.org free non-free\n"
+                                "    http://extras.ubuntu.com/ubuntu\n"
+                                "    ppa:user/repository");
 }
 
 void ApplicationOrigins::load()
