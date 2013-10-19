@@ -342,7 +342,7 @@ void MainWindow::checkDistUpgrade()
     QString checkerFile = KStandardDirs::locate("data", "muon-notifier/releasechecker");
 
     m_checkerProcess = new KProcess(this);
-    m_checkerProcess->setProgram(QStringList() << "/usr/bin/python" << checkerFile);
+    m_checkerProcess->setProgram(QStringList() << "/usr/bin/python3" << checkerFile);
     connect(m_checkerProcess, SIGNAL(finished(int)), this, SLOT(checkerFinished(int)));
     m_checkerProcess->start();
 }
