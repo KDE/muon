@@ -19,38 +19,34 @@
 
 import QtQuick 1.1
 
-Flickable {
-    property int columnCount: Math.max(Math.floor(actualWidth/minCellWidth), 1)
-    property real cellWidth: (actualWidth-(columnCount-1)*dataFlow.spacing)/columnCount
+Column {
+    property int columnCount: Math.max(Math.floor(width/minCellWidth), 1)
+    property real cellWidth: (width-(columnCount-1)*dataFlow.spacing)/columnCount
     property int minCellWidth: 130
-    property alias actualWidth: conts.width
     property alias header: headerLoader.sourceComponent
     property alias footer: footerLoader.sourceComponent
     property alias delegate: dataRepeater.delegate
     property alias model: dataRepeater.model
-    contentHeight: conts.height
-    
-    Column {
-        id: conts
-        anchors.horizontalCenter: parent.horizontalCenter
+
+    id: conts
+    anchors.horizontalCenter: parent.horizontalCenter
+    spacing: 10
+    Loader {
+        id: headerLoader
+        width: parent.width
+    }
+
+    Flow {
+        id: dataFlow
+        width: parent.width
         spacing: 10
-        Loader {
-            id: headerLoader
-            width: parent.width
+        Repeater {
+            id: dataRepeater
         }
-        
-        Flow {
-            id: dataFlow
-            width: parent.width
-            spacing: 10
-            Repeater {
-                id: dataRepeater
-            }
-        }
-        
-        Loader {
-            id: footerLoader
-            width: parent.width
-        }
+    }
+
+    Loader {
+        id: footerLoader
+        width: parent.width
     }
 }

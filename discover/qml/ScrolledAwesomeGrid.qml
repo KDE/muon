@@ -25,23 +25,27 @@ Item {
     property alias footer: gridRepeater.footer
     property alias delegate: gridRepeater.delegate
     property alias model: gridRepeater.model
-    property alias actualWidth: gridRepeater.actualWidth
+    property alias actualWidth: gridRepeater.width
     property alias cellWidth: gridRepeater.cellWidth
     property alias minCellWidth: gridRepeater.minCellWidth
     
-    AwesomeGrid {
-        id: gridRepeater
+    Flickable {
+        id: gridView
         anchors {
             fill: parent
             rightMargin: scroll.width
         }
-        header: parentItem.header
+        contentHeight: gridRepeater.height
+        AwesomeGrid {
+            id: gridRepeater
+            header: parentItem.header
+        }
     }
     
     NativeScrollBar {
         id: scroll
         orientation: Qt.Vertical
-        flickableItem: gridRepeater
+        flickableItem: gridView
         anchors {
             top: parent.top
             right: parent.right
