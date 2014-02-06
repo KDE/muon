@@ -147,7 +147,7 @@ Page {
                     }
                     MenuItem {
                         id: itemGrid
-                        property string type: "grid2"
+                        property string type: "grid3"
                         text: i18n("Grid")
                         checkable: true
                         checked: page.state==type
@@ -220,15 +220,67 @@ Page {
             header: page.header
             actualWidth: page.actualWidth
             minCellWidth: 200
-            
+
             delegate: ApplicationsGridDelegate {
                 height: width/1.618 //tau
                 width: theGrid.cellWidth
             }
         }
     }
+
+    Component {
+        id: pagedGridComponent
+        Item {
+            AwesomeGrid {
+                id: theGrid
+                model: PaginateModel {
+                    id: pagesModel
+                    sourceModel: appsModel
+                }
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    top: parent.top
+                    bottom: buttonsRow.top
+                }
+                header: page.header
+                width: page.actualWidth
+                minCellWidth: 200
+
+                delegate: ApplicationsGridDelegate {
+                    height: width/1.618 //tau
+                    width: theGrid.cellWidth
+                }
+            }
+            Row {
+                id: buttonsRow
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                    bottom: parent.bottom
+                }
+                ToolButton {
+                    iconSource: "go-first"
+                    onClicked: pagesModel.firstItem = 0
+                }
+                ToolButton {
+                    iconSource: "go-previous"
+                    onClicked: pagesModel.previousPage()
+                }
+                Label {
+                    text: i18n("Current Page %1/%2", pagesModel.currentPage, pagesModel.pageCount)
+                }
+                ToolButton {
+                    iconSource: "go-next"
+                    onClicked: pagesModel.nextPage()
+                }
+                ToolButton {
+                    iconSource: "go-last"
+                    onClicked: pagesModel.lastPage()
+                }
+            }
+        }
+    }
     
-    state: preferList ? "list" : "grid2"
+    state: preferList ? "list" : "grid3"
     states: [
         State {
             name: "list"
@@ -237,6 +289,10 @@ Page {
         State {
             name: "grid2"
             PropertyChanges { target: viewLoader; sourceComponent: gridComponent }
+        },
+        State {
+            name: "grid3"
+            PropertyChanges { target: viewLoader; sourceComponent: pagedGridComponent }
         }
     ]
 }
