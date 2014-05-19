@@ -254,7 +254,7 @@ QVector<QPair<QString, QString> > Application::locateApplication(const QString &
 
 QStringList Application::categories()
 {
-    QStringList categories = QString(getField("Categories")).split(',', QString::SkipEmptyParts);
+    QStringList categories = QString(getField("Categories")).split(';', QString::SkipEmptyParts);
 
     if (categories.isEmpty()) {
         // extras.ubuntu.com packages can have this field

@@ -119,14 +119,14 @@ void ResourcesModel::addResourcesBackend(AbstractResourcesBackend* backend)
         m_backends += backend;
         m_resources.append(QVector<AbstractResource*>());
     }
-    if(m_mainwindow)
+    if(m_mainwindow && QByteArray(backend->metaObject()->className())=="ApplicationBackend")
         backend->integrateMainWindow(m_mainwindow);
-
+    
     connect(backend, SIGNAL(fetchingChanged()), SLOT(callerFetchingChanged()));
     connect(backend, SIGNAL(allDataChanged()), SLOT(updateCaller()));
     connect(backend, SIGNAL(updatesCountChanged()), SIGNAL(updatesCountChanged()));
     connect(backend, SIGNAL(searchInvalidated()), SIGNAL(searchInvalidated()));
-
+    
     emit backendsChanged();
 
     if(m_initializingBackends==0)
@@ -357,9 +357,10 @@ void ResourcesModel::registerAllBackends()
         kWarning() << "Couldn't find any backends";
         emit allInitialized();
     } else {
-        foreach(AbstractResourcesBackend* b, backends) {
-            addResourcesBackend(b);
+	foreach(AbstractResourcesBackend* b, backends) {
+	      addResourcesBackend(b);
         }
+        
     }
 }
 
@@ -375,7 +376,8 @@ void ResourcesModel::integrateMainWindow(MuonMainWindow* w)
     m_mainwindow = w;
     setParent(w);
     foreach(AbstractResourcesBackend* b, m_backends) {
-        b->integrateMainWindow(w);
+	if(b->metaObject()->className()=="ApplicationBackend")
+	  b->integrateMainWindow(w);
     }
 }
 

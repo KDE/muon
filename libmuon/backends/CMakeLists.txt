@@ -2,13 +2,13 @@ if(AKABEICLIENT_FOUND)
     add_subdirectory(AkabeiBackend)#TODO: Add checks
 endif(AKABEICLIENT_FOUND)
 
-if(LIBATTICA_FOUND)
-    add_subdirectory(KNSBackend)
-endif(LIBATTICA_FOUND)
-
 if(QAPT_FOUND)
     add_subdirectory(ApplicationBackend)
 endif(QAPT_FOUND)
+
+if(LIBATTICA_FOUND)
+    add_subdirectory(KNSBackend)
+endif(LIBATTICA_FOUND)
 
 if(BODEGA_FOUND)
     add_subdirectory(BodegaBackend)

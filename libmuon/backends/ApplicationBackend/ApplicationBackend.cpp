@@ -80,7 +80,6 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     m_watcher = new QFutureWatcher<QVector<Application*> >(this);
     connect(m_watcher, SIGNAL(finished()), this, SLOT(setApplications()));
     connect(m_reviewsBackend, SIGNAL(ratingsReady()), SIGNAL(allDataChanged()));
-    
     QTimer::singleShot(10, this, SLOT(initBackend()));
 }
 

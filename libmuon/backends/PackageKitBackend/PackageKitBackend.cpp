@@ -192,10 +192,14 @@ PackageKitBackend::PackageKitBackend(QObject* parent, const QVariantList&)
     , m_refresher(0)
     , m_isLoading(false)
     , m_isFetching(false)
+    , m_integrated(false)
 {
     populateInstalledCache();
-    
     startTimer(60 * 60 * 1000);//Update database every 60 minutes
+}
+
+void PackageKitBackend::integrateMainWindow(MuonMainWindow* w){
+  m_integrated = true;
 }
 
 PackageKitBackend::~PackageKitBackend()
@@ -212,10 +216,15 @@ bool PackageKitBackend::isLoading() const
     return m_isLoading;
 }
 
+bool PackageKitBackend::isValid() const
+{
+    return m_integrated;
+}
+
 void PackageKitBackend::populateInstalledCache()
 {
     kDebug() << "Starting to populate the installed packages cache";
-    m_appdata = AppstreamUtils::fetchAppData("/home/lukas/appdata.xml");//FIXME: Change path
+    m_appdata = AppstreamUtils::fetchAppData("/home/stoica-marcu/appdata.xml");//FIXME: Change path
     
     m_isLoading = true;
     

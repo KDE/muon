@@ -52,7 +52,7 @@ class MUONPRIVATE_EXPORT PackageKitBackend : public AbstractResourcesBackend
         
         static QString errorMessage(PackageKit::Transaction::Error error);
         static int compare_versions(const QString &, const QString &);
-        
+        void integrateMainWindow(MuonMainWindow* w);
         virtual AbstractBackendUpdater* backendUpdater() const;
         virtual AbstractReviewsBackend* reviewsBackend() const;
         
@@ -66,7 +66,7 @@ class MUONPRIVATE_EXPORT PackageKitBackend : public AbstractResourcesBackend
         virtual void installApplication(AbstractResource* app, AddonList addons);
         virtual void removeApplication(AbstractResource* app);
         virtual void cancelTransaction(AbstractResource* app);
-        virtual bool isValid() const { return true; }
+        virtual bool isValid() const;
         virtual QList<AbstractResource*> upgradeablePackages() const;
         bool isFetching() const;
         bool isLoading() const;
@@ -95,6 +95,7 @@ class MUONPRIVATE_EXPORT PackageKitBackend : public AbstractResourcesBackend
         PackageKit::Transaction * m_refresher;
         bool m_isLoading;
         bool m_isFetching;
+        bool m_integrated;
 };
 
 #endif // PACKAGEKITBACKEND_H
