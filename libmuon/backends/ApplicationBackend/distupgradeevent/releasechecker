@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/python
 
 # releasechecker.py
 #
@@ -22,25 +22,33 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, time
-sys.path.insert(0, '/usr/lib/python3/dist-packages/')
-
-from UpdateManager.Core.MetaRelease import MetaReleaseCore
-from UpdateManager.Core.utils import init_proxy
+import urllib
+import sys
 
 if __name__ == "__main__":
-    """ check for updates, if there are any say so """
 
-    init_proxy()
-    #FIXME: implement command line options for MetaReleaseCore args
-    metaRelease = MetaReleaseCore(False, False)
-    while metaRelease.downloading:
-        time.sleep(0.5)
-    new_dist = metaRelease.new_dist
+  releaseHandle = urllib.urlopen('http://ftp.debian.org/debian/dists/stable/Release')
+  localHandle= open('/etc/os-release', 'r')
 
-    if new_dist is not None:
-        print("Found a release")
-        sys.exit(0)
-    else:
-        sys.exit(1)
+  releases = ["squeeze","wheezy","jessie","sid"]
+
+  linesLocal = localHandle.readlines()
+  lines = releaseHandle.readlines()
+
+  localRelease = linesLocal[0].split()[2]
+  localRelease = localRelease[:-1]
+
+  if (localRelease in releases) == False:
+    localRelease = localRelease.split('/')[0]
+  
+  print localRelease
+  print lines[4].split()[1]
+  
+  releaseHandle.close()
+  localHandle.close()
+  
+  if releases.index(localRelease) < releases.index(lines[4].split()[1]):
+    sys.exit(0)
+  else:
+    sys.exit(1)
 
