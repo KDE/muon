@@ -403,21 +403,16 @@ void QAptActions::revertChanges()
 void QAptActions::runSourcesEditor()
 {
     KProcess *proc = new KProcess(this);
-    QStringList arguments;
     int winID = m_mainWindow->effectiveWinId();
 
-    QString kdesudo = KStandardDirs::findExe("kdesudo");
-    QString editor = KStandardDirs::findExe("software-properties-kde");
-
+    QString pkexec("pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY /usr/bin/python ");
+    QString editor("/usr/share/kde4/apps/libmuonapt/show-software-properties");
     if (m_reloadWhenEditorFinished) {
         editor.append(QLatin1String(" --dont-update --attach ") % QString::number(winID)); //krazy:exclude=spelling;
     } else {
         editor.append(QLatin1String(" --attach ") % QString::number(winID));
     }
-
-    arguments << kdesudo << editor;
-
-    proc->setProgram(arguments);
+    proc->setShellCommand(pkexec.append(editor));
     m_mainWindow->find(winID)->setEnabled(false);
     proc->start();
     connect(proc, SIGNAL(finished(int,QProcess::ExitStatus)),

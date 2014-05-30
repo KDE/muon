@@ -20,9 +20,9 @@
 
 #include "OriginsBackend.h"
 #include <resources/ResourcesModel.h>
-#include <QProcess>
 #include <QDebug>
 #include <QDir>
+#include <KProcess>
 #include <QMainWindow>
 #include <qdeclarative.h>
 #include <LibQApt/Backend>
@@ -88,24 +88,32 @@ Source* OriginsBackend::sourceForUri(const QString& uri)
 
 void OriginsBackend::addRepository(const QString& repository)
 {
-    QProcess* p = new QProcess(this);
+    QProcess *p = new QProcess(this);
     p->setProcessChannelMode(QProcess::MergedChannels);
+    QString arguments("pkexec env XAUTHORITY=$XAUTHORITY /usr/bin/python /usr/share/kde4/apps/libmuonapt/apt-add-repository ");
+    arguments.append("-y ");
+    arguments.append(repository);
     connect(p, SIGNAL(finished(int)), SLOT(additionDone(int)));
     connect(p, SIGNAL(finished(int)), p, SLOT(deleteLater()));
-    p->start("kdesudo", QStringList("--") << "apt-add-repository" << "-y" << repository);
+    p->start(arguments);
+    
 }
 
 void OriginsBackend::removeRepository(const QString& repository)
 {
-    QProcess* p = new QProcess(this);
+    QProcess *p = new QProcess(this);
     p->setProcessChannelMode(QProcess::MergedChannels);
-    connect(p, SIGNAL(finished(int)), SLOT(removalDone(int)));
+    QString arguments("pkexec env XAUTHORITY=$XAUTHORITY /usr/bin/python /usr/share/kde4/apps/libmuonapt/apt-add-repository ");
+    arguments.append("--remove -y ");
+    arguments.append(repository);
+    connect(p, SIGNAL(finished(int)), SLOT(additionDone(int)));
     connect(p, SIGNAL(finished(int)), p, SLOT(deleteLater()));
-    p->start("kdesudo", QStringList("--") << "apt-add-repository" << "--remove" << "-y" << repository);
+    p->start(arguments);
 }
 
 void OriginsBackend::additionDone(int processErrorCode)
 {
+    qDebug()<<"ERRR: "<<processErrorCode;
     if(processErrorCode==0) {
         load();
         QMetaObject::invokeMethod(applicationBackend(), "reload");

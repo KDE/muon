@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+
+  <vendor>Muon Suite</vendor>
+  <vendor_url>http://hal.freedesktop.org/docs/PolicyKit/</vendor_url>
+
+  <action id="org.kde.apt-add-repository">
+    <description>Add/Remove repository</description>
+    <message>Authentication is required to change the software sources</message>
+    <icon_name>audio-x-generic</icon_name> 
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_self_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/python</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">/usr/share/kde4/apps/libmuonapt/apt-add-repository</annotate>
+  </action>
+
+</policyconfig>
