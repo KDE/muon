@@ -403,16 +403,21 @@ void QAptActions::revertChanges()
 void QAptActions::runSourcesEditor()
 {
     KProcess *proc = new KProcess(this);
+    QStringList arguments;
     int winID = m_mainWindow->effectiveWinId();
 
-    QString pkexec("pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY /usr/bin/python ");
-    QString editor("/usr/share/kde4/apps/libmuonapt/show-software-properties");
+    QString kdesudo = KStandardDirs::findExe("kdesudo");
+    QString editor = KStandardDirs::findExe("software-properties-kde");
+
     if (m_reloadWhenEditorFinished) {
         editor.append(QLatin1String(" --dont-update --attach ") % QString::number(winID)); //krazy:exclude=spelling;
     } else {
         editor.append(QLatin1String(" --attach ") % QString::number(winID));
     }
-    proc->setShellCommand(pkexec.append(editor));
+
+    arguments << kdesudo << editor;
+
+    proc->setProgram(arguments);
     m_mainWindow->find(winID)->setEnabled(false);
     proc->start();
     connect(proc, SIGNAL(finished(int,QProcess::ExitStatus)),
@@ -536,13 +541,13 @@ void QAptActions::checkDistUpgrade()
     if(!QFile::exists("/usr/lib/python3/dist-packages/DistUpgrade/DistUpgradeFetcherKDE.py")) {
         qWarning() << "Couldn't find the /usr/lib/python3/dist-packages/DistUpgrade/DistUpgradeFetcherKDE.py file";
     }
-    QString checkerFile = KStandardDirs::locate("data", "muonapplicationnotifier/releasechecker");
+    QString checkerFile = KStandardDirs::locate("data", "muon-notifier/releasechecker");
     if(checkerFile.isEmpty()) {
         qWarning() << "Couldn't find the releasechecker script";
     }
 
     KProcess* checkerProcess = new KProcess(this);
-    checkerProcess->setProgram(QStringList() << "/usr/bin/python" << checkerFile);
+    checkerProcess->setProgram(QStringList() << "/usr/bin/python3" << checkerFile);
     connect(checkerProcess, SIGNAL(finished(int)), this, SLOT(checkerFinished(int)));
     connect(checkerProcess, SIGNAL(finished(int)), checkerProcess, SLOT(deleteLater()));
     checkerProcess->start();
