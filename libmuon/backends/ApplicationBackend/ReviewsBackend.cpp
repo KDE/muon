@@ -21,6 +21,7 @@
 #include "ReviewsBackend.h"
 
 #include <QtCore/QStringBuilder>
+#include <QNetworkAccessManager>
 #include <QDebug>
 
 #include <KGlobal>
@@ -110,10 +111,8 @@ void ReviewsBackend::fetchRatings()
 {
     QString ratingsCache = KStandardDirs::locateLocal("data", "libmuon/ratings.txt");
     refreshConsumerKeys();
-
     // First, load our old ratings cache in case we don't have net connectivity
     loadRatingsFromFile();
-
     // Try to fetch the latest ratings from the internet
     KUrl ratingsUrl(m_serverBase, "review-stats/");
     KIO::FileCopyJob *getJob = KIO::file_copy(ratingsUrl,

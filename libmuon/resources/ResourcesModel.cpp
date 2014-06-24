@@ -376,7 +376,6 @@ void ResourcesModel::integrateMainWindow(MuonMainWindow* w)
     m_mainwindow = w;
     setParent(w);
     foreach(AbstractResourcesBackend* b, m_backends) {
-	if(b->metaObject()->className()=="ApplicationBackend")
 	  b->integrateMainWindow(w);
     }
 }
