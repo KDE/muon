@@ -21,7 +21,6 @@
 #include "ReviewsBackend.h"
 
 #include <QtCore/QStringBuilder>
-#include <QNetworkAccessManager>
 #include <QDebug>
 
 #include <KGlobal>
