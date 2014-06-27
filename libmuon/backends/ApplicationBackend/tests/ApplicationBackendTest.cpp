@@ -40,6 +40,23 @@
 
 QTEST_KDEMAIN( ApplicationBackendTest, GUI )
 
+QString getCodename(const QString& value)
+{
+    QString ret;
+    QFile f("/etc/os-release");
+    if(f.open(QIODevice::ReadOnly|QIODevice::Text)){
+	QRegExp rx(QString("%1=(.+)\n").arg(value));
+	while(!f.atEnd()) {
+	    QByteArray line = f.readLine();
+	    if(rx.exactMatch(line)) {
+		ret = rx.cap(1);
+		break;
+	    }
+	}
+    }
+    return ret;
+}
+
 AbstractResourcesBackend* backendByName(ResourcesModel* m, const QString& name)
 {
     QVector<AbstractResourcesBackend*> backends = m->backends();
@@ -56,13 +73,18 @@ ApplicationBackendTest::ApplicationBackendTest()
     QString ratingsDir = KStandardDirs::locateLocal("data","libmuon/ratings.txt");
     QFile testRatings("~/.kde-unit-test/share/apps/libmuon/ratings.txt");
     QFile ratings(ratingsDir);
+    QString codeName = getCodename("ID");
     if(!testRatings.exists()){
 	if(ratings.exists()){
 	    ratings.copy(testRatings.fileName());
 	}
 	else{
 	    ratings.close();
-	    ratingsDir = KStandardDirs::locateLocal("data","libmuon/testratings.txt");
+	    if(codeName.toLower() == QLatin1String("ubuntu")){
+		ratingsDir = KStandardDirs::locateLocal("data","libmuon/rnrtestratings.txt");
+	    }else{
+		ratingsDir = KStandardDirs::locateLocal("data","libmuon/popcontestratings.txt");
+	    }
 	    ratings.setFileName(ratingsDir);
 	    if(ratings.exists()){
 		ratings.copy(testRatings.fileName());
