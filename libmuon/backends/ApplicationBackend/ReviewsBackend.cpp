@@ -111,18 +111,17 @@ void ReviewsBackend::fetchRatings()
 {
     QString ratingsCache = KStandardDirs::locateLocal("data", "libmuon/ratings.txt");
     KIO::FileCopyJob *getJob;
-    KUrl *ratingsUrl;
+    KUrl ratingsUrl(m_serverBase,"review-stats/");
     //default to popcon if not using ubuntu
-    if(m_distId.toLower() == QString("ubuntu").toLower()){
+    if(m_distId.toLower() == QLatin1String("ubuntu")){
 	refreshConsumerKeys();
 	// First, load our old ratings cache in case we don't have net connectivity
 	loadRatingsFromFile();
 	// Try to fetch the latest ratings from the internet
-	ratingsUrl = new KUrl(m_serverBase, "review-stats/");
     }else{
-	ratingsUrl = new KUrl("http://popcon.debian.org/all-popcon-results.gz");
+	ratingsUrl.setPath("http://popcon.debian.org/all-popcon-results.gz");
     }
-    getJob = KIO::file_copy(*ratingsUrl, ratingsCache, -1,
+    getJob = KIO::file_copy(ratingsUrl, ratingsCache, -1,
                                KIO::Overwrite | KIO::HideProgressInfo);
     connect(getJob, SIGNAL(result(KJob*)), SLOT(ratingsFetched(KJob*)));
 }
@@ -140,7 +139,7 @@ void ReviewsBackend::loadRatingsFromFile()
 {
     QString ratingsCache = KStandardDirs::locateLocal("data", "libmuon/ratings.txt");
     QIODevice* dev = KFilterDev::deviceForFile(ratingsCache, "application/x-gzip");
-    if(m_distId.toLower() == QString("ubuntu")){
+    if(m_distId.toLower() == QLatin1String("ubuntu")){
 
 	QJson::Parser parser;
 	bool ok = false;
@@ -167,7 +166,7 @@ void ReviewsBackend::loadRatingsFromFile()
 	    while(!dev->atEnd()){
 		QString line(dev->readLine());
 		QStringList lineContent = line.split(" ");
-		if(lineContent.first() != QString("Package:") || lineContent.isEmpty()){
+		if(lineContent.first() != QLatin1String("Package:") || lineContent.isEmpty()){
 		    continue;
 		}
 		QString pkgName = lineContent.at(1);
@@ -185,6 +184,7 @@ void ReviewsBackend::loadRatingsFromFile()
 	}
     }
     dev->close();
+    dev->deleteLater();
     emit ratingsReady();
 }
 
