@@ -35,6 +35,7 @@ configure_file(MuonVersion.h.in MuonVersion.h)
 
 add_subdirectory(libmuon)
 if(QAPT_FOUND)
+    find_package(AppstreamQt REQUIRED)
     add_subdirectory(libmuonapt)
     add_subdirectory(muon)
     add_subdirectory(installer)

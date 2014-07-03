@@ -49,9 +49,8 @@
 //QJSON includes
 #include <qjson/parser.h>
 
-Application::Application(const QString& fileName, QApt::Backend* backend)
+Application::Application(QApt::Backend* backend)
         : AbstractResource(0)
-        , m_data(new KConfig(fileName, KConfig::SimpleConfig))
         , m_backend(backend)
         , m_package(0)
         , m_isValid(true)
@@ -59,13 +58,7 @@ Application::Application(const QString& fileName, QApt::Backend* backend)
         , m_isExtrasApp(false)
         , m_sourceHasScreenshot(true)
 {
-    static QByteArray currentDesktop = qgetenv("XDG_CURRENT_DESKTOP");
 
-    m_isTechnical = getField("NoDisplay").toLower() == "true"
-                    || !hasField("Exec")
-                    || getField("NotShowIn", QByteArray()).contains(currentDesktop)
-                    || !getField("OnlyShowIn", currentDesktop).contains(currentDesktop);
-    m_packageName = getField("X-AppInstall-Package");
 }
 
 Application::Application(QApt::Package* package, QApt::Backend* backend)
@@ -490,7 +483,7 @@ AbstractResource::State Application::state()
     int s = package()->state();
     if(s & QApt::Package::Upgradeable) ret = Upgradeable;
     else if(s & QApt::Package::Installed) ret = Installed;
-    
+
     return ret;
 }
 
@@ -498,7 +491,7 @@ void Application::fetchScreenshots()
 {
     if(!m_sourceHasScreenshot)
         return;
-    
+
     QString dest = KStandardDirs::locate("tmp", "screenshots."+m_packageName);
     const KUrl packageUrl(MuonDataSources::screenshotsSource(), "/json/package/"+m_packageName);
     KIO::StoredTransferJob* job = KIO::storedGet(packageUrl, KIO::NoReload, KIO::HideProgressInfo);
@@ -515,7 +508,7 @@ void Application::downloadingScreenshotsFinished(KJob* j)
         QVariantMap values = p.parse(job->data(), &ok).toMap();
         if(ok) {
             QVariantList screenshots = values["screenshots"].toList();
-            
+
             QList<QUrl> thumbnailUrls, screenshotUrls;
             foreach(const QVariant& screenshot, screenshots) {
                 QVariantMap s = screenshot.toMap();
@@ -618,4 +611,15 @@ QString Application::buildDescription(const QByteArray& data, const QString& sou
     }
 
     return description;
+}
+
+void Application::setPackageName(QByteArray pkgName)
+{
+    Q_ASSERT(!m_package);
+    m_packageName = pkgName;
+}
+
+void Application::setTechnical(bool technical)
+{
+    m_isTechnical = technical;
 }

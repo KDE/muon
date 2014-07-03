@@ -47,6 +47,10 @@
 #include <DebconfGui.h>
 #include <qjson/parser.h>
 
+// Asmara includes
+#include <AppstreamQt/database.h>
+#include <AppstreamQt/component.h>
+
 //libmuonapt includes
 #include "MuonStrings.h"
 #include "ChangesDialog.h"
@@ -54,6 +58,7 @@
 
 // Own includes
 #include "Application.h"
+#include "AppstreamApplication.h"
 #include "ReviewsBackend.h"
 #include "Transaction/Transaction.h"
 #include "Transaction/TransactionModel.h"
@@ -94,17 +99,24 @@ ApplicationBackend::~ApplicationBackend()
 QVector<Application *> init(QApt::Backend *backend, QThread* thread)
 {
     QVector<Application *> appList;
-    QDir appDir("/usr/share/app-install/desktop/");
-    QStringList fileList = appDir.entryList(QStringList("*.desktop"), QDir::Files);
-
-    QList<Application *> tempList;
     QSet<QString> packages;
-    foreach(const QString &fileName, fileList) {
-        Application *app = new Application(appDir.filePath(fileName), backend);
-        packages.insert(app->packageName());
-        tempList << app;
-    }
+    QList<Application *> tempList;
 
+    QList <Appstream::Component> components;
+    Appstream::Database db(QLatin1String("/var/cache/app-info/xapian"));
+
+    bool success = db.open();
+
+    if(!success) {
+        qWarning()<<"Opening database failed";
+    } else {
+        components = db.allComponents();
+        foreach(const Appstream::Component &comp, components){
+            AppstreamApplication *app = new AppstreamApplication(comp, backend);
+            packages.insert(app->packageName());
+            tempList << app;
+        }
+    }
     foreach (QApt::Package *package, backend->availablePackages()) {
         //Don't create applications twice
         if(packages.contains(package->name()))

@@ -43,7 +43,7 @@ class MUONPRIVATE_EXPORT Application : public AbstractResource
 Q_OBJECT
 Q_PROPERTY(QString menuPath READ menuPath CONSTANT)
 public:
-    explicit Application(const QString &fileName, QApt::Backend *backend);
+    explicit Application(QApt::Backend *backend);
     explicit Application(QApt::Package *package, QApt::Backend *backend);
 
     QString name();
@@ -62,6 +62,9 @@ public:
     bool isTechnical() const;
     QString packageName() const;
 
+    void setTechnical(bool technical);
+    void setPackageName(QByteArray pkgName);
+
     //QApt::Package forwarding
     QUrl homepage();
     QString longDescription();
@@ -73,23 +76,23 @@ public:
 
     bool hasScreenshot() const { return m_sourceHasScreenshot; }
     void setHasScreenshot(bool has);
-    
+
     void clearPackage();
     QVector<KService::Ptr> findExecutables() const;
     virtual QStringList executables() const;
-    
+
     /** Used to trigger the stateChanged signal from the ApplicationBackend */
     void emitStateChanged();
-    
+
     void invokeApplication() const;
-    
+
     bool canExecute() const;
     QString section();
-    
+
     virtual State state();
     virtual void fetchScreenshots();
     virtual void fetchChangelog();
-    
+
     bool isFromSecureOrigin() const;
     QByteArray getField(const char* field, const QByteArray& defaultvalue = QByteArray()) const;
 
@@ -99,7 +102,7 @@ private slots:
 
 private:
     QString buildDescription(const QByteArray& data, const QString& source);
-    
+
     QSharedPointer<KConfig> m_data;
     QApt::Backend *m_backend;
     QApt::Package *m_package;
