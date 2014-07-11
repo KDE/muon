@@ -22,7 +22,7 @@ QString AppstreamApplication::comment()
 QString AppstreamApplication::icon() const
 {
     //TODO return icon path from cache
-    return QString();
+    return QString("applications-other");
 }
 
 QStringList AppstreamApplication::mimetypes() const
