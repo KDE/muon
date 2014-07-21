@@ -71,6 +71,23 @@ static const KCatalogLoader loader("app-install-data");
 K_PLUGIN_FACTORY(MuonAppsBackendFactory, registerPlugin<ApplicationBackend>(); )
 K_EXPORT_PLUGIN(MuonAppsBackendFactory(KAboutData("muon-appsbackend","muon-appsbackend",ki18n("Applications Backend"),"0.1",ki18n("Applications in your system"), KAboutData::License_GPL)))
 
+static QString getCodename(const QString& value)
+{
+    QString ret;
+    QFile f("/etc/os-release");
+    if(f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QRegExp rx(QString("%1=(.+)\n").arg(value));
+        while(!f.atEnd()) {
+            QByteArray line = f.readLine();
+            if(rx.exactMatch(line)) {
+                ret = rx.cap(1);
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
 ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     : AbstractResourcesBackend(parent)
     , m_backend(new QApt::Backend(this))
@@ -82,7 +99,15 @@ ApplicationBackend::ApplicationBackend(QObject* parent, const QVariantList& )
     , m_aptify(nullptr)
     , m_aptBackendInitialized(false)
 {
-    KGlobal::dirs()->addResourceDir("appicon", "/usr/share/app-install/icons/");
+    QString distroSeries = getCodename("VERSION");
+    if(!distroSeries.isEmpty()){
+        distroSeries = distroSeries.split(" ").last().remove('(').remove(')');
+    }else{
+        distroSeries = getCodename("PRETTY_NAME").split(" ").last().split("/").first();
+    }
+    QString appInfoPath = QString("/usr/share/app-info/icons/").append(distroSeries).append("/");
+    //TODO Take the path from Appstream
+    KGlobal::dirs()->addResourceDir("appicon", appInfoPath);
 
     m_watcher = new QFutureWatcher<QVector<Application*> >(this);
     connect(m_watcher, SIGNAL(finished()), this, SLOT(setApplications()));

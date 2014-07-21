@@ -1,6 +1,8 @@
 #include "AppstreamApplication.h"
 #include "Application.h"
 
+#include <KStandardDirs>
+
 AppstreamApplication::AppstreamApplication(Appstream::Component comp, QApt::Backend* backend)
     : Application(backend)
     , m_component(comp)
@@ -21,8 +23,16 @@ QString AppstreamApplication::comment()
 
 QString AppstreamApplication::icon() const
 {
-    //TODO return icon path from cache
-    return QString("applications-other");
+    if(m_component.icon().isEmpty()){
+        if(!m_component.iconUrl().toString().isEmpty()){
+            QString iconName = m_component.iconUrl().toString().mid(m_component.iconUrl().toString().lastIndexOf('/')+1);
+            if(!KGlobal::dirs()->findResource("appicon",iconName).isEmpty()){
+                return iconName.left(iconName.lastIndexOf("."));
+            }
+        }
+        return QString("applications-other");
+    }
+    return m_component.icon();
 }
 
 QStringList AppstreamApplication::mimetypes() const
