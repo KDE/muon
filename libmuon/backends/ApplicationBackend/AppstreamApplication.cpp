@@ -8,7 +8,7 @@ AppstreamApplication::AppstreamApplication(Appstream::Component comp, QApt::Back
     , m_component(comp)
 {
     setTechnical(m_component.kind() != Appstream::Component::KindDesktop);
-    setPackageName(m_component.packageName().toLatin1());
+    setPackageName(m_component.packageNames().first().toLatin1());
 }
 
 QString AppstreamApplication::untranslatedName()
