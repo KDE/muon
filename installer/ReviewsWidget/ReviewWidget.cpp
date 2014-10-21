@@ -26,7 +26,7 @@
 
 #include <KGlobal>
 #include <KLocale>
-#include <Nepomuk/KRatingWidget>
+#include <KRatingWidget>
 
 #include <ReviewsBackend/Review.h>
 #include <resources/AbstractResource.h>

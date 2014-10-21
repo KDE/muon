@@ -54,7 +54,7 @@
 #include <KTemporaryFile>
 #include <KToolInvocation>
 #include <KDebug>
-#include <Nepomuk/KRatingWidget>
+#include <KRatingWidget>
 
 // Libmuon includes
 #include <resources/AbstractResource.h>

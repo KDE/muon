@@ -34,7 +34,7 @@
 #include <KGlobal>
 #include <KLocale>
 #include <KStandardDirs>
-#include <Nepomuk/KRatingPainter>
+#include <KRatingPainter>
 #include <KDebug>
 
 // Libmuon includes
