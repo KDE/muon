@@ -541,7 +541,7 @@ void QAptActions::checkDistUpgrade()
     if(!QFile::exists("/usr/lib/python3/dist-packages/DistUpgrade/DistUpgradeFetcherKDE.py")) {
         qWarning() << "Couldn't find the /usr/lib/python3/dist-packages/DistUpgrade/DistUpgradeFetcherKDE.py file";
     }
-    QString checkerFile = KStandardDirs::locate("data", "muon-notifier/releasechecker");
+    QString checkerFile = KStandardDirs::locate("data", "muonapplicationnotifier/releasechecker");
     if(checkerFile.isEmpty()) {
         qWarning() << "Couldn't find the releasechecker script";
     }
