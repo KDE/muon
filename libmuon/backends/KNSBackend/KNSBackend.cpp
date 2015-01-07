@@ -74,7 +74,7 @@ KNSBackend::KNSBackend(QObject* parent, const QVariantList& args)
     
     m_iconName = info.value("Icon").toString();
     m_name = KStandardDirs::locate("config", info.value("X-Muon-Arguments").toString());
-    if(!m_name.isEmpty()) {
+    if(m_name.isEmpty()) {
         kWarning() << "KNS file not installed: " << info.value("X-Muon-Arguments").toString();
         m_isValid = false;
         return;
