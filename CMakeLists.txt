@@ -6,8 +6,6 @@ set(KDE_MIN_VERSION "4.7.0")
 find_package(KDE4 ${KDE_MIN_VERSION} REQUIRED)
 find_package(QApt QUIET)
 find_package(DebconfKDE QUIET)
-find_package(QtOAuth REQUIRED)
-find_package(QCA2 REQUIRED) #required by QtOAuth
 find_package(QJSON REQUIRED)
 find_package(LibAttica QUIET)
 find_package(BODEGA QUIET)
@@ -35,6 +33,9 @@ configure_file(MuonVersion.h.in MuonVersion.h)
 
 add_subdirectory(libmuon)
 if(QAPT_FOUND)
+    find_package(QtOAuth REQUIRED)
+    find_package(QCA2 REQUIRED) #required by QtOAuth
+
     add_subdirectory(libmuonapt)
     add_subdirectory(muon)
     add_subdirectory(installer)
