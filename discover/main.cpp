@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     } else if(args->isSet("listbackends")) {
         fprintf(stdout, "%s", qPrintable(i18n("Available backends:\n")));
         MuonBackendsFactory f;
-        foreach(const QString& name, f.allBackendNames())
+        foreach(const QString& name, f.allBackendNames(false))
             fprintf(stdout, " * %s\n", qPrintable(name));
         return 0;
     }

@@ -48,12 +48,17 @@ AbstractResourcesBackend* MuonBackendsFactory::backend(const QString& name) cons
     return 0;
 }
 
-QStringList MuonBackendsFactory::allBackendNames() const
+QStringList MuonBackendsFactory::allBackendNames(bool w) const
 {
     QStringList ret;
-    KService::List serviceList = KServiceTypeTrader::self()->query("Muon/Backend");
-    foreach(const KService::Ptr& service, serviceList) {
-        ret += service->property("X-KDE-PluginInfo-Name").toString();
+    QSet<QString> whitelist = fetchBackendsWhitelist();
+    if(w && !whitelist.isEmpty()) {
+        ret = whitelist.toList();
+    } else {
+        KService::List serviceList = KServiceTypeTrader::self()->query("Muon/Backend");
+        foreach(const KService::Ptr& service, serviceList) {
+            ret += service->property("X-KDE-PluginInfo-Name").toString();
+        }
     }
     return ret;
 }

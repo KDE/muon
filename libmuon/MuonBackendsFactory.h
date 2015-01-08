@@ -33,7 +33,7 @@ public:
     
     AbstractResourcesBackend* backend(const QString& name) const;
     QList<AbstractResourcesBackend*> allBackends() const;
-    QStringList allBackendNames() const;
+    QStringList allBackendNames(bool whitelist) const;
     int backendsCount() const;
     
 private:
