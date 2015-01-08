@@ -151,11 +151,27 @@ void KNSBackend::categoriesLoaded(Attica::BaseJob* job)
 
     foreach(const Attica::Category& category, categoryList) {
         if (m_categories.contains(category.name())) {
-//             kDebug() << "Adding category: " << category.name();
+//             qDebug() << "Adding category: " << category.name();
             m_categories[category.name()] = category;
         }
     }
     
+    // Remove categories for which we got no matching category from the provider.
+    // Otherwise we'll fetch an empty category specificier which can return
+    // everything and the kitchen sink if the remote provider feels like it.
+    for (auto it = m_categories.begin(); it != m_categories.end(); ++it) {
+        if (it.value().isValid())
+            continue;
+//        qDebug() << "removing category as it is invalid:" << it.key();
+        it = m_categories.erase(it);
+        if (it == m_categories.end())
+            break;
+    }
+    if (m_categories.values().size() <= 0) {
+        setFetching(false);
+        return;
+    }
+
     Attica::ListJob<Attica::Content>* jj =
         m_provider.searchContents(m_categories.values(), QString(), Attica::Provider::Alphabetical, m_page, 100);
     connect(jj, SIGNAL(finished(Attica::BaseJob*)), SLOT(receivedContents(Attica::BaseJob*)));
