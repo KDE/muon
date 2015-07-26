@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8.9)
 project(muon)
 
 set(CMAKE_MODULE_PATH "${muon_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})

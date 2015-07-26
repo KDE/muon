@@ -40,6 +40,7 @@ set_target_properties(muonprivate PROPERTIES
 )
 
 target_link_libraries(muonprivate
+   LINK_PRIVATE
     ${QT_QTXML_LIBRARY}
     ${QT_QTGUI_LIBRARY}
     ${QT_QTDECLARATIVE_LIBRARY}
