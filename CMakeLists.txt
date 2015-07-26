@@ -5,6 +5,7 @@ set(CMAKE_MODULE_PATH "${muon_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 set(KDE_MIN_VERSION "4.7.0")
 find_package(KDE4 ${KDE_MIN_VERSION} REQUIRED)
+find_package(KDeclarative REQUIRED)
 find_package(QApt QUIET)
 find_package(DebconfKDE QUIET)
 find_package(QJSON REQUIRED)

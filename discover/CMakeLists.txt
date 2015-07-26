@@ -20,7 +20,7 @@ kde4_add_executable(muon-discover ${muon_discover_SRCS})
 target_link_libraries(muon-discover muonprivate
                                      ${KDE4_KIO_LIBS}
                                      ${KDE4_PLASMA_LIBS}
-                                     kdeclarative
+                                     ${KDECLARATIVE_LIBRARIES}
                                      ${QAPT_LIBRARY}
                                      ${QT_QTOPENGL_LIBRARY}
                                      ${QT_QTDECLARATIVE_LIBRARY}
