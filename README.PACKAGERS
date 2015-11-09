@@ -7,4 +7,3 @@ apt-backend:
 - apt-xapian-index
 - kde-cli-tools (kdesu)
 - software-properties-kde
-

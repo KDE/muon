@@ -8,7 +8,7 @@ option(MUON_INSTALL_EXPORTER "Install muon-exporter [development utility]" OFF)
 
 find_package(ECM REQUIRED NO_MODULE)
 
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 find_package(Qt5 5.2.0 REQUIRED CONFIG COMPONENTS Widgets Test Network Xml Concurrent DBus Svg Qml QuickWidgets)
 include(KDEInstallDirs)
