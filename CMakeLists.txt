@@ -8,7 +8,7 @@ find_package(ECM REQUIRED NO_MODULE)
 
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-find_package(Qt5 5.2.0 REQUIRED CONFIG COMPONENTS Widgets Test Network Xml Concurrent DBus Svg Qml QuickWidgets)
+find_package(Qt5 5.2.0 REQUIRED CONFIG COMPONENTS Widgets Concurrent)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
@@ -16,15 +16,12 @@ include(ECMInstallIcons)
 include(ECMMarkAsTest)
 include(GenerateExportHeader)
 
-find_package(KF5 REQUIRED WidgetsAddons CoreAddons Solid Archive
-                                            Config Wallet DBusAddons I18n ConfigWidgets Notifications Declarative
-                                            KIO IconThemes ItemViews)
-find_package(KF5TextWidgets REQUIRED)
+find_package(KF5 REQUIRED KIO KDELibs4Support DBusAddons)
 
 find_package(QApt 3.0.0 REQUIRED)
 find_package(DebconfKDE 1.0.0 REQUIRED)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(MUON_VERSION ${PROJECT_VERSION})
 configure_file(MuonVersion.h.in MuonVersion.h)
