@@ -38,7 +38,8 @@
 HistoryView::HistoryView(QWidget *parent)
     : QWidget(parent)
 {
-    setLayout(new QVBoxLayout(this));
+    QLayout *viewLayout = new QVBoxLayout(this);
+    setLayout(viewLayout);
     m_history = new QApt::History(this);
 
     QWidget *headerWidget = new QWidget(this);
@@ -205,6 +206,9 @@ HistoryView::HistoryView(QWidget *parent)
 
     m_historyView->setMouseTracking(true);
     m_historyView->setVerticalScrollMode(QListView::ScrollPerPixel);
+
+    viewLayout->addWidget(headerWidget);
+    viewLayout->addWidget(m_historyView);
 
     m_proxyModel = new HistoryProxyModel(this);
     m_proxyModel->setSourceModel(m_historyModel);

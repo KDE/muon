@@ -475,7 +475,7 @@ void QAptActions::showHistoryDialog()
         KWindowConfig::restoreWindowSize(m_historyDialog->windowHandle(), dialogConfig);
         
 
-        connect(m_historyDialog, SIGNAL(finished()), SLOT(closeHistoryDialog()));
+        connect(m_historyDialog, SIGNAL(finished(int)), SLOT(closeHistoryDialog()));
         HistoryView *historyView = new HistoryView(m_historyDialog);
         m_historyDialog->layout()->addWidget(historyView);
         m_historyDialog->setWindowTitle(i18nc("@title:window", "Package History"));
