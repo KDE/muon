@@ -22,11 +22,11 @@
 
 // Qt includes
 #include <QScrollBar>
+#include <QTextBrowser>
 
 // KDE includes
 #include <KComboBox>
 #include <KLocalizedString>
-#include <KTextBrowser>
 
 // QApt includes
 #include <QApt/Package>
@@ -42,7 +42,7 @@ DependsTab::DependsTab(QWidget *parent)
     m_comboBox->addItem(i18nc("@item:inlistbox", "Dependants (Reverse Dependencies)"), ReverseDependsType);
     m_comboBox->addItem(i18nc("@item:inlistbox", "Virtual Packages Provided"), VirtualDependsType);
     connect(m_comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(populateDepends(int)));
-    m_dependsBrowser = new KTextBrowser(this);
+    m_dependsBrowser = new QTextBrowser(this);
 
     m_layout->addWidget(m_comboBox);
     m_layout->addWidget(m_dependsBrowser);

@@ -20,8 +20,10 @@
 
 #include "InstalledFilesTab.h"
 
+// Qt includes
+#include <QTextBrowser>
+
 // KDE includes
-#include <KTextBrowser>
 #include <KLocalizedString>
 
 // QApt includes
@@ -31,7 +33,7 @@ InstalledFilesTab::InstalledFilesTab(QWidget *parent)
     : DetailsTab(parent)
 {
     m_name = i18nc("@title:tab", "Installed Files");
-    m_filesBrowser = new KTextBrowser(this);
+    m_filesBrowser = new QTextBrowser(this);
 
     m_layout->addWidget(m_filesBrowser);
 }

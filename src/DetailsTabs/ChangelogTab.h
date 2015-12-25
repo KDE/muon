@@ -26,10 +26,11 @@
 // Qt includes
 #include <QtCore/QHash>
 
+class QTextBrowser;
+
 class KJob;
 class KPixmapSequenceOverlayPainter;
 class KTemporaryFile;
-class KTextBrowser;
 
 class ChangelogTab : public DetailsTab
 {
@@ -38,7 +39,7 @@ public:
     explicit ChangelogTab(QWidget *parent = 0);
 
 private:
-    KTextBrowser *m_changelogBrowser;
+    QTextBrowser *m_changelogBrowser;
     KPixmapSequenceOverlayPainter *m_busyWidget;
     QHash<KJob *, QString> m_jobFilenames;
 

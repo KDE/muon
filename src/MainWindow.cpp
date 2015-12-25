@@ -32,12 +32,10 @@
 
 // KDE includes
 #include <KActionCollection>
-#include <KFileDialog>
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KProtocolManager>
 #include <KStandardAction>
-#include <KStatusBar>
 
 // QApt includes
 #include <QApt/Backend>
@@ -69,7 +67,7 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    MuonSettings::self()->writeConfig();
+    MuonSettings::self()->save();
 }
 
 void MainWindow::initGUI()
@@ -164,7 +162,7 @@ void MainWindow::loadSplitterSizes()
 void MainWindow::saveSplitterSizes()
 {
     MuonSettings::self()->setSplitterSizes(m_mainWidget->sizes());
-    MuonSettings::self()->writeConfig();
+    MuonSettings::self()->save();
 }
 
 void MainWindow::setupActions()

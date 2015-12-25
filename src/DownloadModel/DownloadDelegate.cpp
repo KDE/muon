@@ -21,10 +21,10 @@
 #include "DownloadDelegate.h"
 
 // Qt includes
+#include <QApplication>
 #include <QPainter>
 
 // KDE includes
-#include <KApplication>
 #include <KFormat>
 #include <KLocalizedString>
 
@@ -74,7 +74,7 @@ void DownloadDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
             progressBarOption.text = text;
             progressBarOption.textVisible = true;
 
-            KApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarOption, painter);
+            QApplication::style()->drawControl(QStyle::CE_ProgressBar, &progressBarOption, painter);
             break;
         }
     }

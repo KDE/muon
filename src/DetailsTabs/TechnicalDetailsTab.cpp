@@ -27,10 +27,8 @@
 #include <QScrollArea>
 
 // KDE includes
-#include <KGlobal>
-#include <KVBox>
-#include <KHBox>
 #include <KFormat>
+#include <KLocalizedString>
 
 // QApt includes
 #include <QApt/Backend>
@@ -50,9 +48,7 @@ TechnicalDetailsTab::TechnicalDetailsTab(QWidget *parent)
     scrollArea->viewport()->setAutoFillBackground(false);
     m_layout->addWidget(scrollArea);
 
-    KVBox *mainWidget = new KVBox(this);
-
-    QWidget *generalWidget = new QWidget(mainWidget);
+    QWidget *generalWidget = new QWidget;
     QGridLayout *generalGrid = new QGridLayout(generalWidget);
     generalWidget->setLayout(generalGrid);
 
@@ -106,9 +102,7 @@ TechnicalDetailsTab::TechnicalDetailsTab(QWidget *parent)
 
     generalGrid->setColumnStretch(1, 1);
 
-    KHBox *versionWidget = new KHBox(mainWidget);
-
-    m_installedVersionBox = new QGroupBox(versionWidget);
+    m_installedVersionBox = new QGroupBox;
     m_installedVersionBox->setTitle(i18nc("@title:group", "Installed Version"));
     QGridLayout *installedGridLayout = new QGridLayout(m_installedVersionBox);
     m_installedVersionBox->setLayout(installedGridLayout);
@@ -133,7 +127,7 @@ TechnicalDetailsTab::TechnicalDetailsTab(QWidget *parent)
     installedGridLayout->setColumnStretch(1, 1);
 
 
-    m_currentVersionBox = new QGroupBox(versionWidget);
+    m_currentVersionBox = new QGroupBox;
     m_currentVersionBox->setTitle(i18nc("@title:group", "Available Version"));
     QGridLayout *currentGridLayout = new QGridLayout(m_currentVersionBox);
     m_currentVersionBox->setLayout(currentGridLayout);
@@ -165,8 +159,20 @@ TechnicalDetailsTab::TechnicalDetailsTab(QWidget *parent)
 
     currentGridLayout->setColumnStretch(1, 1);
 
-    QWidget *verticalSpacer = new QWidget(mainWidget);
+    QHBoxLayout *versionLayout = new QHBoxLayout;
+    versionLayout->addWidget(m_installedVersionBox);
+    versionLayout->addWidget(m_currentVersionBox);
+
+    QWidget *verticalSpacer = new QWidget;
     verticalSpacer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(generalWidget);
+    mainLayout->addLayout(versionLayout);
+    mainLayout->addWidget(verticalSpacer);
+
+    QWidget *mainWidget = new QWidget;
+    mainWidget->setLayout(mainLayout);
     scrollArea->setWidget(mainWidget);
 }
 

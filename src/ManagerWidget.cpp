@@ -27,8 +27,6 @@
 #include <QSplitter>
 
 // KDE includes
-#include <KDebug>
-#include <KHBox>
 #include <KLocalizedString>
 
 // QApt includes

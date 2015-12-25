@@ -1,5 +1,3 @@
-find_package(KF5KDELibs4Support)
-
 add_subdirectory(icons)
 
 set(muon_SRCS
@@ -53,8 +51,10 @@ target_compile_definitions(muon PRIVATE -DCMAKE_INSTALL_FULL_LIBEXECDIR_KF5=\"${
 
 target_link_libraries(muon DebconfKDE::Main
                            KF5::KIOWidgets
-                           KF5::KDELibs4Support
                            KF5::DBusAddons
+                           KF5::I18n
+                           KF5::IconThemes
+                           KF5::XmlGui
                            Qt5::Concurrent
                            QApt::Main)
 

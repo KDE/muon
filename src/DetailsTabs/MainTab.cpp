@@ -22,19 +22,16 @@
 
 // Qt includes
 #include <QHBoxLayout>
+#include <QMenu>
+#include <QTextBrowser>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 
 // KDE includes
-#include <KDebug>
-#include <KDialog>
-#include <KHBox>
 #include <KLocalizedString>
-#include <KMenu>
 #include <KMessageBox>
-#include <KTextBrowser>
 
 // QApt includes
 #include <QApt/Backend>
@@ -45,18 +42,16 @@ MainTab::MainTab(QWidget *parent)
 {
     m_name = i18nc("@title:tab", "Details");
 
-    KHBox *headerBox = new KHBox(this);
-    m_packageShortDescLabel = new QLabel(headerBox);
+    m_packageShortDescLabel = new QLabel;
     m_packageShortDescLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
     QFont font;
     font.setBold(true);
     m_packageShortDescLabel->setFont(font);
 
-    QWidget *buttonBox = new QWidget(headerBox);
+    QWidget *buttonBox = new QWidget;
 
     QHBoxLayout *buttonBoxLayout = new QHBoxLayout(buttonBox);
     buttonBoxLayout->setMargin(0);
-    buttonBoxLayout->setSpacing(KDialog::spacingHint());
 
     m_buttonLabel = new QLabel(buttonBox);
     m_buttonLabel->setText(i18nc("@label", "Mark for:"));
@@ -88,7 +83,7 @@ MainTab::MainTab(QWidget *parent)
     connect(m_reinstallButton, SIGNAL(clicked()), this, SLOT(emitSetReInstall()));
     buttonBoxLayout->addWidget(m_reinstallButton);
 
-    m_purgeMenu = new KMenu(m_removeButton);
+    m_purgeMenu = new QMenu(m_removeButton);
     m_purgeAction = new QAction(this);
     m_purgeAction->setIcon(QIcon::fromTheme("edit-delete-shred"));
     m_purgeAction->setText(i18nc("@action:button", "Purge"));
@@ -108,9 +103,13 @@ MainTab::MainTab(QWidget *parent)
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(emitSetKeep()));
     buttonBoxLayout->addWidget(m_cancelButton);
 
-    m_descriptionBrowser = new KTextBrowser(this);
+    QHBoxLayout *headerBox = new QHBoxLayout;
+    headerBox->addWidget(m_packageShortDescLabel);
+    headerBox->addWidget(buttonBox);
 
-    m_layout->addWidget(headerBox);
+    m_descriptionBrowser = new QTextBrowser(this);
+
+    m_layout->addLayout(headerBox);
     m_layout->addWidget(m_descriptionBrowser);
 }
 

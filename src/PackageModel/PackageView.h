@@ -27,7 +27,7 @@ class PackageView : public QTreeView
 {
     Q_OBJECT
 public:
-    explicit PackageView(QWidget *parent);
+    explicit PackageView(QWidget *parent = 0);
 
 protected Q_SLOTS:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);

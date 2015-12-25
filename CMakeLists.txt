@@ -16,7 +16,7 @@ include(ECMInstallIcons)
 include(ECMMarkAsTest)
 include(GenerateExportHeader)
 
-find_package(KF5 REQUIRED KIO KDELibs4Support DBusAddons)
+find_package(KF5 REQUIRED KIO DBusAddons I18n IconThemes XmlGui)
 
 find_package(QApt 3.0.0 REQUIRED)
 find_package(DebconfKDE 1.0.0 REQUIRED)

@@ -21,7 +21,11 @@
 #include "ChangelogTab.h"
 
 // Qt includes
+#include <QDir>
 #include <QtCore/QTextStream>
+#include <QTemporaryFile>
+#include <QTextBrowser>
+#include <QUrl>
 
 // KDE includes
 #include <KIO/Job>
@@ -29,8 +33,6 @@
 #include <KLocalizedString>
 #include <KPixmapSequence>
 #include <KPixmapSequenceOverlayPainter>
-#include <KTemporaryFile>
-#include <KTextBrowser>
 #include <KIconLoader>
 
 // QApt includes
@@ -42,10 +44,10 @@ ChangelogTab::ChangelogTab(QWidget *parent)
 {
     m_name = i18nc("@title:tab", "Changes List");
 
-    m_changelogBrowser = new KTextBrowser(this);
+    m_changelogBrowser = new QTextBrowser(this);
 
     m_busyWidget = new KPixmapSequenceOverlayPainter(this);
-    m_busyWidget->setSequence(KPixmapSequence("process-working", KIconLoader::SizeSmallMedium));
+    m_busyWidget->setSequence(KIconLoader::global()->loadPixmapSequence("process-working", KIconLoader::SizeSmallMedium));
     m_busyWidget->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_busyWidget->setWidget(m_changelogBrowser->viewport());
 
@@ -111,16 +113,14 @@ void ChangelogTab::fetchChangelog()
     m_changelogBrowser->clear();
     m_busyWidget->start();
 
-    KTemporaryFile *changelogFile = new KTemporaryFile;
+    QTemporaryFile *changelogFile = new QTemporaryFile(QDir::tempPath() + QLatin1String("/muon_XXXXXX.txt"));
     changelogFile->setAutoRemove(false);
-    changelogFile->setPrefix("muon");
-    changelogFile->setSuffix(".txt");
     changelogFile->open();
     QString filename = changelogFile->fileName();
     delete changelogFile;
 
     KIO::FileCopyJob *getJob = KIO::file_copy(m_package->changelogUrl(),
-                               filename, -1,
+                               QUrl::fromLocalFile(filename), -1,
                                KIO::Overwrite | KIO::HideProgressInfo);
     getJob->setAutoDelete(false);
     m_jobFilenames.insert(getJob, filename);

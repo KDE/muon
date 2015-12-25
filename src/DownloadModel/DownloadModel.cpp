@@ -20,7 +20,6 @@
 
 #include "DownloadModel.h"
 
-#include <KDebug>
 #include <KLocalizedString>
 
 DownloadModel::DownloadModel(QObject *parent)

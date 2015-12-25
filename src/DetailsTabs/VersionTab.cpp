@@ -28,7 +28,6 @@
 #include <QStandardItemModel>
 
 // KDE includes
-#include <KDialog>
 #include <KLocalizedString>
 
 // QApt includes

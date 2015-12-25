@@ -75,7 +75,7 @@ TransactionWidget::TransactionWidget(QWidget *parent)
     m_downloadView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     m_downloadView->header()->setStretchLastSection(false);
-    m_downloadView->header()->setResizeMode(1, QHeaderView::Stretch);
+    m_downloadView->header()->setSectionResizeMode(1, QHeaderView::Stretch);
     m_downloadView->hide();
 
     QString uuid = QUuid::createUuid().toString();

@@ -28,18 +28,17 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLabel>
+#include <QLineEdit>
+#include <QMenu>
 #include <QSplitter>
+#include <QVBoxLayout>
 
 // KDE includes
 #include <KComboBox>
-#include <KHBox>
-#include <KLineEdit>
 #include <KLocalizedString>
-#include <KMenu>
 #include <KMessageBox>
 #include <KPixmapSequence>
 #include <KPixmapSequenceOverlayPainter>
-#include <KVBox>
 #include <KIconLoader>
 
 // QApt includes
@@ -70,7 +69,7 @@ QApt::PackageList sortPackages(QApt::PackageList list)
 }
 
 PackageWidget::PackageWidget(QWidget *parent)
-        : KVBox(parent)
+        : QWidget(parent)
         , m_backend(0)
         , m_headerLabel(0)
         , m_searchEdit(0)
@@ -85,10 +84,13 @@ PackageWidget::PackageWidget(QWidget *parent)
     m_proxyModel = new PackageProxyModel(this);
     m_proxyModel->setSourceModel(m_model);
 
-    KVBox *topVBox = new KVBox;
+    QVBoxLayout *topVBox = new QVBoxLayout;
+    topVBox->setContentsMargins(0, 0, 0, 0);
+    topVBox->setSpacing(0);
 
-    m_headerLabel = new QLabel(topVBox);
+    m_headerLabel = new QLabel;
     m_headerLabel->setTextFormat(Qt::RichText);
+    topVBox->addWidget(m_headerLabel);
 
     m_searchTimer = new QTimer(this);
     m_searchTimer->setInterval(300);
@@ -97,20 +99,20 @@ PackageWidget::PackageWidget(QWidget *parent)
 
     setupActions();
 
-    m_searchEdit = new KLineEdit(topVBox);
+    m_searchEdit = new QLineEdit;
     m_searchEdit->setEnabled(false);
-    m_searchEdit->setClickMessage(i18nc("@label Line edit click message", "Search"));
-    m_searchEdit->setClearButtonShown(true);
+    m_searchEdit->setPlaceholderText(i18nc("@label Line edit click message", "Search"));
+    m_searchEdit->setClearButtonEnabled(true);
     m_searchEdit->hide(); // Off by default, use showSearchEdit() to show
+    topVBox->addWidget(m_searchEdit);
 
-    m_packageView = new PackageView(topVBox);
+    m_packageView = new PackageView;
     m_packageView->setModel(m_proxyModel);
     m_packageView->setItemDelegate(delegate);
-    m_packageView->header()->setResizeMode(0, QHeaderView::Stretch);
+    m_packageView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    topVBox->addWidget(m_packageView);
 
-    KVBox *bottomVBox = new KVBox(this);
-
-    m_detailsWidget = new DetailsWidget(bottomVBox);
+    m_detailsWidget = new DetailsWidget;
     connect(m_detailsWidget, SIGNAL(setInstall(QApt::Package*)),
             this, SLOT(setInstall(QApt::Package*)));
     connect(m_detailsWidget, SIGNAL(setRemove(QApt::Package*)),
@@ -143,10 +145,17 @@ PackageWidget::PackageWidget(QWidget *parent)
             this, SLOT(sectionClicked(int)));
     connect(m_searchEdit, SIGNAL(textChanged(QString)), m_searchTimer, SLOT(start()));
 
-    QSplitter *splitter = new QSplitter(this);
+    QWidget* topWidget = new QWidget;
+    topWidget->setLayout(topVBox);
+
+    QSplitter *splitter = new QSplitter;
     splitter->setOrientation(Qt::Vertical);
-    splitter->addWidget(topVBox);
-    splitter->addWidget(bottomVBox);
+    splitter->addWidget(topWidget);
+    splitter->addWidget(m_detailsWidget);
+
+    setLayout(new QVBoxLayout);
+    layout()->setContentsMargins(0, 0, 0, 0);
+    layout()->addWidget(splitter);
 }
 
 void PackageWidget::setupActions()
@@ -248,7 +257,7 @@ void PackageWidget::reload()
     QFuture<QList<QApt::Package*> > future = QtConcurrent::run(sortPackages, packageList);
     m_watcher->setFuture(future);
     m_proxyModel->setSourceModel(m_model);
-    m_packageView->header()->setResizeMode(0, QHeaderView::Stretch);
+    m_packageView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 }
 
 void PackageWidget::packageActivated(const QModelIndex &index)
@@ -263,7 +272,7 @@ void PackageWidget::packageActivated(const QModelIndex &index)
 
 void PackageWidget::contextMenuRequested(const QPoint &pos)
 {
-    KMenu menu;
+    QMenu menu;
 
     menu.addAction(m_installAction);
     menu.addAction(m_removeAction);

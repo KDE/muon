@@ -31,10 +31,10 @@
 
 class QPushButton;
 class QLabel;
+class QMenu;
+class QTextBrowser;
 class QToolButton;
 
-class KMenu;
-class KTextBrowser;
 
 class MainTab : public DetailsTab
 {
@@ -51,11 +51,11 @@ private:
     QPushButton *m_upgradeButton;
     QPushButton *m_reinstallButton;
     QAction *m_purgeAction;
-    KMenu *m_purgeMenu;
+    QMenu *m_purgeMenu;
     QPushButton *m_purgeButton;
     QPushButton *m_cancelButton;
 
-    KTextBrowser *m_descriptionBrowser;
+    QTextBrowser *m_descriptionBrowser;
 
 public Q_SLOTS:
     void refresh();

@@ -23,7 +23,7 @@
 
 #include "DetailsTab.h"
 
-class KTextBrowser;
+class QTextBrowser;
 
 class InstalledFilesTab : public DetailsTab
 {
@@ -34,7 +34,7 @@ public:
     bool shouldShow() const;
 
 private:
-    KTextBrowser *m_filesBrowser;
+    QTextBrowser *m_filesBrowser;
 
 public Q_SLOTS:
     void setPackage(QApt::Package *package);

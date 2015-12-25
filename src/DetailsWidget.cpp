@@ -39,7 +39,7 @@
 #include "DetailsTabs/VersionTab.h"
 
 DetailsWidget::DetailsWidget(QWidget *parent)
-    : KTabWidget(parent)
+    : QTabWidget(parent)
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
     setDocumentMode(true);

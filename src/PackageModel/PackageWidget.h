@@ -24,17 +24,15 @@
 // Qt includes
 #include <QModelIndex>
 #include <QFutureWatcher>
-
-// KDE includes
-#include <KVBox>
+#include <QWidget>
 
 #include <QApt/Package>
 
 class QLabel;
+class QLineEdit;
 class QTimer;
 class QVBoxLayout;
 
-class KLineEdit;
 class KPixmapSequenceOverlayPainter;
 
 class DetailsWidget;
@@ -47,7 +45,7 @@ namespace QApt
     class Backend;
 }
 
-class PackageWidget : public KVBox
+class PackageWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -82,7 +80,7 @@ private:
     QFutureWatcher<QList<QApt::Package*> >* m_watcher;
     QWidget *m_headerWidget;
     QLabel *m_headerLabel;
-    KLineEdit *m_searchEdit;
+    QLineEdit *m_searchEdit;
     QTimer *m_searchTimer;
 
     QAction *m_installAction;

@@ -23,8 +23,9 @@
 
 #include "DetailsTab.h"
 
+class QTextBrowser;
+
 class KComboBox;
-class KTextBrowser;
 
 class DependsTab : public DetailsTab
 {
@@ -41,7 +42,7 @@ public:
 
 private:
     KComboBox *m_comboBox;
-    KTextBrowser *m_dependsBrowser;
+    QTextBrowser *m_dependsBrowser;
 
 public Q_SLOTS:
     void refresh();

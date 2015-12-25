@@ -21,11 +21,9 @@
 #ifndef DETAILSWIDGET_H
 #define DETAILSWIDGET_H
 
-#include <KTabWidget>
-
-
 // Qt includes
 #include <QtCore/QVector>
+#include <QTabWidget>
 
 class QScrollArea;
 
@@ -37,11 +35,11 @@ namespace QApt
 
 class DetailsTab;
 
-class DetailsWidget : public KTabWidget
+class DetailsWidget : public QTabWidget
 {
     Q_OBJECT
 public:
-    explicit DetailsWidget(QWidget *parent);
+    explicit DetailsWidget(QWidget *parent = 0);
     ~DetailsWidget();
 
 private:

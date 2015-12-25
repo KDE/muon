@@ -26,7 +26,6 @@
 #include <QSpinBox>
 #include <QFormLayout>
 
-#include <KDialog>
 #include <KLocalizedString>
 
 #include <QApt/Config>
@@ -47,7 +46,6 @@ GeneralSettingsPage::GeneralSettingsPage(QWidget* parent, QApt::Config *aptConfi
 {
     QFormLayout *layout = new QFormLayout(this);
     layout->setMargin(0);
-    layout->setSpacing(KDialog::spacingHint());
     setLayout(layout);
 
     m_askChangesCheckBox->setText(i18n("Ask to confirm changes that affect other packages"));
@@ -130,7 +128,7 @@ void GeneralSettingsPage::applySettings()
     settings->setAskChanges(m_askChangesCheckBox->isChecked());
     settings->setShowMultiArchDupes(m_multiArchDupesBox->isChecked());
     settings->setUndoStackSize(m_undoStackSpinbox->value());
-    settings->writeConfig();
+    settings->save();
 
     // Only write if changed. Unnecessary password dialogs ftl
     if (m_aptConfig->readEntry("APT::Install-Recommends", true) != m_recommendsCheckBox->isChecked()) {

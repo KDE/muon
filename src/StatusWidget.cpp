@@ -28,8 +28,8 @@
 #include <QtWidgets/QProgressBar>
 
 // KDE includes
-#include <KGlobal>
 #include <KFormat>
+#include <KLocalizedString>
 
 // QApt includes
 #include <QApt/Backend>
