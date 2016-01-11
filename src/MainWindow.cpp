@@ -170,6 +170,9 @@ void MainWindow::setupActions()
     QAction *quitAction = KStandardAction::quit(QCoreApplication::instance(), SLOT(quit()), actionCollection());
     actionCollection()->addAction("file_quit", quitAction);
 
+    QAction *focusSearchAction = KStandardAction::find(this, SLOT(setFocusSearchEdit()), actionCollection());
+    actionCollection()->addAction("find", focusSearchAction);
+
     m_safeUpgradeAction = actionCollection()->addAction("safeupgrade");
     m_safeUpgradeAction->setIcon(QIcon::fromTheme("go-up"));
     m_safeUpgradeAction->setText(i18nc("@action Marks upgradeable packages for upgrade", "Cautious Upgrade"));
@@ -210,6 +213,13 @@ void MainWindow::setupActions()
     setActionsEnabled(false);
 
     setupGUI(StandardWindowOption(KXmlGuiWindow::Default & ~KXmlGuiWindow::StatusBar));
+}
+
+void MainWindow::setFocusSearchEdit()
+{
+    if (m_managerWidget->isVisible()) {
+        m_managerWidget->setFocusSearchEdit();
+    }
 }
 
 void MainWindow::markUpgrade()

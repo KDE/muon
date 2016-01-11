@@ -229,6 +229,12 @@ void PackageWidget::showSearchEdit()
     m_searchEdit->show();
 }
 
+void PackageWidget::setFocusSearchEdit()
+{
+    m_searchEdit->setFocus();
+    m_searchEdit->selectAll();
+}
+
 void PackageWidget::setBackend(QApt::Backend *backend)
 {
     m_backend = backend;
@@ -371,6 +377,7 @@ void PackageWidget::setSortedPackages()
     QApt::PackageList packageList = m_watcher->future().result();
     m_model->setPackages(packageList);
     m_searchEdit->setEnabled(true);
+    m_searchEdit->setFocus();
     m_busyWidget->stop();
     QApplication::restoreOverrideCursor();
 }

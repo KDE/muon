@@ -93,6 +93,7 @@ private Q_SLOTS:
     void loadSettings();
     void saveSplitterSizes();
     void setupActions();
+    void setFocusSearchEdit();
     void markUpgrade();
     void markDistUpgrade();
     void markAutoRemove();
