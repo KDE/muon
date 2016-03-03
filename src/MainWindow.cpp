@@ -136,6 +136,8 @@ void MainWindow::initObject()
     emit backendReady(m_backend);
     connect(m_backend, SIGNAL(packageChanged()),
             this, SLOT(setActionsEnabled()));
+    connect(m_backend, SIGNAL(cacheReloadFinished()),
+            this, SLOT(setActionsEnabled()));
 
     // Set up GUI
     loadSettings();

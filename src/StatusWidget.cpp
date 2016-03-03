@@ -73,6 +73,8 @@ void StatusWidget::setBackend(QApt::Backend *backend)
     m_backend = backend;
     connect(m_backend, SIGNAL(packageChanged()),
             this, SLOT(updateStatus()));
+    connect(m_backend, SIGNAL(cacheReloadFinished()),
+            this, SLOT(updateStatus()));
     connect(m_backend, SIGNAL(xapianUpdateStarted()),
             this, SLOT(showXapianProgress()));
     connect(m_backend, SIGNAL(xapianUpdateProgress(int)),
