@@ -355,7 +355,7 @@ void MainWindow::startCommit()
 
 bool MainWindow::queryClose()
 {
-    return !m_reloading && !m_managerWidget->isSortingPackages() && QAptActions::self()->canExit();
+    return !m_reloading && !m_managerWidget->isSortingPackages();
 }
 
 void MainWindow::reload()
