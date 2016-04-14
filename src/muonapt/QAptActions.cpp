@@ -201,7 +201,7 @@ void QAptActions::setActionsEnabled(bool enabled)
 
     actionCollection()->action("undo")->setEnabled(m_backend && !m_backend->isUndoStackEmpty());
     actionCollection()->action("redo")->setEnabled(m_backend && !m_backend->isRedoStackEmpty());
-    actionCollection()->action("revert")->setEnabled(m_backend && !m_backend->isUndoStackEmpty());
+    actionCollection()->action("revert")->setEnabled(m_backend && m_backend->areChangesMarked());
     
     actionCollection()->action("save_download_list")->setEnabled(isConnected());
 
@@ -379,6 +379,7 @@ void QAptActions::redo()
 
 void QAptActions::revertChanges()
 {
+    m_backend->saveCacheState();
     m_backend->restoreCacheState(m_originalState);
     emit changesReverted();
 }
