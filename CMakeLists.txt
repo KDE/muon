@@ -18,7 +18,7 @@ include(GenerateExportHeader)
 
 find_package(KF5 REQUIRED KIO DBusAddons I18n IconThemes XmlGui)
 
-find_package(QApt 3.0.0 REQUIRED)
+find_package(QApt 3.0.2 REQUIRED)
 find_package(DebconfKDE 1.0.0 REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
