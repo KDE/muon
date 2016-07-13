@@ -66,9 +66,8 @@ void PackageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 
 void PackageDelegate::paintBackground(QPainter *painter, const QStyleOptionViewItem &option) const
 {
-    QStyleOptionViewItemV4 opt(option);
-    QStyle *style = opt.widget ? opt.widget->style() : QApplication::style();
-    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
+    QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 }
 
 void PackageDelegate::paintPackageName(QPainter *painter, const QStyleOptionViewItem &option , const QModelIndex &index) const
