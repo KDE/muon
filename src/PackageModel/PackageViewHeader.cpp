@@ -18,53 +18,56 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "PackageView.h"
-
 #include "PackageViewHeader.h"
 
-#define NUM_COLUMNS 6 // If this is changed change PackageWidget.cpp value as well
+#include <QAction>
+#include <QMenu>
+#include <QContextMenuEvent>
 
-PackageView::PackageView(QWidget *parent)
-    : QTreeView(parent)
+PackageViewHeader::PackageViewHeader(QWidget *parent)
+    : QHeaderView(Qt::Horizontal, parent)
 {
-    setHeader(new PackageViewHeader());
-    setAlternatingRowColors(true);
-    setContextMenuPolicy(Qt::CustomContextMenu);
-    setRootIsDecorated(false);
-    setSelectionMode(QAbstractItemView::ExtendedSelection);
-    setUniformRowHeights(true);
-    header()->setStretchLastSection(false);
-    header()->setDefaultAlignment(Qt::AlignLeft);
 }
 
-void PackageView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
+void PackageViewHeader::contextMenuEvent(QContextMenuEvent *event)
 {
-    if (previous.row() != -1 && current.isValid()) {
-        emit currentPackageChanged(current);
+    QMenu menu(this);
+    createActions();
+    foreach (QAction *action, m_columnActions) {
+        menu.addAction(action);
     }
-    QAbstractItemView::currentChanged(current, previous);
+    menu.exec(event->globalPos());
+    deleteActions();
 }
 
-void PackageView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void PackageViewHeader::createActions()
 {
-    QTreeView::selectionChanged(selected, deselected);
-
-    if (!selectedIndexes().size()) {
-        emit selectionEmpty();
-        return;
-    }
-
-    if (!selected.indexes().isEmpty()) {
-        emit currentPackageChanged(selected.indexes().first());
-        if(selectedIndexes().count()/NUM_COLUMNS > 1) {
-          emit selectionMulti();
-        }
+    QAbstractItemModel *m = model();
+    // first 3 columns (0-2) are always shown
+    for(int i = 3; i < count(); ++i) {
+        QAction *action = new QAction(m->headerData(i, orientation()).toString(), this);
+        action->setCheckable(true);
+        action->setChecked(!isSectionHidden(i));
+        action->setData(i);
+        connect(action, SIGNAL(toggled(bool)), this, SLOT(toggleColumn(bool)));
+        m_columnActions.append(action);
     }
 }
 
-void PackageView::updateView()
+void PackageViewHeader::deleteActions()
 {
-    QModelIndex oldIndex = currentIndex();
-    reset();
-    setCurrentIndex(oldIndex);
+    while (!m_columnActions.isEmpty()) {
+        QAction *action = m_columnActions.takeFirst();
+        disconnect(action, SIGNAL(toggled(bool)), this, SLOT(toggleColumn(bool)));
+        delete action;
+    }
+}
+
+void PackageViewHeader::toggleColumn(bool visible)
+{
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (action) {
+        int column = action->data().toInt();
+        setSectionHidden(column, !visible);
+    }
 }

@@ -23,6 +23,7 @@
 #include <QStringBuilder>
 #include <QIcon>
 #include <KLocalizedString>
+#include <KFormat>
 
 PackageModel::PackageModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -37,7 +38,7 @@ int PackageModel::rowCount(const QModelIndex & /*parent*/) const
 
 int PackageModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 3;
+    return 6;
 }
 
 QVariant PackageModel::data(const QModelIndex &index, int role) const
@@ -62,6 +63,15 @@ QVariant PackageModel::data(const QModelIndex &index, int role) const
         return package->state();
     case SupportRole:
         return package->isSupported();
+    case InstalledSizeRole:
+        if (package->isInstalled()) {
+            return KFormat().formatByteSize(package->currentInstalledSize());
+        }
+        return QVariant();
+    case InstalledVersionRole:
+        return package->installedVersion();
+    case AvailableVersionRole:
+        return package->availableVersion();
     case Qt::ToolTipRole:
         return QVariant();
     }
@@ -80,6 +90,12 @@ QVariant PackageModel::headerData(int section, Qt::Orientation orientation, int 
             return QVariant(i18n("Status"));
         case 2:
             return QVariant(i18n("Requested"));
+        case 3:
+            return QVariant(i18n("Installed Size"));
+        case 4:
+            return QVariant(i18n("Installed Version"));
+        case 5:
+            return QVariant(i18n("Available Version"));
         }
     }
     return QVariant();

@@ -65,6 +65,8 @@ public:
         return m_packagesType;
     }
     bool isSortingPackages() const;
+    QByteArray saveColumnsState() const;
+    bool restoreColumnsState(const QByteArray &state);
 
 protected:
     QApt::Backend *m_backend;

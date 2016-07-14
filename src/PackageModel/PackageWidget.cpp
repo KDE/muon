@@ -55,7 +55,7 @@
 #include "PackageView.h"
 #include "PackageDelegate.h"
 
-#define NUM_COLUMNS 3 // If this is changed change PackageView.cpp value as well
+#define NUM_COLUMNS 6 // If this is changed change PackageView.cpp value as well
 
 bool packageNameLessThan(QApt::Package *p1, QApt::Package *p2)
 {
@@ -110,6 +110,9 @@ PackageWidget::PackageWidget(QWidget *parent)
     m_packageView->setModel(m_proxyModel);
     m_packageView->setItemDelegate(delegate);
     m_packageView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    for (int i = 3; i < NUM_COLUMNS; ++i) {
+        m_packageView->header()->setSectionHidden(i, true);
+    }
     topVBox->addWidget(m_packageView);
 
     m_detailsWidget = new DetailsWidget;
@@ -233,6 +236,16 @@ void PackageWidget::setFocusSearchEdit()
 {
     m_searchEdit->setFocus();
     m_searchEdit->selectAll();
+}
+
+QByteArray PackageWidget::saveColumnsState() const
+{
+    return m_packageView->header()->saveState();
+}
+
+bool PackageWidget::restoreColumnsState(const QByteArray& state)
+{
+    return m_packageView->header()->restoreState(state);
 }
 
 void PackageWidget::setBackend(QApt::Backend *backend)

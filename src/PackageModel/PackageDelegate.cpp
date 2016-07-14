@@ -57,6 +57,9 @@ void PackageDelegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
         break;
     case 1: // Status
     case 2: // Action
+    case 3: // InstalledSize
+    case 4: // InstalledVersion
+    case 5: // AvailableVersion
         paintText(painter, option, index);
         break;
     default:
@@ -162,6 +165,9 @@ void PackageDelegate::paintText(QPainter *painter, const QStyleOptionViewItem &o
     QPen pen;
     KColorScheme color(option.palette.currentColorGroup());
 
+    QColor foregroundColor = (option.state.testFlag(QStyle::State_Selected)) ?
+                             option.palette.color(QPalette::HighlightedText) : option.palette.color(QPalette::Text);
+
     switch (index.column()) {
     case 1:
         state = index.data(PackageModel::StatusRole).toInt();
@@ -229,6 +235,18 @@ void PackageDelegate::paintText(QPainter *painter, const QStyleOptionViewItem &o
             break;
         }
         break;
+    case 3:
+        text = index.data(PackageModel::InstalledSizeRole).toString();
+        pen.setBrush(foregroundColor);
+        break;
+    case 4:
+        text = index.data(PackageModel::InstalledVersionRole).toString();
+        pen.setBrush(foregroundColor);
+        break;
+    case 5:
+        text = index.data(PackageModel::AvailableVersionRole).toString();
+        pen.setBrush(foregroundColor);
+        break;
     }
 
     QFont font = option.font;
@@ -258,6 +276,15 @@ QSize PackageDelegate::sizeHint(const QStyleOptionViewItem &option, const QModel
         break;
     case 2:
         size.setWidth(metric.width(index.data(PackageModel::ActionRole).toString()));
+        break;
+    case 3:
+        size.setWidth(metric.width(index.data(PackageModel::InstalledSizeRole).toString()));
+        break;
+    case 4:
+        size.setWidth(metric.width(index.data(PackageModel::InstalledVersionRole).toString()));
+        break;
+    case 5:
+        size.setWidth(metric.width(index.data(PackageModel::AvailableVersionRole).toString()));
         break;
     default:
         break;

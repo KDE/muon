@@ -34,6 +34,7 @@
 
 // Own includes
 #include "muonapt/MuonStrings.h"
+#include "MuonSettings.h"
 #include "DetailsWidget.h"
 #include "PackageModel/PackageModel.h"
 #include "PackageModel/PackageProxyModel.h"
@@ -46,7 +47,14 @@ ManagerWidget::ManagerWidget(QWidget *parent)
     setPackagesType(PackageWidget::AvailablePackages);
 
     hideHeaderLabel();
+    restoreColumnsState(QByteArray::fromBase64(MuonSettings::self()->managerListColumns().toLatin1()));
     showSearchEdit();
+}
+
+ManagerWidget::~ManagerWidget()
+{
+    MuonSettings::self()->setManagerListColumns(saveColumnsState().toBase64());
+    MuonSettings::self()->save();
 }
 
 void ManagerWidget::reload()

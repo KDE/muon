@@ -18,53 +18,30 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "PackageView.h"
+#ifndef PACKAGEVIEWHEADER_H
+#define PACKAGEVIEWHEADER_H
 
-#include "PackageViewHeader.h"
+#include <QtWidgets/QHeaderView>
+#include <QList>
 
-#define NUM_COLUMNS 6 // If this is changed change PackageWidget.cpp value as well
-
-PackageView::PackageView(QWidget *parent)
-    : QTreeView(parent)
+class PackageViewHeader : public QHeaderView
 {
-    setHeader(new PackageViewHeader());
-    setAlternatingRowColors(true);
-    setContextMenuPolicy(Qt::CustomContextMenu);
-    setRootIsDecorated(false);
-    setSelectionMode(QAbstractItemView::ExtendedSelection);
-    setUniformRowHeights(true);
-    header()->setStretchLastSection(false);
-    header()->setDefaultAlignment(Qt::AlignLeft);
-}
+    Q_OBJECT
+public:
+    explicit PackageViewHeader(QWidget *parent = 0);
 
-void PackageView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
-{
-    if (previous.row() != -1 && current.isValid()) {
-        emit currentPackageChanged(current);
-    }
-    QAbstractItemView::currentChanged(current, previous);
-}
+protected:
+    void contextMenuEvent(QContextMenuEvent *event);
 
-void PackageView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
-{
-    QTreeView::selectionChanged(selected, deselected);
+private slots:
+    void toggleColumn(bool visible);
 
-    if (!selectedIndexes().size()) {
-        emit selectionEmpty();
-        return;
-    }
+private:
+    void createActions();
+    void deleteActions();
 
-    if (!selected.indexes().isEmpty()) {
-        emit currentPackageChanged(selected.indexes().first());
-        if(selectedIndexes().count()/NUM_COLUMNS > 1) {
-          emit selectionMulti();
-        }
-    }
-}
+private:
+    QList<QAction *> m_columnActions;
+};
 
-void PackageView::updateView()
-{
-    QModelIndex oldIndex = currentIndex();
-    reset();
-    setCurrentIndex(oldIndex);
-}
+#endif

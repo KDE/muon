@@ -28,5 +28,9 @@
       <label>Show foreign architecture packages also available natively.</label>
       <default>false</default>
     </entry>
+    <entry name="ManagerListColumns" type="String">
+      <label>Visible columns in the manager list of packages.</label>
+      <default></default>
+    </entry>
   </group>
 </kcfg>

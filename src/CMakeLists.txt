@@ -24,6 +24,7 @@ set(muon_SRCS
     PackageModel/PackageModel.cpp
     PackageModel/PackageProxyModel.cpp
     PackageModel/PackageView.cpp
+    PackageModel/PackageViewHeader.cpp
     PackageModel/PackageDelegate.cpp
     PackageModel/PackageWidget.cpp
     StatusWidget.cpp
