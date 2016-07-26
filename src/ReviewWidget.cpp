@@ -22,16 +22,21 @@
 
 #include <KLocalizedString>
 
+#include "MuonSettings.h"
+
 ReviewWidget::ReviewWidget(QWidget *parent)
     : PackageWidget(parent)
 {
     setPackagesType(PackageWidget::MarkedPackages);
 
     setHeaderText(i18n("<b>Review and Apply Changes</b>"));
+    restoreColumnsState(QByteArray::fromBase64(MuonSettings::self()->reviewListColumns().toLatin1()));
 }
 
 ReviewWidget::~ReviewWidget()
 {
+    MuonSettings::self()->setReviewListColumns(saveColumnsState().toBase64());
+    MuonSettings::self()->save();
 }
 
 #include "ReviewWidget.moc"

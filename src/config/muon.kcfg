@@ -29,7 +29,11 @@
       <default>false</default>
     </entry>
     <entry name="ManagerListColumns" type="String">
-      <label>Visible columns in the manager list of packages.</label>
+      <label>Status of columns in the manager list of packages.</label>
+      <default></default>
+    </entry>
+    <entry name="ReviewListColumns" type="String">
+      <label>Status of columns in the changes review list of packages.</label>
       <default></default>
     </entry>
   </group>
