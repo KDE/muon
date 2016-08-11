@@ -255,6 +255,7 @@ void PackageWidget::setBackend(QApt::Backend *backend)
     connect(m_backend, SIGNAL(packageChanged()), m_model, SLOT(externalDataChanged()));
     connect(m_backend, SIGNAL(cacheReloadStarted()), this, SLOT(cacheReloadStarted()));
     connect(m_backend, SIGNAL(cacheReloadFinished()), this, SLOT(cacheReloadFinished()));
+    connect(m_backend, SIGNAL(xapianUpdateFinished()), this, SLOT(startSearch()));
 
     m_detailsWidget->setBackend(backend);
     m_proxyModel->setBackend(m_backend);
