@@ -410,9 +410,8 @@ void PackageWidget::setSortedPackages()
 
 void PackageWidget::sectionClicked(int section)
 {
-    if (section == 0) {
-        m_proxyModel->setSortByRelevancy(false);
-    }
+    Q_UNUSED(section);
+    m_proxyModel->setSortByRelevancy(false);
 }
 
 void PackageWidget::startSearch()

@@ -30,10 +30,13 @@ class PackageViewHeader : public QHeaderView
 public:
     explicit PackageViewHeader(QWidget *parent = 0);
 
+    void setModel(QAbstractItemModel *model) override;
+
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
 
 private slots:
+    void modelLayoutChanged();
     void toggleColumn(bool visible);
 
 private:

@@ -24,10 +24,29 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 
+#include "PackageProxyModel.h"
+
 PackageViewHeader::PackageViewHeader(QWidget *parent)
     : QHeaderView(Qt::Horizontal, parent)
 {
 }
+
+void PackageViewHeader::setModel(QAbstractItemModel* model)
+{
+    QAbstractItemModel* currentModel = this->model();
+    if (model == currentModel)
+        return;
+    if (currentModel) {
+        disconnect(currentModel, &QAbstractItemModel::layoutChanged,
+                   this, &PackageViewHeader::modelLayoutChanged);
+    }
+
+    QHeaderView::setModel(model);
+
+    connect(model, &QAbstractItemModel::layoutChanged,
+            this, &PackageViewHeader::modelLayoutChanged);
+}
+
 
 void PackageViewHeader::contextMenuEvent(QContextMenuEvent *event)
 {
@@ -61,6 +80,12 @@ void PackageViewHeader::deleteActions()
         disconnect(action, SIGNAL(toggled(bool)), this, SLOT(toggleColumn(bool)));
         delete action;
     }
+}
+
+void PackageViewHeader::modelLayoutChanged()
+{
+    setSortIndicatorShown(!(static_cast<PackageProxyModel*>(model())->isSortedByRelevancy() &&
+        sortIndicatorSection() == 0));
 }
 
 void PackageViewHeader::toggleColumn(bool visible)

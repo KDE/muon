@@ -69,7 +69,9 @@ void PackageProxyModel::search(const QString &searchText)
     // 1-character searches are painfully slow. >= 2 chars are fine, though
     if (searchText.size() > 1) {
         m_searchPackages = m_backend->search(searchText);
-        m_sortByRelevancy = true;
+        if (!m_useSearchResults) {
+            m_sortByRelevancy = true;
+        }
         m_useSearchResults = true;
     } else {
         m_searchPackages.clear();
@@ -85,6 +87,11 @@ void PackageProxyModel::setSortByRelevancy(bool enabled)
 {
     m_sortByRelevancy = enabled;
     invalidate();
+}
+
+bool PackageProxyModel::isSortedByRelevancy() const
+{
+    return m_sortByRelevancy;
 }
 
 void PackageProxyModel::setGroupFilter(const QString &filterText)
