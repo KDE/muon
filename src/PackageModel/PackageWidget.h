@@ -119,7 +119,6 @@ private Q_SLOTS:
     void packageActivated(const QModelIndex &index);
     void contextMenuRequested(const QPoint &pos);
     void setSortedPackages();
-    void sectionClicked(int section);
 
     bool confirmEssentialRemoval();
     void saveState();

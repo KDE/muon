@@ -144,8 +144,6 @@ PackageWidget::PackageWidget(QWidget *parent)
             this, SLOT(packageActivated(QModelIndex)));
     connect(m_packageView, SIGNAL(selectionEmpty()), m_detailsWidget, SLOT(hide()));
     connect(m_packageView, SIGNAL(selectionMulti()), m_detailsWidget, SLOT(emitHideButtons()));
-    connect(m_packageView->header(), SIGNAL(sectionClicked(int)),
-            this, SLOT(sectionClicked(int)));
     connect(m_searchEdit, SIGNAL(textChanged(QString)), m_searchTimer, SLOT(start()));
 
     QWidget* topWidget = new QWidget;
@@ -406,12 +404,6 @@ void PackageWidget::setSortedPackages()
     m_searchEdit->setFocus();
     m_busyWidget->stop();
     QApplication::restoreOverrideCursor();
-}
-
-void PackageWidget::sectionClicked(int section)
-{
-    Q_UNUSED(section);
-    m_proxyModel->setSortByRelevancy(false);
 }
 
 void PackageWidget::startSearch()

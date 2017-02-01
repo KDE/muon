@@ -37,6 +37,7 @@ protected:
 
 private slots:
     void modelLayoutChanged();
+    void onSectionClicked();
     void toggleColumn(bool visible);
 
 private:

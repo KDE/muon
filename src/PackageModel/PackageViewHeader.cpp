@@ -29,6 +29,8 @@
 PackageViewHeader::PackageViewHeader(QWidget *parent)
     : QHeaderView(Qt::Horizontal, parent)
 {
+    connect(this, &QHeaderView::sectionClicked,
+            this, &PackageViewHeader::onSectionClicked);
 }
 
 void PackageViewHeader::setModel(QAbstractItemModel* model)
@@ -86,6 +88,14 @@ void PackageViewHeader::modelLayoutChanged()
 {
     setSortIndicatorShown(!(static_cast<PackageProxyModel*>(model())->isSortedByRelevancy() &&
         sortIndicatorSection() == 0));
+}
+
+void PackageViewHeader::onSectionClicked()
+{
+    QAbstractItemModel* model = this->model();
+    if (model) {
+        static_cast<PackageProxyModel*>(model)->setSortByRelevancy(false);
+    }
 }
 
 void PackageViewHeader::toggleColumn(bool visible)
