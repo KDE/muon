@@ -1,3 +1,34 @@
+5.7.0
+======
+- Features:
+  * Add columns for Installed-Size, Version and Available-Version. (BKO: #332453)
+- Bugfixes:
+  * Fix sort order indicator for search results. (BKO: #313596)
+  * Hide purge button when a package is already marked for change.
+  * Show error message if software-properties-kde cannot be found. (BKO: #366590)
+  * Refresh current search results when xapian update is done. (BKO: #362047)
+
+5.6.0
+======
+- Features:
+  * Add keyboard shortcut to move focus to the serach box. (BKO: #299763, #312568, #325536)
+  * Remove dependency from KDELibs4Support. New KF5 dependecies are I18n, IconThemes and XmlGui.
+- Bugfixes:
+  * "Unmark all" can be undone/redone like other mark actions.
+  * Fix a crash when the backend is reloaded and more than one model has a list of packages.
+    (BKO: #332530)
+  * Fix Muon window not closing. (BKO: #358659)
+  * Fix names of icons.
+  * Fix history dialog layout. (BKO: #343992)
+
+5.5.0
+======
+  This is the first release of Muon Package Manager after the split of
+  Discover and Updater, which have then become plasma-discover and
+  plasma-discover-updater respectively.
+  Code for Discover has been removed and dependencies have been adjusted
+  accordingly.
+
 2.1: (as of 2.1 alpha)
 ======
 - Features:
