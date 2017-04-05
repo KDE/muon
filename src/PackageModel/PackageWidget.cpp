@@ -276,7 +276,6 @@ void PackageWidget::cacheReloadStarted()
     m_model->clear();
     m_proxyModel->clear();
     m_proxyModel->reset();
-    m_proxyModel->setSourceModel(0);
     m_busyWidget->start();
 }
 
@@ -285,7 +284,6 @@ void PackageWidget::cacheReloadFinished()
     QApt::PackageList packageList = m_backend->availablePackages();
     QFuture<QList<QApt::Package*> > future = QtConcurrent::run(sortPackages, packageList);
     m_watcher->setFuture(future);
-    m_proxyModel->setSourceModel(m_model);
     m_packageView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     startSearch();
 }
