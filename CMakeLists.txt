@@ -8,7 +8,7 @@ find_package(ECM REQUIRED NO_MODULE)
 
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-find_package(Qt5 5.2.0 REQUIRED CONFIG COMPONENTS Widgets Concurrent)
+find_package(Qt5 5.6.0 REQUIRED CONFIG COMPONENTS Widgets Concurrent)
 include(KDEInstallDirs)
 include(KDECMakeSettings NO_POLICY_SCOPE)
 include(KDECompilerSettings NO_POLICY_SCOPE)

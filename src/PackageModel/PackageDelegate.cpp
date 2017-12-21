@@ -84,8 +84,11 @@ void PackageDelegate::paintPackageName(QPainter *painter, const QStyleOptionView
     QColor foregroundColor = (option.state.testFlag(QStyle::State_Selected)) ?
                              option.palette.color(QPalette::HighlightedText) : option.palette.color(QPalette::Text);
 
+    const qreal dpr = painter->device()->devicePixelRatioF();
+
     // Pixmap that the text/icon goes in
-    QPixmap pixmap(option.rect.size());
+    QPixmap pixmap(option.rect.size() * dpr);
+    pixmap.setDevicePixelRatio(dpr);
     pixmap.fill(Qt::transparent);
     QPainter p(&pixmap);
     p.translate(-option.rect.topLeft());
