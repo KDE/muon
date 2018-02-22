@@ -54,8 +54,8 @@ StatusWidget::StatusWidget(QWidget *parent)
     m_xapianProgress->hide();
 
     m_xapianTimeout = new QTimer(this);
-    // Time out if no progress at all is made in 10 seconds
-    m_xapianTimeout->setInterval(10000);
+    // Time out if no progress at all is made in 30 seconds
+    m_xapianTimeout->setInterval(30000);
     m_xapianTimeout->setSingleShot(true);
     connect(m_xapianTimeout, SIGNAL(timeout()), this, SLOT(hideXapianProgress()));
 
@@ -156,5 +156,6 @@ void StatusWidget::hideXapianProgress()
 void StatusWidget::updateXapianProgress(int percentage)
 {
     m_xapianProgress->setValue(percentage);
+    m_xapianProgress->show();
     m_xapianTimeout->start();
 }
