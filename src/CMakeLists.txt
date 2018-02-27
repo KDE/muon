@@ -64,5 +64,5 @@ install(TARGETS muon ${INSTALL_TARGETS_DEFAULT_ARGS} )
 
 ########### install files ###############
 
-install( PROGRAMS muon.desktop  DESTINATION ${XDG_APPS_INSTALL_DIR} )
+install( PROGRAMS org.kde.muon.desktop  DESTINATION ${XDG_APPS_INSTALL_DIR} )
 install( FILES muonui.rc  DESTINATION  ${KXMLGUI_INSTALL_DIR}/muon )
