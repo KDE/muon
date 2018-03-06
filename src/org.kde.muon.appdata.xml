@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>org.kde.muon</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>Muon Package Manager</name>
+  <summary>Search, install and remove software packages</summary>
+  <description>
+    <p>Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependences.</p>
+    <p>Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.</p>
+  </description>
+  <url type="homepage">https://www.kde.org</url>
+  <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=Muon</url>
+  <url type="donation">https://www.kde.org/community/donations/?app=Muon</url>
+  <launchable type="desktop-id">org.kde.muon.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source" width="1600" height="900">https://cdn.kde.org/screenshots/muon/muon.png</image>
+    </screenshot>
+  </screenshots>
+  <project_group>KDE</project_group>
+  <provides>
+    <binary>muon</binary>
+    <id>muon.desktop</id>
+  </provides>
+</component>
