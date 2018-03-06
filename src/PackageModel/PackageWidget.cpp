@@ -55,8 +55,6 @@
 #include "PackageView.h"
 #include "PackageDelegate.h"
 
-#define NUM_COLUMNS 6 // If this is changed change PackageView.cpp value as well
-
 bool packageNameLessThan(QApt::Package *p1, QApt::Package *p2)
 {
      return p1->name() < p2->name();
@@ -110,7 +108,9 @@ PackageWidget::PackageWidget(QWidget *parent)
     m_packageView->setModel(m_proxyModel);
     m_packageView->setItemDelegate(delegate);
     m_packageView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    for (int i = 3; i < NUM_COLUMNS; ++i) {
+    const int numColumns = m_packageView->header()->count();
+    Q_ASSERT(numColumns >= 3);
+    for (int i = 3; i < numColumns; ++i) {
         m_packageView->header()->setSectionHidden(i, true);
     }
     topVBox->addWidget(m_packageView);
@@ -311,15 +311,14 @@ void PackageWidget::contextMenuRequested(const QPoint &pos)
     menu.addSeparator();
     menu.addAction(m_lockAction);
 
-    const QModelIndexList selected = m_packageView->selectionModel()->selectedIndexes();
+    const int selected = m_packageView->selectionCount();
 
-    if (!selected.size()) {
+    if (selected <= 0) {
         return;
     }
 
-    // Divide by the number of columns
-    if (selected.size()/NUM_COLUMNS == 1) {
-        int state = m_proxyModel->packageAt(selected.first())->state();
+    if (selected == 1) {
+        int state = m_proxyModel->packageAt(m_packageView->currentIndex())->state();
         bool upgradeable = (state & QApt::Package::Upgradeable);
 
         if (state & QApt::Package::Installed) {

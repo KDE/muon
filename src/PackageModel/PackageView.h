@@ -29,6 +29,8 @@ class PackageView : public QTreeView
 public:
     explicit PackageView(QWidget *parent = 0);
 
+    int selectionCount() const;
+
 protected Q_SLOTS:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

@@ -22,8 +22,6 @@
 
 #include "PackageViewHeader.h"
 
-#define NUM_COLUMNS 6 // If this is changed change PackageWidget.cpp value as well
-
 PackageView::PackageView(QWidget *parent)
     : QTreeView(parent)
 {
@@ -35,6 +33,11 @@ PackageView::PackageView(QWidget *parent)
     setUniformRowHeights(true);
     header()->setStretchLastSection(false);
     header()->setDefaultAlignment(Qt::AlignLeft);
+}
+
+int PackageView::selectionCount() const
+{
+    return selectionModel()->selectedRows().count();
 }
 
 void PackageView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
@@ -49,14 +52,15 @@ void PackageView::selectionChanged(const QItemSelection &selected, const QItemSe
 {
     QTreeView::selectionChanged(selected, deselected);
 
-    if (!selectedIndexes().size()) {
+    const int count = selectionCount();
+    if (count <= 0) {
         emit selectionEmpty();
         return;
     }
 
     if (!selected.indexes().isEmpty()) {
         emit currentPackageChanged(selected.indexes().first());
-        if(selectedIndexes().count()/NUM_COLUMNS > 1) {
+        if(count > 1) {
           emit selectionMulti();
         }
     }
