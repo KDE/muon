@@ -40,14 +40,6 @@ int PackageView::selectionCount() const
     return selectionModel()->selectedRows().count();
 }
 
-void PackageView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
-{
-    if (previous.row() != -1 && current.isValid()) {
-        emit currentPackageChanged(current);
-    }
-    QAbstractItemView::currentChanged(current, previous);
-}
-
 void PackageView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     QTreeView::selectionChanged(selected, deselected);
@@ -58,11 +50,13 @@ void PackageView::selectionChanged(const QItemSelection &selected, const QItemSe
         return;
     }
 
-    if (!selected.indexes().isEmpty()) {
+    if (selected.isEmpty()) {
+        emit currentPackageChanged(selectedIndexes().last());
+    } else {
         emit currentPackageChanged(selected.indexes().first());
-        if(count > 1) {
-          emit selectionMulti();
-        }
+    }
+    if(count > 1) {
+        emit selectionMulti();
     }
 }
 

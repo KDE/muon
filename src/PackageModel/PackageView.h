@@ -32,7 +32,6 @@ public:
     int selectionCount() const;
 
 protected Q_SLOTS:
-    void currentChanged(const QModelIndex &current, const QModelIndex &previous);
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 public Q_SLOTS:
