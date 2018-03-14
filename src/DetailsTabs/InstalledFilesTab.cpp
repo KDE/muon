@@ -46,6 +46,10 @@ bool InstalledFilesTab::shouldShow() const
 void InstalledFilesTab::setPackage(QApt::Package *package)
 {
     m_package = package;
+}
+
+void InstalledFilesTab::refresh()
+{
     populateFilesList();
 }
 

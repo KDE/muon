@@ -51,7 +51,6 @@ void DetailsTab::setBackend(QApt::Backend *backend)
 void DetailsTab::setPackage(QApt::Package *package)
 {
     m_package = package;
-    refresh();
 }
 
 void DetailsTab::refresh()

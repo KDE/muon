@@ -92,6 +92,10 @@ void VersionTab::enableButton()
 void VersionTab::setPackage(QApt::Package *package)
 {
     m_package = package;
+}
+
+void VersionTab::refresh()
+{
     m_versionModel->clear();
     populateVersions();
 }

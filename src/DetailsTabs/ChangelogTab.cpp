@@ -57,6 +57,10 @@ ChangelogTab::ChangelogTab(QWidget *parent)
 void ChangelogTab::setPackage(QApt::Package *package)
 {
     m_package = package;
+}
+
+void ChangelogTab::refresh()
+{
     fetchChangelog();
 }
 

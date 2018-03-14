@@ -55,6 +55,10 @@ DetailsWidget::DetailsWidget(QWidget *parent)
     // Hide until a package is clicked
     hide();
 
+    Q_FOREACH (DetailsTab *tab, m_detailsTabs) {
+        addTab(tab, tab->name());
+    }
+
     connect(mainTab, SIGNAL(setInstall(QApt::Package*)),
             this, SIGNAL(setInstall(QApt::Package*)));
     connect(mainTab, SIGNAL(setRemove(QApt::Package*)),
@@ -69,6 +73,8 @@ DetailsWidget::DetailsWidget(QWidget *parent)
             this, SIGNAL(setPurge(QApt::Package*)));
     connect(this, SIGNAL(emitHideButtonsSignal()),
 	    mainTab, SLOT(hideButtons()));
+    connect(this, &DetailsWidget::currentChanged,
+            this, &DetailsWidget::refreshCurrentTab);
 }
 
 DetailsWidget::~DetailsWidget()
@@ -84,17 +90,18 @@ void DetailsWidget::setBackend(QApt::Backend *backend)
 
 void DetailsWidget::setPackage(QApt::Package *package)
 {
+    bool tabChanged = false;
     Q_FOREACH (DetailsTab *tab, m_detailsTabs) {
         tab->setPackage(package);
 
-        if (tab->shouldShow()) {
-            addTab(tab, tab->name());
-        } else {
-            if (currentIndex() == indexOf(tab)) {
-                setCurrentIndex(0);
-            }
-            removeTab(indexOf(tab));
+        if (currentIndex() == indexOf(tab) && !tab->shouldShow()) {
+            setCurrentIndex(0);
+            tabChanged = true;
         }
+        setTabEnabled(indexOf(tab), tab->shouldShow());
+    }
+    if (!tabChanged) {
+        refreshCurrentTab();
     }
 
     show();
@@ -105,9 +112,10 @@ void DetailsWidget::emitHideButtons()
   emit emitHideButtonsSignal();
 }
 
-void DetailsWidget::refreshTabs()
+void DetailsWidget::refreshCurrentTab()
 {
-    Q_FOREACH (DetailsTab *tab, m_detailsTabs) {
+    DetailsTab *tab = qobject_cast<DetailsTab *>(currentWidget());
+    if (tab) {
         tab->refresh();
     }
 }

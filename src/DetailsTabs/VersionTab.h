@@ -43,6 +43,7 @@ private:
 
 public Q_SLOTS:
     void setPackage(QApt::Package *package);
+    void refresh() override;
 
 private Q_SLOTS:
     void enableButton();

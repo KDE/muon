@@ -249,7 +249,7 @@ bool PackageWidget::restoreColumnsState(const QByteArray& state)
 void PackageWidget::setBackend(QApt::Backend *backend)
 {
     m_backend = backend;
-    connect(m_backend, SIGNAL(packageChanged()), m_detailsWidget, SLOT(refreshTabs()));
+    connect(m_backend, SIGNAL(packageChanged()), m_detailsWidget, SLOT(refreshCurrentTab()));
     connect(m_backend, SIGNAL(packageChanged()), m_model, SLOT(externalDataChanged()));
     connect(m_backend, SIGNAL(cacheReloadStarted()), this, SLOT(cacheReloadStarted()));
     connect(m_backend, SIGNAL(cacheReloadFinished()), this, SLOT(cacheReloadFinished()));

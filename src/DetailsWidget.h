@@ -48,7 +48,7 @@ private:
 public Q_SLOTS:
     void setBackend(QApt::Backend *backend);
     void setPackage(QApt::Package *package);
-    void refreshTabs();
+    void refreshCurrentTab();
     void clear();
     void emitHideButtons();
 
