@@ -1,3 +1,17 @@
+5.8.0
+======
+- Features:
+  * Add AppStream metadata for Muon.
+- Bugfixes:
+  * Fix high-dpi scaling. The text in the list of packages is not rendered
+  blurry. (BKO: #354050)
+  * Give more time to the search index rebuild to start before hiding the
+  progress bar.
+  * Fix name of desktop file.
+  * Show the correct icon in Wayland. (BKO: #382538)
+  * Fix the count of selected packages.
+  * Avoid double refresh of all details tabs on package selection. (BKO: #390785)
+
 5.7.0
 ======
 - Features:
