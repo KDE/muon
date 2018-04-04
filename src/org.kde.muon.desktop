@@ -50,7 +50,6 @@ Name[zh_TW]=Muon 軟體包管理員
 Exec=muon
 Icon=muon
 Type=Application
-X-DocPath=muon/index.html
 GenericName=Package Manager
 GenericName[ar]=مدير الحزم
 GenericName[ast]=Xestor de paquetes
