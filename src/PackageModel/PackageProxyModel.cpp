@@ -31,6 +31,8 @@
 #include "MuonSettings.h"
 
 constexpr int status_sort_magic = (QApt::Package::Installed |
+                                   QApt::Package::Upgradeable |
+                                   QApt::Package::NowBroken |
                                    QApt::Package::New);
 
 bool packageStatusLessThan(QApt::Package *p1, QApt::Package *p2)
@@ -40,7 +42,11 @@ bool packageStatusLessThan(QApt::Package *p1, QApt::Package *p2)
 }
 
 constexpr int requested_sort_magic = (QApt::Package::ToInstall
+                                         | QApt::Package::ToUpgrade
                                          | QApt::Package::ToRemove
+                                         | QApt::Package::ToPurge
+                                         | QApt::Package::ToReInstall
+                                         | QApt::Package::ToDowngrade
                                          | QApt::Package::ToKeep);
 
 bool packageRequestedLessThan(QApt::Package *p1, QApt::Package *p2)
