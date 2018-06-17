@@ -64,6 +64,8 @@ QVariant PackageModel::data(const QModelIndex &index, int role) const
     case SupportRole:
         return package->isSupported();
     case InstalledSizeRole:
+        return package->currentInstalledSize();
+    case InstalledSizeDisplayRole:
         if (package->isInstalled()) {
             return KFormat().formatByteSize(package->currentInstalledSize());
         }

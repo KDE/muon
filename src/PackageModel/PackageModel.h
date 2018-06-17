@@ -37,8 +37,9 @@ public:
         StatusRole = Qt::UserRole + 4,
         SupportRole = Qt::UserRole + 5,
         InstalledSizeRole = Qt::UserRole + 6,
-        InstalledVersionRole = Qt::UserRole + 7,
-        AvailableVersionRole = Qt::UserRole + 8
+        InstalledSizeDisplayRole = Qt::UserRole + 7,
+        InstalledVersionRole = Qt::UserRole + 8,
+        AvailableVersionRole = Qt::UserRole + 9
     };
     explicit PackageModel(QObject *parent = 0);
 

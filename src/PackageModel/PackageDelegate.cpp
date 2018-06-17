@@ -239,7 +239,7 @@ void PackageDelegate::paintText(QPainter *painter, const QStyleOptionViewItem &o
         }
         break;
     case 3:
-        text = index.data(PackageModel::InstalledSizeRole).toString();
+        text = index.data(PackageModel::InstalledSizeDisplayRole).toString();
         pen.setBrush(foregroundColor);
         break;
     case 4:
@@ -281,7 +281,7 @@ QSize PackageDelegate::sizeHint(const QStyleOptionViewItem &option, const QModel
         size.setWidth(metric.width(index.data(PackageModel::ActionRole).toString()));
         break;
     case 3:
-        size.setWidth(metric.width(index.data(PackageModel::InstalledSizeRole).toString()));
+        size.setWidth(metric.width(index.data(PackageModel::InstalledSizeDisplayRole).toString()));
         break;
     case 4:
         size.setWidth(metric.width(index.data(PackageModel::InstalledVersionRole).toString()));

@@ -207,6 +207,16 @@ bool PackageProxyModel::lessThan(const QModelIndex &left, const QModelIndex &rig
           return packageStatusLessThan(leftPackage, rightPackage);
       case 2:
           return packageRequestedLessThan(leftPackage, rightPackage);
+      case 3: /* Installed size */
+          {
+              qlonglong leftSize = left.data(PackageModel::InstalledSizeRole).toLongLong();
+              qlonglong rightSize = right.data(PackageModel::InstalledSizeRole).toLongLong();
+              return leftSize < rightSize;
+          }
+      case 4: /* Installed version */
+          return QApt::Package::compareVersion(leftPackage->installedVersion(), rightPackage->installedVersion()) < 0;
+      case 5: /* Available version */
+          return QApt::Package::compareVersion(leftPackage->availableVersion(), rightPackage->availableVersion()) < 0;
     }
 
     return false;
