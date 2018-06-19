@@ -201,7 +201,7 @@ bool PackageProxyModel::lessThan(const QModelIndex &left, const QModelIndex &rig
               QString leftString = left.data(PackageModel::NameRole).toString();
               QString rightString = right.data(PackageModel::NameRole).toString();
 
-              return leftString > rightString;
+              return leftString < rightString;
           }
       case 1:
           return packageStatusLessThan(leftPackage, rightPackage);
