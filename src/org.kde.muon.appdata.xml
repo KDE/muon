@@ -17,6 +17,7 @@
   <name xml:lang="nl">Muon pakketbeheerder</name>
   <name xml:lang="pl">Zarządzanie pakietami Muon</name>
   <name xml:lang="pt">Gestor de Pacotes Muon</name>
+  <name xml:lang="pt-BR">Gerenciador de pacotes Muon</name>
   <name xml:lang="sk">Správca balíkov Muon</name>
   <name xml:lang="sv">Muon pakethanterare</name>
   <name xml:lang="uk">Програма для керування пакунками Muon</name>
@@ -34,6 +35,7 @@
   <summary xml:lang="nl">Software pakketten zoeken, installeren en verwijderen</summary>
   <summary xml:lang="pl">Wyszukuj, wgrywaj i usuwaj programy</summary>
   <summary xml:lang="pt">Pesquisar, instalar e remover os pacotes de aplicações</summary>
+  <summary xml:lang="pt-BR">Pesquisa, instala e remove pacotes de software</summary>
   <summary xml:lang="sv">Sök efter, installera och ta bort programvarupaket</summary>
   <summary xml:lang="uk">Пошук, встановлення і вилучення пакунків із програмним забезпеченням</summary>
   <summary xml:lang="x-test">xxSearch, install and remove software packagesxx</summary>
@@ -49,6 +51,7 @@
     <p xml:lang="nl">Op uw systeem geïnstalleerde toepassingen en bibliotheken beheren op het pakketniveau. Pakketten zoeken, installeren en verwijderen en hun versies en afhankelijkheden inspecteren.</p>
     <p xml:lang="pl">Zarządzaj aplikacjami  i bibliotekami wgranymi na twoim systemie na poziomie pakietów. Wyszukuj, wgrywaj i usuwaj pakiety, a także sprawdzaj ich wersje i zależności.</p>
     <p xml:lang="pt">Gerir as aplicações e bibliotecas instaladas no seu sistema ao nível de cada pacote. Pesquise, instale e remova os pacotes e inspeccione as suas versões e dependências.</p>
+    <p xml:lang="pt-BR">Gerenciar os aplicativos e bibliotecas instaladas no seu sistema ao nível de cada pacote. Pesquise, instale e remova os pacotes e inspecione as suas versões e dependências.</p>
     <p xml:lang="sv">Hantera program och bibliotek installerade på systemet på paketnivå. Sök efter, installera och ta bort paket, samt inspektera deras versioner och beroenden.</p>
     <p xml:lang="uk">Керуйте програмами і бібліотеками, встановленими у вашій системі, на рівні пакунків. Шукайте, встановлюйте та вилучайте пакунки, а також ознайомлюйтеся із версіями пакунків та їхніми залежностями.</p>
     <p xml:lang="x-test">xxManage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependences.xx</p>
@@ -63,6 +66,7 @@
     <p xml:lang="nl">Opmerking: dit houdt geen toepassingen in gedistribueerd via Snap of Flatpack. U zou de voorkeur kunnen geven aan Plasma-Discover, als wat u zocht een Softwarecentrum is.</p>
     <p xml:lang="pl">Uwaga: Nie uwzględnia to aplikacji rozpowszechnianych przez Snap lub Flatpack. Do tego możesz chcieć użyć Odkrywcy Plazmy, jeśli to czego szukasz jest ośrodkiem programów.</p>
     <p xml:lang="pt">Nota: isto não inclui as aplicações distribuídas pelo Snap ou Flatpack. Poderá preferir o Plasma-Discover, se o que precisa é um Centro de Aplicações.</p>
+    <p xml:lang="pt-BR">Observação: Isto não inclui os aplicativos distribuídos pelo Snap ou Flatpack. Você poderá preferir o Plasma-Discover, se precisar de uma Central de Aplicativos.</p>
     <p xml:lang="sv">Observera: detta omfattar inte program distribuerade via Snap eller Flatpack. Om du är ute efter ett programvarucenter, kanske du föredrar Plasma-Discover.</p>
     <p xml:lang="uk">Зауваження: це не стосується програм, які поширюються за допомогою Snap або Flatpack. Якщо вам потрібен центр роботи із програмним забезпеченням, краще скористайтеся Plasma-Discover.</p>
     <p xml:lang="x-test">xxNote: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.xx</p>
