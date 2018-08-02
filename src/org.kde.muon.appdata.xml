@@ -44,20 +44,6 @@
   <summary xml:lang="x-test">xxSearch, install and remove software packagesxx</summary>
   <description>
     <p>Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
-    <p xml:lang="ca">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets i les seves versions i dependències.</p>
-    <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets i les seues versions i dependències.</p>
-    <p xml:lang="en-GB">Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependences.</p>
-    <p xml:lang="es">Gestionar aplicaciones y bibliotecas instaladas en su sistema a nivel de paquetes. Buscar, instalar y eliminar paquetes e inspeccionar sus versiones y sus dependencias.</p>
-    <p xml:lang="gl">Xestionar aplicativos e bibliotecas instaladas no sistema a nivel de paquetes. Buscar, instalar e retirar paquetes e inspeccionar as súas versións e dependencias.</p>
-    <p xml:lang="id">Kelola aplikasi dan pustaka yang terpasang pada sistemmu terhadap level paket. Cari, pasang, dan copot paket-paket dan mengamati versinya dan ketergantungannya.</p>
-    <p xml:lang="it">Gestisce le applicazioni e le librerie installate nel tuo sistema a livello di pacchetti. Cerca, installa e rimuove i pacchetti, e ispeziona la loro versione e le loro dipendenze.</p>
-    <p xml:lang="nl">Op uw systeem geïnstalleerde toepassingen en bibliotheken beheren op het pakketniveau. Pakketten zoeken, installeren en verwijderen en hun versies en afhankelijkheden inspecteren.</p>
-    <p xml:lang="pl">Zarządzaj aplikacjami  i bibliotekami wgranymi na twoim systemie na poziomie pakietów. Wyszukuj, wgrywaj i usuwaj pakiety, a także sprawdzaj ich wersje i zależności.</p>
-    <p xml:lang="pt">Gerir as aplicações e bibliotecas instaladas no seu sistema ao nível de cada pacote. Pesquise, instale e remova os pacotes e inspeccione as suas versões e dependências.</p>
-    <p xml:lang="pt-BR">Gerenciar os aplicativos e bibliotecas instaladas no seu sistema ao nível de cada pacote. Pesquise, instale e remova os pacotes e inspecione as suas versões e dependências.</p>
-    <p xml:lang="sv">Hantera program och bibliotek installerade på systemet på paketnivå. Sök efter, installera och ta bort paket, samt inspektera deras versioner och beroenden.</p>
-    <p xml:lang="uk">Керуйте програмами і бібліотеками, встановленими у вашій системі, на рівні пакунків. Шукайте, встановлюйте та вилучайте пакунки, а також ознайомлюйтеся із версіями пакунків та їхніми залежностями.</p>
-    <p xml:lang="x-test">xxManage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependences.xx</p>
     <p>Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.</p>
     <p xml:lang="ca">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de Programari.</p>
     <p xml:lang="ca-valencia">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de Programari.</p>
