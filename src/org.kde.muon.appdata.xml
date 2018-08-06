@@ -47,6 +47,7 @@
   <description>
     <p>Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
     <p xml:lang="ca">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets i les seves versions i dependències.</p>
+    <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets i les seues versions i dependències.</p>
     <p xml:lang="fi">Hallitse järjestelmääsi asennettuja sovelluksia ja kirjastoja pakettien tasolla. Etsi, asenna ja poista paketteja ja tutki niiden versioita ja riippuvuuksia.</p>
     <p xml:lang="fr">Gérer les applications et bibliothèques installées sur votre système, paquet par paquet. Chercher, installer et supprimer des paquets et inspecter leurs versions et leurs dépendances.</p>
     <p xml:lang="nl">Op uw systeem geïnstalleerde toepassingen en bibliotheken beheren op het pakketniveau. Pakketten zoeken, installeren en verwijderen en hun versies en afhankelijkheden inspecteren.</p>
