@@ -391,16 +391,20 @@ void QAptActions::runSourcesEditor()
     int winID = m_mainWindow->effectiveWinId();
 
     const QString kdesu = QFile::decodeName(CMAKE_INSTALL_FULL_LIBEXECDIR_KF5 "/kdesu");
-    const QString editor = QStandardPaths::findExecutable("software-properties-kde");
+    QString editor = QStandardPaths::findExecutable("software-properties-qt");
+    if (editor.isEmpty()) {
+        editor = QStandardPaths::findExecutable("software-properties-kde");
+    }
 
     if (editor.isEmpty()) {
         QString text = i18nc("@label",
-                             "Could not find <command>software-properties-kde</command> "
+                             "Could not find <command>software-properties-qt</command> "
+                             "nor <command>software-properties-kde</command> "
                              "on your system, please install it. Alternatively, you can use "
                              "<application>Plasma Discover</application> to configure "
                              "software sources.");
         QString title = i18nc("@title:window",
-                              "Cannot find <command>software-properties-kde</command>");
+                              "Cannot find <command>software-properties-qt</command>");
         KMessageBox::sorry(m_mainWindow, text, title);
         return;
     }
