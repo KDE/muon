@@ -29,6 +29,7 @@
 #include <QDebug>
 #include <QDialog>
 #include <QFileDialog>
+#include <QProcess>
 #include <QStandardPaths>
 #include <QDialogButtonBox>
 #include <QLayout>
@@ -39,7 +40,6 @@
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KMessageBox>
-#include <KProcess>
 #include <KStandardAction>
 #include <KSharedConfig>
 #include <KXmlGuiWindow>
@@ -386,7 +386,7 @@ void QAptActions::revertChanges()
 
 void QAptActions::runSourcesEditor()
 {
-    KProcess *proc = new KProcess(this);
+    QProcess *proc = new QProcess(this);
     QStringList arguments;
     int winID = m_mainWindow->effectiveWinId();
 
@@ -397,28 +397,30 @@ void QAptActions::runSourcesEditor()
     }
 
     if (editor.isEmpty()) {
-        QString text = i18nc("@label",
-                             "Could not find <command>software-properties-qt</command> "
+        QString text = xi18nc("@info",
+                             "<para>Could not find <command>software-properties-qt</command> "
                              "nor <command>software-properties-kde</command> "
-                             "on your system, please install it. Alternatively, you can use "
-                             "<application>Plasma Discover</application> to configure "
-                             "software sources.");
-        QString title = i18nc("@title:window",
+                             "on your system, please install it.</para>"
+                             "<para>Alternatively, you can use <application>Plasma Discover</application> "
+                             "to configure software sources.</para>");
+        QString title = xi18nc("@title:window",
                               "Cannot find <command>software-properties-qt</command>");
         KMessageBox::sorry(m_mainWindow, text, title);
         return;
     }
 
-    arguments << kdesu << "--" << editor << QStringLiteral("--attach") << QString::number(winID);
+    arguments << QStringLiteral("--") << editor << QStringLiteral("--attach") << QString::number(winID);
     if (m_reloadWhenEditorFinished) {
         arguments << QStringLiteral("--dont-update");
     }
 
-    proc->setProgram(arguments);
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, &QAptActions::sourcesEditorFinished);
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            proc, &QProcess::deleteLater);
     m_mainWindow->find(winID)->setEnabled(false);
-    proc->start();
-    connect(proc, SIGNAL(finished(int,QProcess::ExitStatus)),
-            this, SLOT(sourcesEditorFinished(int)));
+    proc->setProcessChannelMode(QProcess::ForwardedChannels);
+    proc->start(kdesu, arguments);
 }
 
 void QAptActions::sourcesEditorFinished(int exitStatus)
@@ -536,10 +538,14 @@ void QAptActions::checkDistUpgrade()
         return;
     }
 
-    KProcess* checkerProcess = new KProcess(this);
-    checkerProcess->setProgram(QStringList() << "/usr/bin/python3" << checkerFile);
-    connect(checkerProcess, SIGNAL(finished(int)), this, SLOT(checkerFinished(int)));
-    connect(checkerProcess, SIGNAL(finished(int)), checkerProcess, SLOT(deleteLater()));
+    QProcess *checkerProcess = new QProcess(this);
+    checkerProcess->setProgram(QStringLiteral("/usr/bin/python3"));
+    checkerProcess->setArguments(QStringList() << checkerFile);
+    checkerProcess->setProcessChannelMode(QProcess::ForwardedChannels);
+    connect(checkerProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, &QAptActions::checkerFinished);
+    connect(checkerProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            checkerProcess, &QProcess::deleteLater);
     checkerProcess->start();
 }
 
