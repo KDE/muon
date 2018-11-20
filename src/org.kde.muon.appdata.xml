@@ -52,6 +52,7 @@
     <p>Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
     <p xml:lang="ca">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets i les seves versions i dependències.</p>
     <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets i les seues versions i dependències.</p>
+    <p xml:lang="de">Verwalten Sie Anwendungen und Bibliotheken, die auf Ihrem System installiert sind, als Pakete. Suchen, installieren und entfernen Sie Pakete und überprüfen Sie deren Versionen und ihre Abhängigkeiten.</p>
     <p xml:lang="en-GB">Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
     <p xml:lang="es">Gestionar aplicaciones y bibliotecas instaladas en su sistema a nivel de paquetes. Buscar, instalar y eliminar paquetes e inspeccionar sus versiones y sus dependencias.</p>
     <p xml:lang="fi">Hallitse järjestelmääsi asennettuja sovelluksia ja kirjastoja pakettien tasolla. Etsi, asenna ja poista paketteja ja tutki niiden versioita ja riippuvuuksia.</p>
@@ -70,6 +71,7 @@
     <p>Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.</p>
     <p xml:lang="ca">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de Programari.</p>
     <p xml:lang="ca-valencia">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de Programari.</p>
+    <p xml:lang="de">Hinweis: Dies gilt nicht für Anwendungen, die über Snap oder Faltpack verteilt werden. Sie sollten Plasma-Discover benutzen, wenn Sie ein Software-Verwaltungsprogramm suchen.</p>
     <p xml:lang="en-GB">Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Centre.</p>
     <p xml:lang="es">Nota: esto no incluye las aplicaciones distribuidas mediante Snap o Flatpack. Es posible que prefiera usar Plasma-Discover en el caso de que esté buscando un centro de software.</p>
     <p xml:lang="fi">Huomaa: Tähän eivät sisälly Snapin tai Flatpackin kautta levitetyt ohjelmat. Jos etsit ohjelmistokeskusta, Plasma Discover voi olla mitä etsit.</p>
