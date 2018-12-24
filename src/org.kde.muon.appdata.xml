@@ -38,7 +38,7 @@
   <summary xml:lang="fi">Etsi, asenna ja poista ohjelmistopaketteja</summary>
   <summary xml:lang="fr">Chercher, installer et supprimer des paquets logiciels</summary>
   <summary xml:lang="gl">Buscar, instalar e retirar paquetes de software</summary>
-  <summary xml:lang="id">Cari, pasang, dan copot paket-paket perangkat lunak</summary>
+  <summary xml:lang="id">Mencari, menginstal, dan menghapus aket-paket software</summary>
   <summary xml:lang="it">Cerca, installa e rimuove i pacchetti software</summary>
   <summary xml:lang="ko">소프트웨어 패키지 검색, 설치, 삭제</summary>
   <summary xml:lang="nl">Software pakketten zoeken, installeren en verwijderen</summary>
@@ -61,6 +61,7 @@
     <p xml:lang="fi">Hallitse järjestelmääsi asennettuja sovelluksia ja kirjastoja pakettien tasolla. Etsi, asenna ja poista paketteja ja tutki niiden versioita ja riippuvuuksia.</p>
     <p xml:lang="fr">Gérer les applications et bibliothèques installées sur votre système, paquet par paquet. Chercher, installer et supprimer des paquets et inspecter leurs versions et leurs dépendances.</p>
     <p xml:lang="gl">Xestionar aplicativos e bibliotecas instaladas no sistema a nivel de paquetes. Buscar, instalar e retirar paquetes e inspeccionar as súas versións e dependencias.</p>
+    <p xml:lang="id">Mengelola aplikasi dan pustaka yang terinstal pada sistemmu terhadap level paket. Mencari, menginstal, dan menghapus paket-paket, dan mengamati versinya, dan ketergantungannya.</p>
     <p xml:lang="it">Gestisce le applicazioni e le librerie installate nel tuo sistema a livello di pacchetti. Cerca, installa e rimuove i pacchetti, e ispeziona la loro versione e le loro dipendenze.</p>
     <p xml:lang="ko">시스템에 설치된 프로그램과 라이브러리를 패키지 단위로 관리합니다. 패키지를 검색, 설치, 삭제하고 버전 및 의존성을 볼 수 있습니다.</p>
     <p xml:lang="nl">Op uw systeem geïnstalleerde toepassingen en bibliotheken beheren op het pakketniveau. Pakketten zoeken, installeren en verwijderen en hun versies en afhankelijkheden inspecteren.</p>
@@ -81,7 +82,7 @@
     <p xml:lang="fi">Huomaa: Tähän eivät sisälly Snapin tai Flatpackin kautta levitetyt ohjelmat. Jos etsit ohjelmistokeskusta, Plasma Discover voi olla mitä etsit.</p>
     <p xml:lang="fr">Remarque : cela n'inclut pas les applications distribuées via Snap ou Flatpack. Si vous cherchez un centre de logiciels, vous préférerez peut-être utiliser Plasma-Discover.</p>
     <p xml:lang="gl">Nota: isto non inclúe aplicativos distribuídos mediante Snap ou Flatpack. Pode que prefira Plasma Discover, se o que busca é un centro de software.</p>
-    <p xml:lang="id">Catatan: ini tidak termasuk aplikasi yang didistribusikan melalui Snap atau Flatpack. Kamu mungkin lebih menyukai Plasma-Discover, jika apa yang kamu cari adalah sebuah Pusat Perangkat Lunak.</p>
+    <p xml:lang="id">Catatan: ini tidak termasuk aplikasi yang didistribusikan melalui Snap atau Flatpack. Kamu mungkin lebih menyukai Plasma-Discover, jika apa yang kamu cari adalah sebuah Pusat Software.</p>
     <p xml:lang="it">Nota: questo non include le applicazioni distribuite attraverso Snap o Flatpack. Potresti preferire Plasma-Discover se stai cercando un Software Center.</p>
     <p xml:lang="ko">메모: Snap이나 Flatpack으로 설치된 프로그램은 표시되지 않습니다. 소프트웨어 센터를 찾고 있다면 Plasma 발견을 사용해 보십시오.</p>
     <p xml:lang="nl">Opmerking: dit houdt geen toepassingen in gedistribueerd via Snap of Flatpack. U zou de voorkeur kunnen geven aan Plasma-Discover, als wat u zocht een Softwarecentrum is.</p>
