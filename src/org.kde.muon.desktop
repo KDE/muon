@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=Muon Package Manager
 Name[ar]=مدير ميون للحزم
+Name[ast]=Xestor de paquetes Muon
 Name[bg]=Мениджър на пакети Muon
 Name[bs]=Muon menadžer paketa
 Name[ca]=Gestor de paquets Muon
@@ -51,6 +52,7 @@ Icon=muon
 Type=Application
 GenericName=Package Manager
 GenericName[ar]=مدير الحزم
+GenericName[ast]=Xestor de paquetes
 GenericName[bg]=Мениджър на пакети
 GenericName[bs]=Menadžer paketa
 GenericName[ca]=Gestor de paquets
@@ -99,6 +101,7 @@ GenericName[zh_TW]=軟體包管理員
 Categories=Qt;KDE;System;
 X-KDE-Keywords=program,software,repository,archive,package,install,remove,update,deb
 X-KDE-Keywords[ar]=برنامج,برمجيّة,برمجية,مستودع,أرشيف,ارشيف,حزمة,تثبيت,إزالة,ازالة,تحديث,deb
+X-KDE-Keywords[ast]=programa,software,repositoriu,archivu,paquete,instalar,instalación,desaniciar,desaniciu,anovar,anovamientu,deb
 X-KDE-Keywords[ca]=programa,programari,repositori,arxiu,paquet,instal·la,elimina,actualitza,deb
 X-KDE-Keywords[ca@valencia]=programa,programari,repositori,arxiu,paquet,instal·la,elimina,actualitza,deb
 X-KDE-Keywords[cs]=program,software,repozitář,archiv,balíček,instalovat,odstranit,aktualizovat,deb
