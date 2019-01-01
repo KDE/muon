@@ -4,6 +4,7 @@
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-2.0+</project_license>
   <name>Muon Package Manager</name>
+  <name xml:lang="ast">Xestor de paquetes Muon</name>
   <name xml:lang="ca">Gestor de paquets Muon</name>
   <name xml:lang="ca-valencia">Gestor de paquets Muon</name>
   <name xml:lang="cs">Správce balíčků Muon</name>
@@ -29,6 +30,7 @@
   <name xml:lang="x-test">xxMuon Package Managerxx</name>
   <name xml:lang="zh-CN">Muon 软件包管理器</name>
   <summary>Search, install and remove software packages</summary>
+  <summary xml:lang="ast">Gueta, instala y desanicia paquetes de software</summary>
   <summary xml:lang="ca">Cerca, instal·la i elimina paquets de programari</summary>
   <summary xml:lang="ca-valencia">Cerca, instal·la i elimina paquets de programari</summary>
   <summary xml:lang="de">Software-Pakete suchen, installieren und entfernen</summary>
@@ -73,6 +75,7 @@
     <p xml:lang="uk">Керуйте програмами і бібліотеками, встановленими у вашій системі, на рівні пакунків. Шукайте, встановлюйте та вилучайте пакунки, а також ознайомлюйтеся із версіями пакунків та їхніми залежностями.</p>
     <p xml:lang="x-test">xxManage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.xx</p>
     <p>Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.</p>
+    <p xml:lang="ast">Nota: esto nun inclúi aplicaciones distribuyíes pente Snap o Flatpack. Quiciabes prefieras Plasma-Discover si lo que tas guetando ye un centru de software.</p>
     <p xml:lang="ca">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de Programari.</p>
     <p xml:lang="ca-valencia">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de Programari.</p>
     <p xml:lang="de">Hinweis: Dies gilt nicht für Anwendungen, die über Snap oder Faltpack verteilt werden. Sie sollten Plasma-Discover benutzen, wenn Sie ein Software-Verwaltungsprogramm suchen.</p>
