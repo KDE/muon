@@ -29,6 +29,7 @@
   <name xml:lang="uk">Програма для керування пакунками Muon</name>
   <name xml:lang="x-test">xxMuon Package Managerxx</name>
   <name xml:lang="zh-CN">Muon 软件包管理器</name>
+  <name xml:lang="zh-TW">Muon 軟體包管理器</name>
   <summary>Search, install and remove software packages</summary>
   <summary xml:lang="ast">Gueta, instala y desanicia paquetes de software</summary>
   <summary xml:lang="ca">Cerca, instal·la i elimina paquets de programari</summary>
@@ -52,6 +53,7 @@
   <summary xml:lang="sv">Sök efter, installera och ta bort programvarupaket</summary>
   <summary xml:lang="uk">Пошук, встановлення і вилучення пакунків із програмним забезпеченням</summary>
   <summary xml:lang="x-test">xxSearch, install and remove software packagesxx</summary>
+  <summary xml:lang="zh-TW">搜尋、安裝或移除軟體包</summary>
   <description>
     <p>Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
     <p xml:lang="ca">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets i les seves versions i dependències.</p>
