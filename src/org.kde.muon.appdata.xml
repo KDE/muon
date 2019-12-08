@@ -13,6 +13,7 @@
   <name xml:lang="el">Διαχειριστής πακέτων Muon</name>
   <name xml:lang="en-GB">Muon Package Manager</name>
   <name xml:lang="es">Gestor de paquetes Muon</name>
+  <name xml:lang="et">Tarkvarahaldur Muon</name>
   <name xml:lang="fi">Muon-paketinhallinta</name>
   <name xml:lang="fr">Gestionnaire de paquets Muon</name>
   <name xml:lang="gl">Xestor de paquetes Muon</name>
@@ -41,6 +42,7 @@
   <summary xml:lang="el">Αναζητήαστε, εγκαταστήστε και αφαιρέστε πακέτα λογισμικού</summary>
   <summary xml:lang="en-GB">Search, install and remove software packages</summary>
   <summary xml:lang="es">Buscar, instalar y eliminar paquetes de software</summary>
+  <summary xml:lang="et">Tarkvarapakettide otsimine, paigaldamine ja eemaldamine</summary>
   <summary xml:lang="fi">Etsi, asenna ja poista ohjelmistopaketteja</summary>
   <summary xml:lang="fr">Chercher, installer et supprimer des paquets logiciels</summary>
   <summary xml:lang="gl">Buscar, instalar e retirar paquetes de software</summary>
@@ -67,6 +69,7 @@
     <p xml:lang="el">Διαχειριστείτε εφαρμογές και βιβλιοθήκες εγκατεστημένες στο σύστημά σας σε επίπεδο πακέτων. Αναζητήαστε, εγκαταστήστε και αφαιρέστε πακέτα και επιθεωρείστε τις εκδόσεις και τις εξαρτήσεις τους.</p>
     <p xml:lang="en-GB">Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
     <p xml:lang="es">Gestionar aplicaciones y bibliotecas instaladas en su sistema a nivel de paquetes. Buscar, instalar y eliminar paquetes e inspeccionar sus versiones y sus dependencias.</p>
+    <p xml:lang="et">Süsteemi paigaldatud rakenduste ja teekide haldamine tarkvarapakettide tasemel. Pakettide otsimine, paigaldamine ja eemaldamine ning nende versioonide ja sõltuvuste väljaselgitamine.</p>
     <p xml:lang="fi">Hallitse järjestelmääsi asennettuja sovelluksia ja kirjastoja pakettien tasolla. Etsi, asenna ja poista paketteja ja tutki niiden versioita ja riippuvuuksia.</p>
     <p xml:lang="fr">Gérer les applications et bibliothèques installées sur votre système, paquet par paquet. Chercher, installer et supprimer des paquets et inspecter leurs versions et leurs dépendances.</p>
     <p xml:lang="gl">Xestionar aplicacións e bibliotecas instaladas no sistema a nivel de paquetes. Buscar, instalar e retirar paquetes e inspeccionar as súas versións e dependencias.</p>
@@ -90,6 +93,7 @@
     <p xml:lang="el">Σημείωση: Αυτό δεν περιλαμβάνει εφαρμογές που διανέμονται με Snap ή Flatpack. Ίσως προτιμάτε το Plasma-Discover, αν αυτό που αναζητάτε είναι ένα Κέντρο Λογισμικού.</p>
     <p xml:lang="en-GB">Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Centre.</p>
     <p xml:lang="es">Nota: esto no incluye las aplicaciones distribuidas mediante Snap o Flatpack. Es posible que prefiera usar Plasma-Discover en el caso de que esté buscando un centro de software.</p>
+    <p xml:lang="et">Märkus: see ei hõlma rakendusi, mida levitatakse Snapi või Flatpacki kaudu. Sellise tarkvarakeskuse soovi korral võiks vaadata Plasma-Discoveri poole.</p>
     <p xml:lang="fi">Huomaa: Tähän eivät sisälly Snapin tai Flatpackin kautta levitetyt ohjelmat. Jos etsit ohjelmistokeskusta, Plasma Discover voi olla mitä etsit.</p>
     <p xml:lang="fr">Remarque : cela n'inclut pas les applications distribuées via Snap ou Flatpack. Si vous cherchez un centre de logiciels, vous préférerez peut-être utiliser Plasma-Discover.</p>
     <p xml:lang="gl">Nota: isto non inclúe aplicacións distribuídas mediante Snap ou Flatpack. Pode que prefira Plasma Discover, se o que busca é un centro de software.</p>
