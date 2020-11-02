@@ -83,6 +83,12 @@ void StatusFilter::populate()
     lockedItem->setIcon(QIcon::fromTheme("object-locked"));
     lockedItem->setText(MuonStrings::global()->packageStateName(QApt::Package::IsPinned));
     lockedItem->setData(QApt::Package::IsPinned);
+    
+    QStandardItem *orphanedItem = new QStandardItem;
+    items.append(orphanedItem);
+    orphanedItem->setIcon(QIcon::fromTheme("archive-extract"));
+    orphanedItem->setText(MuonStrings::global()->packageStateName(QApt::Package::Orphaned));
+    orphanedItem->setData(QApt::Package::Orphaned);
 
     for (QStandardItem *item : items) {
         item->setEditable(false);
