@@ -38,7 +38,7 @@
   <name xml:lang="zh-CN">Muon 软件包管理器</name>
   <name xml:lang="zh-TW">Muon 軟體包管理器</name>
   <summary>Search, install and remove software packages</summary>
-  <summary xml:lang="ast">Gueta, instala y desanicia paquetes de software</summary>
+  <summary xml:lang="ast">Busca, instala y desanicia paquetes de software</summary>
   <summary xml:lang="ca">Cerca, instal·la i elimina paquets de programari</summary>
   <summary xml:lang="ca-valencia">Cerca, instal·la i elimina paquets de programari</summary>
   <summary xml:lang="da">Søg, installer og fjern softwarepakker</summary>
@@ -69,7 +69,7 @@
   <summary xml:lang="zh-TW">搜尋、安裝或移除軟體包</summary>
   <description>
     <p>Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
-    <p xml:lang="ast">Xestiona aplicaciones y biblioteques instalaes nel sistema a nivel de paquete. Gueta, instala y desanicia paquetes ya inspeiciona les versiones y dependencies de so.</p>
+    <p xml:lang="ast">Xestiona aplicaciones y biblioteques instalaes nel sistema a nivel de paquete. Busca, instala y desanicia paquetes ya inspeiciona les versiones y dependencies de so.</p>
     <p xml:lang="ca">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets, així com les seves versions i dependències.</p>
     <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets, així com les seues versions i dependències.</p>
     <p xml:lang="da">Håndter programmer og biblioteker som er installeret på dit system på pakkeniveau. Søg, installer og fjern pakker, og inspicer deres versioner og deres afhængigheder.</p>
@@ -96,7 +96,7 @@
     <p xml:lang="uk">Керуйте програмами і бібліотеками, встановленими у вашій системі, на рівні пакунків. Шукайте, встановлюйте та вилучайте пакунки, а також ознайомлюйтеся із версіями пакунків та їхніми залежностями.</p>
     <p xml:lang="x-test">xxManage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.xx</p>
     <p>Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.</p>
-    <p xml:lang="ast">Nota: esto nun inclúi aplicaciones distribuyíes pente Snap o Flatpack. Quiciabes prefieras Plasma-Discover si lo que tas guetando ye un centru de software.</p>
+    <p xml:lang="ast">Nota: esto nun inclúi aplicaciones distribuyíes pente Snap o Flatpack. Quiciabes prefieras Plasma-Discover si lo que tas buscando ye un centru de software.</p>
     <p xml:lang="ca">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de programari.</p>
     <p xml:lang="ca-valencia">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de programari.</p>
     <p xml:lang="da">Bemærk: det inkluderer ikke programmer som distribueres gennem Snap eller Flatpack. Hvis du leder efter et softwarecenter, så vil du måske foretrække at bruge Plasma-Discover.</p>
