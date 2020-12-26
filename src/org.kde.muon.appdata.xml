@@ -19,6 +19,7 @@
   <name xml:lang="fr">Gestionnaire de paquets Muon</name>
   <name xml:lang="gl">Xestor de paquetes Muon</name>
   <name xml:lang="hi">मुआन पैकेज प्रबंधक</name>
+  <name xml:lang="hu">Muon csomagkezelő</name>
   <name xml:lang="id">Muon Package Manager</name>
   <name xml:lang="it">Gestore di pacchetti Muon</name>
   <name xml:lang="ko">Muon 패키지 관리자</name>
@@ -52,6 +53,7 @@
   <summary xml:lang="fr">Chercher, installer et supprimer des paquets logiciels</summary>
   <summary xml:lang="gl">Buscar, instalar e retirar paquetes de software</summary>
   <summary xml:lang="hi">सॉफ्टवेयर पैकेज खोजें, सथापित करे व हटाएँ</summary>
+  <summary xml:lang="hu">Szoftvercsomagok keresése, telepítése és eltávolítása</summary>
   <summary xml:lang="id">Mencari, menginstal, dan menghapus aket-paket perangkat lunak</summary>
   <summary xml:lang="it">Cerca, installa e rimuove i pacchetti software</summary>
   <summary xml:lang="ko">소프트웨어 패키지 검색, 설치, 삭제</summary>
