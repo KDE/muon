@@ -71,6 +71,7 @@
   <summary xml:lang="sv">Sök efter, installera och ta bort programvarupaket</summary>
   <summary xml:lang="uk">Пошук, встановлення і вилучення пакунків із програмним забезпеченням</summary>
   <summary xml:lang="x-test">xxSearch, install and remove software packagesxx</summary>
+  <summary xml:lang="zh-CN">搜索、安装和删除软件包</summary>
   <summary xml:lang="zh-TW">搜尋、安裝或移除軟體包</summary>
   <description>
     <p>Manage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.</p>
@@ -102,6 +103,7 @@
     <p xml:lang="sv">Hantera program och bibliotek installerade på systemet på paketnivå. Sök efter, installera och ta bort paket, samt inspektera deras versioner och beroenden.</p>
     <p xml:lang="uk">Керуйте програмами і бібліотеками, встановленими у вашій системі, на рівні пакунків. Шукайте, встановлюйте та вилучайте пакунки, а також ознайомлюйтеся із версіями пакунків та їхніми залежностями.</p>
     <p xml:lang="x-test">xxManage applications and libraries installed on your system to the package level. Search, install and remove packages and inspect their versions and their dependencies.xx</p>
+    <p xml:lang="zh-CN">以软件包层次管理安装在您系统上的应用程序和库。搜索、安装和移除包，并检查他们的版本及其依赖性。</p>
     <p>Note: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.</p>
     <p xml:lang="ar">ملاحظة: هذا لا يشمل التطبيقات الموزعة من خلال Snap أو Flatpack. قد تفضل Plasma-Discover ، إذا كان ما تبحث عنه هو مركز برمجيات.</p>
     <p xml:lang="ast">Nota: esto nun inclúi aplicaciones distribuyíes pente Snap o Flatpack. Quiciabes prefieras Plasma-Discover si lo que tas buscando ye un centru de software.</p>
@@ -131,6 +133,7 @@
     <p xml:lang="sv">Observera: detta omfattar inte program distribuerade via Snap eller Flatpack. Om du är ute efter ett programvarucenter, kanske du föredrar Plasma-Discover.</p>
     <p xml:lang="uk">Зауваження: це не стосується програм, які поширюються за допомогою Snap або Flatpack. Якщо вам потрібен центр роботи із програмним забезпеченням, краще скористайтеся Plasma-Discover.</p>
     <p xml:lang="x-test">xxNote: this does not include applications distributed through Snap or Flatpack. You may prefer Plasma-Discover, if what you are looking for is a Software Center.xx</p>
+    <p xml:lang="zh-CN">注意：这不包括通过 Snap 或 Flatpack分发的应用程序。如果您需要一个软件中心的话，您可能要安装 Discover 软件中心。</p>
   </description>
   <url type="homepage">https://www.kde.org</url>
   <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=Muon</url>
