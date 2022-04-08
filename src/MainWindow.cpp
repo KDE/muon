@@ -29,6 +29,7 @@
 #include <QToolBox>
 #include <QVBoxLayout>
 #include <QAction>
+#include <QStyle>
 
 // KDE includes
 #include <KActionCollection>
@@ -93,6 +94,12 @@ void MainWindow::initGUI()
     connect(m_mainWidget, SIGNAL(splitterMoved(int,int)), this, SLOT(saveSplitterSizes()));
 
     m_transWidget = new TransactionWidget(this);
+    m_transWidget->setContentsMargins(
+        style()->pixelMetric(QStyle::PM_LayoutTopMargin),
+        style()->pixelMetric(QStyle::PM_LayoutLeftMargin),
+        style()->pixelMetric(QStyle::PM_LayoutRightMargin),
+        style()->pixelMetric(QStyle::PM_LayoutBottomMargin)
+    );
 
     m_filterBox = new FilterWidget(m_stack);
     connect(this, SIGNAL(backendReady(QApt::Backend*)),
