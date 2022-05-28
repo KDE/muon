@@ -44,7 +44,7 @@
   <summary xml:lang="ar">ثبّت حزم البرمجيّات واعرضها وابحث عنها</summary>
   <summary xml:lang="ast">Busca, instala y desanicia paquetes de software</summary>
   <summary xml:lang="ca">Cerca, instal·la i elimina paquets de programari</summary>
-  <summary xml:lang="ca-valencia">Busca, instal·la i elimina paquets de programari</summary>
+  <summary xml:lang="ca-valencia">Busca, instala i elimina paquets de programari</summary>
   <summary xml:lang="cs">Hledejte, instalujte a odstraňujte balíčky</summary>
   <summary xml:lang="da">Søg, installer og fjern softwarepakker</summary>
   <summary xml:lang="de">Software-Pakete suchen, installieren und entfernen</summary>
@@ -80,7 +80,7 @@
     <p xml:lang="ar">إدارة التطبيقات والمكتبات المثبتة على نظامك حتى مستوى الحزمة. ابحث عن الحزم وقم بتثبيتها وإزالتها وفحص إصداراتها وتبعياتها.</p>
     <p xml:lang="ast">Xestiona aplicaciones y biblioteques instalaes nel sistema a nivel de paquete. Busca, instala y desanicia paquetes ya inspeiciona les versiones y dependencies de so.</p>
     <p xml:lang="ca">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets, així com les seves versions i dependències.</p>
-    <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Busca, instal·la i elimina paquets, així com les seues versions i dependències.</p>
+    <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instalades al sistema al nivell dels paquets. Busca, instala i elimina paquets, aixina com les seues versions i dependències.</p>
     <p xml:lang="da">Håndter programmer og biblioteker som er installeret på dit system på pakkeniveau. Søg, installer og fjern pakker, og inspicer deres versioner og deres afhængigheder.</p>
     <p xml:lang="de">Verwalten Sie Anwendungen und Bibliotheken, die auf Ihrem System installiert sind, als Pakete. Suchen, installieren und entfernen Sie Pakete und überprüfen Sie deren Versionen und ihre Abhängigkeiten.</p>
     <p xml:lang="el">Διαχειριστείτε εφαρμογές και βιβλιοθήκες εγκατεστημένες στο σύστημά σας σε επίπεδο πακέτων. Αναζητήαστε, εγκαταστήστε και αφαιρέστε πακέτα και επιθεωρείστε τις εκδόσεις και τις εξαρτήσεις τους.</p>
