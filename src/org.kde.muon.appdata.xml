@@ -44,7 +44,7 @@
   <summary xml:lang="ar">ثبّت حزم البرمجيّات واعرضها وابحث عنها</summary>
   <summary xml:lang="ast">Busca, instala y desanicia paquetes de software</summary>
   <summary xml:lang="ca">Cerca, instal·la i elimina paquets de programari</summary>
-  <summary xml:lang="ca-valencia">Busca, instala i elimina paquets de programari</summary>
+  <summary xml:lang="ca-valencia">Busca, instal·la i elimina paquets de programari</summary>
   <summary xml:lang="cs">Hledejte, instalujte a odstraňujte balíčky</summary>
   <summary xml:lang="da">Søg, installer og fjern softwarepakker</summary>
   <summary xml:lang="de">Software-Pakete suchen, installieren und entfernen</summary>
@@ -80,7 +80,7 @@
     <p xml:lang="ar">إدارة التطبيقات والمكتبات المثبتة على نظامك حتى مستوى الحزمة. ابحث عن الحزم وقم بتثبيتها وإزالتها وفحص إصداراتها وتبعياتها.</p>
     <p xml:lang="ast">Xestiona aplicaciones y biblioteques instalaes nel sistema a nivel de paquete. Busca, instala y desanicia paquetes ya inspeiciona les versiones y dependencies de so.</p>
     <p xml:lang="ca">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Cerca, instal·la i elimina paquets, així com les seves versions i dependències.</p>
-    <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instalades al sistema al nivell dels paquets. Busca, instala i elimina paquets, aixina com les seues versions i dependències.</p>
+    <p xml:lang="ca-valencia">Gestiona les aplicacions i biblioteques instal·lades al sistema al nivell dels paquets. Busca, instal·la i elimina paquets, així com les seues versions i dependències.</p>
     <p xml:lang="da">Håndter programmer og biblioteker som er installeret på dit system på pakkeniveau. Søg, installer og fjern pakker, og inspicer deres versioner og deres afhængigheder.</p>
     <p xml:lang="de">Verwalten Sie Anwendungen und Bibliotheken, die auf Ihrem System installiert sind, als Pakete. Suchen, installieren und entfernen Sie Pakete und überprüfen Sie deren Versionen und ihre Abhängigkeiten.</p>
     <p xml:lang="el">Διαχειριστείτε εφαρμογές και βιβλιοθήκες εγκατεστημένες στο σύστημά σας σε επίπεδο πακέτων. Αναζητήαστε, εγκαταστήστε και αφαιρέστε πακέτα και επιθεωρείστε τις εκδόσεις και τις εξαρτήσεις τους.</p>
@@ -111,7 +111,7 @@
     <p xml:lang="ar">ملاحظة: هذا لا يشمل التطبيقات الموزعة من خلال Snap أو Flatpack. قد تفضل Plasma-Discover ، إذا كان ما تبحث عنه هو مركز برمجيات.</p>
     <p xml:lang="ast">Nota: esto nun inclúi aplicaciones distribuyíes pente Snap o Flatpack. Quiciabes prefieras Plasma-Discover si lo que tas buscando ye un centru de software.</p>
     <p xml:lang="ca">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu el Plasma-Discover, si esteu cercant un Centre de programari.</p>
-    <p xml:lang="ca-valencia">Nota: açò no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu Plasma-Discover, si esteu buscant un Centre de programari.</p>
+    <p xml:lang="ca-valencia">Nota: això no inclou les aplicacions distribuïdes mitjançant Snap o Flatpack. Potser preferireu Plasma-Discover, si esteu buscant un Centre de programari.</p>
     <p xml:lang="da">Bemærk: det inkluderer ikke programmer som distribueres gennem Snap eller Flatpack. Hvis du leder efter et softwarecenter, så vil du måske foretrække at bruge Plasma-Discover.</p>
     <p xml:lang="de">Hinweis: Dies gilt nicht für Anwendungen, die über Snap oder Faltpack verteilt werden. Sie sollten Plasma-Discover benutzen, wenn Sie ein Software-Verwaltungsprogramm suchen.</p>
     <p xml:lang="el">Σημείωση: Αυτό δεν περιλαμβάνει εφαρμογές που διανέμονται με Snap ή Flatpack. Ίσως προτιμάτε το Plasma-Discover, αν αυτό που αναζητάτε είναι ένα Κέντρο Λογισμικού.</p>
